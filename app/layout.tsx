@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { OnchainProvider } from '@/components/providers/OnchainProvider';
-import { Navbar } from '@/components/Navbar';
+import { AppShell } from '@/components/AppShell';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -47,10 +47,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-base-dark min-h-screen`}>
+      <body className={`${inter.className} bg-[#0A0A0A] min-h-screen`}>
         <OnchainProvider>
-          <Navbar />
-          <main>{children}</main>
+          <AppShell>{children}</AppShell>
         </OnchainProvider>
       </body>
     </html>
