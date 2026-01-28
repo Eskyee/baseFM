@@ -6,9 +6,10 @@ import { Stream } from '@/types/stream';
 interface StreamCardProps {
   stream: Stream;
   showDJControls?: boolean;
+  linkPrefix?: string;
 }
 
-export function StreamCard({ stream, showDJControls = false }: StreamCardProps) {
+export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dj' }: StreamCardProps) {
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
 
@@ -95,7 +96,7 @@ export function StreamCard({ stream, showDJControls = false }: StreamCardProps) 
         <div className="flex gap-2">
           {showDJControls ? (
             <Link
-              href={`/dj/stream/${stream.id}`}
+              href={`${linkPrefix}/stream/${stream.id}`}
               className="flex-1 px-4 py-2 bg-base-blue text-white text-center rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
             >
               Manage Stream
