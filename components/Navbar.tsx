@@ -16,7 +16,7 @@ export function Navbar() {
   ];
 
   // Only show Dashboard link if wallet is connected (DJ access)
-  const djLinks = isConnected ? [{ href: '/dj', label: 'Dashboard' }] : [];
+  const djLinks = isConnected ? [{ href: '/dashboard', label: 'Dashboard' }] : [];
 
   return (
     <header className="sticky top-0 z-40 bg-[#0A0A0A]/95 backdrop-blur-sm border-b border-[#1A1A1A]">
