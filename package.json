@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "next": "14.2.18",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "@coinbase/onchainkit": "^0.31.6",
     "@supabase/supabase-js": "^2.45.4",
     "@mux/mux-node": "^8.9.0",
