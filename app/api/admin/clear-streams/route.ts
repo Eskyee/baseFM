@@ -1,25 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 import { deleteMuxLiveStream } from '@/lib/streaming/mux';
+import { isAdminWallet, getAdminWallets } from '@/lib/admin/config';
 
 // Admin endpoint to delete all streams
-// Protected by a secret key in the request header
+// Protected by wallet address check
 export async function POST(request: NextRequest) {
   try {
-    // Check for admin secret
-    const adminSecret = request.headers.get('x-admin-secret');
-    const expectedSecret = process.env.ADMIN_SECRET;
+    const body = await request.json().catch(() => ({}));
+    const walletAddress = body.walletAddress;
 
-    if (!expectedSecret) {
+    // Check if admin wallets are configured
+    if (getAdminWallets().length === 0) {
       return NextResponse.json(
-        { error: 'Admin endpoint not configured. Set ADMIN_SECRET env var.' },
+        { error: 'Admin not configured. Set ADMIN_WALLET_ADDRESS env var.' },
         { status: 503 }
       );
     }
 
-    if (adminSecret !== expectedSecret) {
+    // Check if wallet is admin
+    if (!isAdminWallet(walletAddress)) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized: wallet is not an admin' },
         { status: 401 }
       );
     }
