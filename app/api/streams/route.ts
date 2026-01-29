@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createStream, getStreams } from '@/lib/db/streams';
-import { createMuxLiveStream, getMuxPlaybackUrl } from '@/lib/streaming/mux';
+import { createStream, getStreams, deleteStream } from '@/lib/db/streams';
+import { createMuxLiveStream, getMuxPlaybackUrl, isMuxConfigured } from '@/lib/streaming/mux';
 import { updateStreamWithMuxDetails } from '@/lib/db/streams';
 import { isValidWalletAddress } from '@/lib/auth/wallet';
 import { StreamStatus } from '@/types/stream';
@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let streamId: string | null = null;
+
   try {
     const body = await request.json();
 
@@ -48,6 +50,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check Mux configuration before creating stream
+    if (!isMuxConfigured()) {
+      return NextResponse.json(
+        { error: 'Streaming service not configured. Please add MUX_TOKEN_ID and MUX_TOKEN_SECRET to environment variables.' },
+        { status: 503 }
+      );
+    }
+
     // Create stream in database
     const stream = await createStream({
       title: body.title,
@@ -62,6 +72,8 @@ export async function POST(request: NextRequest) {
       genre: body.genre,
       tags: body.tags,
     });
+
+    streamId = stream.id;
 
     // Create Mux live stream
     const muxStream = await createMuxLiveStream(stream.id);
@@ -78,8 +90,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ stream: updatedStream }, { status: 201 });
   } catch (error) {
     console.error('Error creating stream:', error);
+
+    // If we created the stream but Mux failed, clean up the orphaned stream
+    if (streamId) {
+      try {
+        await deleteStream(streamId);
+        console.log('Cleaned up orphaned stream:', streamId);
+      } catch (cleanupError) {
+        console.error('Failed to cleanup orphaned stream:', cleanupError);
+      }
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // Provide specific error messages
+    if (errorMessage.includes('MUX_TOKEN_ID') || errorMessage.includes('MUX_TOKEN_SECRET')) {
+      return NextResponse.json(
+        { error: 'Streaming service not configured. Please contact the administrator.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Failed to create stream' },
+      { error: `Failed to create stream: ${errorMessage}` },
       { status: 500 }
     );
   }
