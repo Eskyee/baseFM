@@ -1,10 +1,21 @@
 import Mux from '@mux/mux-node';
 import crypto from 'crypto';
 
-const mux = new Mux({
-  tokenId: process.env.MUX_TOKEN_ID!,
-  tokenSecret: process.env.MUX_TOKEN_SECRET!,
-});
+// Check if Mux credentials are configured
+export function isMuxConfigured(): boolean {
+  return !!(process.env.MUX_TOKEN_ID && process.env.MUX_TOKEN_SECRET);
+}
+
+// Lazy initialize Mux client only when needed
+function getMuxClient(): Mux {
+  if (!isMuxConfigured()) {
+    throw new Error('MUX_TOKEN_ID and MUX_TOKEN_SECRET environment variables are required');
+  }
+  return new Mux({
+    tokenId: process.env.MUX_TOKEN_ID!,
+    tokenSecret: process.env.MUX_TOKEN_SECRET!,
+  });
+}
 
 export interface MuxLiveStream {
   id: string;
@@ -14,6 +25,7 @@ export interface MuxLiveStream {
 }
 
 export async function createMuxLiveStream(baseFmStreamId: string): Promise<MuxLiveStream> {
+  const mux = getMuxClient();
   const liveStream = await mux.video.liveStreams.create({
     playback_policy: ['public'],
     new_asset_settings: {
@@ -36,6 +48,7 @@ export async function createMuxLiveStream(baseFmStreamId: string): Promise<MuxLi
 
 export async function deleteMuxLiveStream(muxStreamId: string): Promise<void> {
   try {
+    const mux = getMuxClient();
     await mux.video.liveStreams.delete(muxStreamId);
   } catch (error) {
     console.error('Failed to delete Mux stream:', error);
@@ -43,6 +56,7 @@ export async function deleteMuxLiveStream(muxStreamId: string): Promise<void> {
 }
 
 export async function getMuxLiveStreamStatus(muxStreamId: string) {
+  const mux = getMuxClient();
   const liveStream = await mux.video.liveStreams.retrieve(muxStreamId);
   return liveStream.status;
 }

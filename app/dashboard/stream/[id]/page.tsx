@@ -11,7 +11,9 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const { stream, isLoading, error, refetch } = useStream(params.id);
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
+  const [isSettingUpMux, setIsSettingUpMux] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   if (!isConnected) {
     return (
@@ -38,7 +40,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold text-white mb-4">Stream Not Found</h1>
-        <Link href="/dj" className="text-base-blue hover:underline">
+        <Link href="/dashboard" className="text-blue-400 hover:underline">
           Back to Dashboard
         </Link>
       </div>
@@ -51,7 +53,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold text-white mb-4">Unauthorized</h1>
         <p className="text-gray-400 mb-6">You do not own this stream</p>
-        <Link href="/dj" className="text-base-blue hover:underline">
+        <Link href="/dashboard" className="text-blue-400 hover:underline">
           Back to Dashboard
         </Link>
       </div>
@@ -61,6 +63,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const handleStart = async () => {
     setIsStarting(true);
     setActionError(null);
+    setActionSuccess(null);
 
     try {
       const response = await fetch(`/api/streams/${stream.id}/start`, {
@@ -85,6 +88,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const handleStop = async () => {
     setIsStopping(true);
     setActionError(null);
+    setActionSuccess(null);
 
     try {
       const response = await fetch(`/api/streams/${stream.id}/stop`, {
@@ -106,6 +110,35 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     }
   };
 
+  const handleSetupMux = async () => {
+    setIsSettingUpMux(true);
+    setActionError(null);
+    setActionSuccess(null);
+
+    try {
+      const response = await fetch(`/api/streams/${stream.id}/setup-mux`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ djWalletAddress: address }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to setup streaming');
+      }
+
+      setActionSuccess('Streaming credentials generated! You can now go live.');
+      refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsSettingUpMux(false);
+    }
+  };
+
+  const needsMuxSetup = !stream.muxStreamKey;
+
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
   const canStart = stream.status === 'CREATED';
@@ -115,7 +148,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Back Link */}
       <Link
-        href="/dj"
+        href="/dashboard"
         className="text-gray-400 hover:text-white mb-6 inline-flex items-center gap-2"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,8 +186,32 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
       )}
 
+      {actionSuccess && (
+        <div className="bg-green-900/20 border border-green-500 text-green-400 px-4 py-3 rounded-lg mb-6">
+          {actionSuccess}
+        </div>
+      )}
+
+      {/* Setup Mux Section - Show if stream doesn't have Mux credentials */}
+      {needsMuxSetup && (
+        <div className="bg-yellow-900/20 border border-yellow-500 rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold text-yellow-400 mb-2">Streaming Setup Required</h2>
+          <p className="text-yellow-200/80 text-sm mb-4">
+            This stream needs to be connected to the streaming service to get your RTMP credentials.
+            Click the button below to generate your streaming credentials.
+          </p>
+          <button
+            onClick={handleSetupMux}
+            disabled={isSettingUpMux}
+            className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSettingUpMux ? 'Setting up...' : 'Generate Streaming Credentials'}
+          </button>
+        </div>
+      )}
+
       {/* RTMP Credentials */}
-      {(canStart || isPreparing || isLive) && stream.rtmpUrl && (
+      {!needsMuxSetup && (canStart || isPreparing || isLive) && stream.rtmpUrl && (
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold text-white mb-4">RTMP Credentials</h2>
           <p className="text-gray-400 text-sm mb-4">
@@ -202,6 +259,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       )}
 
       {/* Controls */}
+      {!needsMuxSetup && (
       <div className="bg-gray-800 rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-white mb-4">Stream Controls</h2>
 
@@ -244,6 +302,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           </p>
         )}
       </div>
+      )}
 
       {/* Stream Info */}
       <div className="bg-gray-800 rounded-lg p-6">
