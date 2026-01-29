@@ -90,6 +90,48 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Link
+            href="/admin/schedule"
+            className="bg-[#1A1A1A] rounded-lg p-6 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-colors">
+              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium mb-1">Schedule Manager</h3>
+            <p className="text-[#888] text-sm">Manage weekly programming</p>
+          </Link>
+
+          <Link
+            href="/admin/djs"
+            className="bg-[#1A1A1A] rounded-lg p-6 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-colors">
+              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium mb-1">DJ Management</h3>
+            <p className="text-[#888] text-sm">Manage DJs & permissions</p>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="bg-[#1A1A1A] rounded-lg p-6 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center mb-4 group-hover:bg-green-500/30 transition-colors">
+              <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium mb-1">Go Live</h3>
+            <p className="text-[#888] text-sm">Start streaming</p>
+          </Link>
+        </div>
+
         {/* Admin Actions */}
         <div className="bg-[#1A1A1A] rounded-lg p-6">
           <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Stream Management</h2>
