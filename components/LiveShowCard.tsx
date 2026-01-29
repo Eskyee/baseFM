@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Default fallback image - baseFM logo
+const DEFAULT_ARTWORK = '/logo.png';
+
 interface LiveShowCardProps {
   id: string;
   title: string;
@@ -28,6 +31,9 @@ export function LiveShowCard({
   variant = 'compact',
   onClick,
 }: LiveShowCardProps) {
+  // Use provided artwork or fall back to logo
+  const imageUrl = artwork || DEFAULT_ARTWORK;
+
   const content = (
     <>
       {/* Artwork */}
@@ -40,20 +46,14 @@ export function LiveShowCard({
             : 'aspect-square rounded-lg'
         }`}
       >
-        {artwork ? (
-          <Image
-            src={artwork}
-            alt={title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-12 h-12 text-[#333]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-            </svg>
-          </div>
-        )}
+        <Image
+          src={imageUrl}
+          alt={title}
+          fill
+          className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+            !artwork ? 'object-contain p-8 bg-[#0A0A0A]' : ''
+          }`}
+        />
 
         {/* Gradient overlay for featured */}
         {variant === 'featured' && (

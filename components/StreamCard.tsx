@@ -3,13 +3,16 @@
 import Link from 'next/link';
 import { Stream } from '@/types/stream';
 
+// Default fallback image - baseFM logo
+const DEFAULT_COVER = '/logo.png';
+
 interface StreamCardProps {
   stream: Stream;
   showDJControls?: boolean;
   linkPrefix?: string;
 }
 
-export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dj' }: StreamCardProps) {
+export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dashboard' }: StreamCardProps) {
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
 
@@ -29,27 +32,20 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dj' 
     ENDED: 'Ended',
   };
 
+  // Use provided cover image or fall back to logo
+  const coverImage = stream.coverImageUrl || DEFAULT_COVER;
+
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors">
       {/* Cover Image */}
       <div className="relative aspect-video bg-gray-900">
-        {stream.coverImageUrl ? (
-          <img
-            src={stream.coverImageUrl}
-            alt={stream.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg
-              className="w-16 h-16 text-gray-700"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-            </svg>
-          </div>
-        )}
+        <img
+          src={coverImage}
+          alt={stream.title}
+          className={`w-full h-full ${
+            stream.coverImageUrl ? 'object-cover' : 'object-contain p-8 bg-[#0A0A0A]'
+          }`}
+        />
 
         {/* Status Badge */}
         <div className="absolute top-2 left-2">
