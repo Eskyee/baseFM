@@ -13,6 +13,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/schedule', label: 'Schedule' },
+    { href: '/djs', label: 'DJs' },
   ];
 
   // Only show Dashboard link if wallet is connected (DJ access)
