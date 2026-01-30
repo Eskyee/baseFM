@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { BaseAd } from './BaseAd';
 
 export function Footer() {
   return (
@@ -62,18 +63,8 @@ export function Footer() {
         </div>
 
         {/* Base Sponsor Logo */}
-        <div className="mt-6 flex justify-center">
-          <Link
-            href="https://base.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="opacity-40 hover:opacity-70 transition-opacity"
-            title="Built on Base"
-          >
-            <svg width="24" height="24" viewBox="0 0 111 111" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z" fill="#0052FF"/>
-            </svg>
-          </Link>
+        <div className="mt-6">
+          <BaseAd />
         </div>
       </div>
     </footer>
