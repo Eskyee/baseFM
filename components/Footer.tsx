@@ -25,20 +25,20 @@ export function Footer() {
           {/* Links */}
           <div className="flex items-center gap-6">
             <Link
+              href="https://talent.app/raveculture.base.eth"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+            >
+              RaveCulture
+            </Link>
+            <Link
               href="https://base.org"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
             >
               Built on Base
-            </Link>
-            <Link
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
-            >
-              GitHub
             </Link>
           </div>
         </div>
