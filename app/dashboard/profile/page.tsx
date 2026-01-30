@@ -28,10 +28,17 @@ export default function DJProfileEditorPage() {
     avatarUrl: '',
     coverImageUrl: '',
     genres: [] as string[],
+    // Social
     twitterUrl: '',
     instagramUrl: '',
+    farcasterUrl: '',
+    // Creator platforms
     soundcloudUrl: '',
     mixcloudUrl: '',
+    youtubeUrl: '',
+    spotifyUrl: '',
+    appleMusicUrl: '',
+    bandcampUrl: '',
     websiteUrl: '',
   });
 
@@ -59,8 +66,13 @@ export default function DJProfileEditorPage() {
               genres: data.dj.genres || [],
               twitterUrl: data.dj.twitterUrl || '',
               instagramUrl: data.dj.instagramUrl || '',
+              farcasterUrl: data.dj.farcasterUrl || '',
               soundcloudUrl: data.dj.soundcloudUrl || '',
               mixcloudUrl: data.dj.mixcloudUrl || '',
+              youtubeUrl: data.dj.youtubeUrl || '',
+              spotifyUrl: data.dj.spotifyUrl || '',
+              appleMusicUrl: data.dj.appleMusicUrl || '',
+              bandcampUrl: data.dj.bandcampUrl || '',
               websiteUrl: data.dj.websiteUrl || '',
             });
           }
@@ -312,6 +324,56 @@ export default function DJProfileEditorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-[#888] mb-2">
+                  Farcaster
+                </label>
+                <input
+                  type="url"
+                  name="farcasterUrl"
+                  value={formData.farcasterUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="https://warpcast.com/username"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  Website
+                </label>
+                <input
+                  type="url"
+                  name="websiteUrl"
+                  value={formData.websiteUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Creator Platforms */}
+          <div className="bg-[#1A1A1A] rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-[#F5F5F5] mb-2">Creator Platforms</h2>
+            <p className="text-sm text-[#666] mb-4">Link your music and content channels for listeners to find more of your work</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  YouTube
+                </label>
+                <input
+                  type="url"
+                  name="youtubeUrl"
+                  value={formData.youtubeUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="https://youtube.com/@channel"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
                   SoundCloud
                 </label>
                 <input
@@ -338,17 +400,45 @@ export default function DJProfileEditorPage() {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label className="block text-sm font-medium text-[#888] mb-2">
-                  Website
+                  Spotify
                 </label>
                 <input
                   type="url"
-                  name="websiteUrl"
-                  value={formData.websiteUrl}
+                  name="spotifyUrl"
+                  value={formData.spotifyUrl}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
-                  placeholder="https://yourwebsite.com"
+                  placeholder="https://open.spotify.com/artist/..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  Apple Music
+                </label>
+                <input
+                  type="url"
+                  name="appleMusicUrl"
+                  value={formData.appleMusicUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="https://music.apple.com/artist/..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  Bandcamp
+                </label>
+                <input
+                  type="url"
+                  name="bandcampUrl"
+                  value={formData.bandcampUrl}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="https://username.bandcamp.com"
                 />
               </div>
             </div>
