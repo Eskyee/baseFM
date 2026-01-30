@@ -29,6 +29,59 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Push notifications
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  try {
+    const data = event.data.json();
+    const { title, body, icon, url, djName, djAvatar } = data;
+
+    const options = {
+      body: body || `${djName} is now live on baseFM!`,
+      icon: djAvatar || '/logo.png',
+      badge: '/logo.png',
+      vibrate: [100, 50, 100],
+      data: { url: url || '/' },
+      actions: [
+        { action: 'open', title: 'Watch Now' },
+        { action: 'close', title: 'Dismiss' },
+      ],
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(title || 'baseFM', options)
+    );
+  } catch (err) {
+    console.error('Push notification error:', err);
+  }
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') return;
+
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Check if there's already a window open
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      // Open new window
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
+});
+
 // Fetch - network first, fallback to cache
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
