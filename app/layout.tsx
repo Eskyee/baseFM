@@ -58,6 +58,12 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#0A0A0A" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        {/* Farcaster Frame Meta Tags */}
+        <meta property="fc:frame" content="vNext" />
+        <meta property="fc:frame:image" content="https://basefm.vercel.app/og-image.png" />
+        <meta property="fc:frame:button:1" content="Listen Live 📻" />
+        <meta property="fc:frame:button:1:action" content="link" />
+        <meta property="fc:frame:button:1:target" content="https://basefm.vercel.app" />
       </head>
       <body className={`${inter.className} bg-[#0A0A0A] min-h-screen`}>
         <OnchainProvider>

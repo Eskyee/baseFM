@@ -26,7 +26,7 @@ export function Footer() {
           {/* Links */}
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link
-              href="https://base.app/profile/raveculture"
+              href="https://talent.app/raveculture.base.eth"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
@@ -55,10 +55,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* DIY tagline */}
+        {/* Copyright */}
         <div className="mt-6 pt-6 border-t border-[#1A1A1A] text-center">
           <p className="text-xs text-[#666]">
-            Do it yourself with community backing · Created by RaveCulture for Base Builders
+            Created by RaveCulture for baseFM © 2026 · MIT License
           </p>
         </div>
 
