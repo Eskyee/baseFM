@@ -216,10 +216,13 @@ function MessagesContent() {
     );
   }
 
+  // On mobile, show conversation list or chat, not both
+  const showConversationList = !selectedConvId;
+
   return (
     <div className="h-[calc(100vh-3.5rem)] flex">
       {/* Sidebar - Conversations List */}
-      <div className="w-80 border-r border-[#1A1A1A] flex flex-col">
+      <div className={`${showConversationList ? 'flex' : 'hidden'} md:flex w-full md:w-80 border-r border-[#1A1A1A] flex-col`}>
         <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
           <h1 className="text-lg font-bold text-[#F5F5F5]">Messages</h1>
           <button
@@ -340,33 +343,43 @@ function MessagesContent() {
       </div>
 
       {/* Main - Messages Area */}
-      <div className="flex-1 flex flex-col">
+      <div className={`${selectedConvId ? 'flex' : 'hidden md:flex'} flex-1 flex-col`}>
         {selectedConvId && selectedConv ? (
           <>
             {/* Header */}
             <div className="p-4 border-b border-[#1A1A1A] flex items-center gap-3">
+              {/* Back button - mobile only */}
+              <Link
+                href="/messages"
+                className="md:hidden p-2 -ml-2 rounded-lg text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </Link>
+
               {selectedConv.otherWallet ? (
                 <>
                   <Identity address={selectedConv.otherWallet as `0x${string}`} className="!bg-transparent">
                     <Avatar className="w-10 h-10 rounded-full" />
                   </Identity>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <Identity address={selectedConv.otherWallet as `0x${string}`} className="!bg-transparent">
-                      <Name className="text-[#F5F5F5] font-medium" />
+                      <Name className="text-[#F5F5F5] font-medium truncate" />
                     </Identity>
                     {selectedConv.isDj && selectedConv.djSlug && (
                       <Link href={`/djs/${selectedConv.djSlug}`} className="text-xs text-blue-400 hover:underline">
-                        View DJ Profile
+                        View Profile
                       </Link>
                     )}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="w-10 h-10 rounded-full bg-[#333] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-[#333] flex items-center justify-center flex-shrink-0">
                     <span>{selectedConv.name?.charAt(0) || '?'}</span>
                   </div>
-                  <span className="text-[#F5F5F5] font-medium">{selectedConv.name}</span>
+                  <span className="text-[#F5F5F5] font-medium truncate">{selectedConv.name}</span>
                 </>
               )}
             </div>
