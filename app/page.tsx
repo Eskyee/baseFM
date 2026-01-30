@@ -39,6 +39,42 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen pb-20">
+      {/* 🎉 Launch Event Hype Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-purple-900/80 via-blue-900/80 to-purple-900/80 border-b border-purple-500/30">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Animated confetti particles */}
+          <div className="absolute top-2 left-[10%] text-2xl animate-bounce" style={{ animationDelay: '0s' }}>🎊</div>
+          <div className="absolute top-4 left-[25%] text-xl animate-bounce" style={{ animationDelay: '0.2s' }}>✨</div>
+          <div className="absolute top-2 left-[40%] text-2xl animate-bounce" style={{ animationDelay: '0.4s' }}>🎉</div>
+          <div className="absolute top-3 left-[60%] text-xl animate-bounce" style={{ animationDelay: '0.1s' }}>💥</div>
+          <div className="absolute top-2 left-[75%] text-2xl animate-bounce" style={{ animationDelay: '0.3s' }}>🔊</div>
+          <div className="absolute top-4 left-[90%] text-xl animate-bounce" style={{ animationDelay: '0.5s' }}>🚀</div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">📻</span>
+              <span className="text-white font-bold text-sm sm:text-base">
+                LIVE THIS SATURDAY
+              </span>
+              <span className="text-2xl">📻</span>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+              <span className="text-purple-200 text-xs sm:text-sm">
+                🇬🇧 Broadcasting live from Oxfordshire, UK
+              </span>
+              <span className="hidden sm:inline text-purple-400">•</span>
+              <span className="text-blue-200 text-xs sm:text-sm font-medium">
+                Welcome to baseFM 🤫
+              </span>
+            </div>
+          </div>
+          <p className="text-center text-purple-300/80 text-xs mt-2">
+            Something special is coming... Be there for the launch 🎧
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Featured Live Show */}
