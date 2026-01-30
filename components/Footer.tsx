@@ -33,7 +33,7 @@ export function Footer() {
               RaveCulture
             </Link>
             <Link
-              href="https://base.org"
+              href="https://base.app/profile/raveculture"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
