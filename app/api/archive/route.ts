@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get DJ info for each stream
-    const walletAddresses = [...new Set((streams || []).map(s => s.wallet_address))];
+    const walletAddresses = Array.from(new Set((streams || []).map(s => s.wallet_address)));
 
     let djMap: Record<string, { name: string; slug: string; avatar_url: string | null }> = {};
 
