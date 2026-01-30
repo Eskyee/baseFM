@@ -99,7 +99,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       <nav
-        className={`fixed top-14 right-0 z-35 w-64 bg-[#0A0A0A] border-l border-[#1A1A1A] h-[calc(100vh-3.5rem)] transform transition-transform duration-200 ease-in-out md:hidden ${
+        className={`fixed top-14 right-0 z-50 w-64 bg-[#0A0A0A] border-l border-[#1A1A1A] h-[calc(100vh-3.5rem)] transform transition-transform duration-200 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
