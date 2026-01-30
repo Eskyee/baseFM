@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -38,7 +38,17 @@ interface Message {
   createdAt: string;
 }
 
-export default function MessagesPage() {
+// Loading component for Suspense
+function MessagesLoading() {
+  return (
+    <div className="h-[calc(100vh-3.5rem)] flex items-center justify-center">
+      <div className="animate-spin w-8 h-8 border-2 border-[#333] border-t-blue-500 rounded-full" />
+    </div>
+  );
+}
+
+// Main messages content component
+function MessagesContent() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -450,5 +460,14 @@ export default function MessagesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Default export with Suspense boundary
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<MessagesLoading />}>
+      <MessagesContent />
+    </Suspense>
   );
 }
