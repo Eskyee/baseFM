@@ -56,17 +56,21 @@ export async function getMemberByWallet(walletAddress: string): Promise<Member |
   return memberFromRow(data as MemberRow);
 }
 
-// Join community (create member)
-export async function joinCommunity(input: JoinCommunityInput): Promise<Member | null> {
+// Join community (create or update member)
+export async function joinCommunity(input: JoinCommunityInput & { tokenBalance?: number }): Promise<Member | null> {
   const supabase = createServerClient();
 
+  // Use upsert to handle both new and existing members
   const { data, error } = await supabase
     .from('members')
-    .insert({
+    .upsert({
       wallet_address: input.walletAddress.toLowerCase(),
       display_name: input.displayName || null,
       bio: input.bio || null,
-      token_balance: 0, // Will be updated by token check
+      token_balance: input.tokenBalance || 0,
+      last_balance_check: new Date().toISOString(),
+    }, {
+      onConflict: 'wallet_address',
     })
     .select()
     .single();

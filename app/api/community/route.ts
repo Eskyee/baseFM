@@ -65,11 +65,12 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
-    // Create member
+    // Create or update member with current token balance
     const member = await joinCommunity({
       walletAddress,
       displayName,
       bio,
+      tokenBalance,
     });
 
     if (!member) {
