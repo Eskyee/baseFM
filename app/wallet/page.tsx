@@ -3,6 +3,7 @@
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import { WalletConnect } from '@/components/WalletConnect';
+import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
@@ -13,7 +14,7 @@ export default function WalletPage() {
     : 'https://pay.coinbase.com/buy/select-asset';
 
   // Uniswap swap URL for RAVE token on Base
-  const swapUrl = `https://app.uniswap.org/#/swap?chain=base&outputCurrency=0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888`;
+  const swapUrl = `https://app.uniswap.org/#/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`;
 
   if (!isConnected) {
     return (
@@ -84,7 +85,7 @@ export default function WalletPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base font-semibold text-[#F5F5F5]">Swap Tokens</h2>
-                <p className="text-xs text-[#888]">ETH, USDC, RAVE on Uniswap</p>
+                <p className="text-xs text-[#888]">ETH, USDC, {DJ_TOKEN_CONFIG.symbol} on Uniswap</p>
               </div>
               <svg className="w-5 h-5 text-[#666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -96,7 +97,7 @@ export default function WalletPage() {
         {/* Get RAVE Section */}
         <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-2xl p-4 border border-purple-500/20 active:scale-[0.98] transition-transform">
           <Link
-            href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
+            href={`https://base.meme/coin/base:${DJ_TOKEN_CONFIG.address}`}
             target="_blank"
             rel="noopener noreferrer"
             className="block"
@@ -106,8 +107,8 @@ export default function WalletPage() {
                 <span className="text-lg">🎵</span>
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-base font-semibold text-[#F5F5F5]">Get RAVE</h2>
-                <p className="text-xs text-purple-300">5K+ unlocks community features</p>
+                <h2 className="text-base font-semibold text-[#F5F5F5]">Get {DJ_TOKEN_CONFIG.symbol}</h2>
+                <p className="text-xs text-purple-300">{DJ_TOKEN_CONFIG.requiredAmount.toLocaleString()}+ unlocks community</p>
               </div>
               <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
