@@ -18,15 +18,15 @@ export default function WalletPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen pb-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-lg mx-auto px-4 py-12">
           <div className="text-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-5">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-[#F5F5F5] mb-4">Wallet</h1>
-            <p className="text-[#888] mb-8">Connect your wallet to access fund and swap features</p>
+            <h1 className="text-xl font-bold text-[#F5F5F5] mb-3">Wallet</h1>
+            <p className="text-[#888] text-sm mb-6">Connect to access fund and swap</p>
             <WalletConnect />
           </div>
         </div>
@@ -36,95 +36,90 @@ export default function WalletPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-lg mx-auto px-4 py-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#F5F5F5] mb-2">Wallet</h1>
-          <p className="text-[#888] text-sm">Fund your wallet or swap tokens on Base</p>
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-bold text-[#F5F5F5] mb-1">Wallet</h1>
+          <p className="text-[#888] text-xs">Fund or swap tokens on Base</p>
         </div>
 
         {/* Fund Section */}
-        <section className="bg-[#1A1A1A] rounded-xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#F5F5F5]">Fund Wallet</h2>
-              <p className="text-xs text-[#888]">Buy crypto with card or bank transfer</p>
-            </div>
-          </div>
-          <p className="text-sm text-[#888] mb-6">
-            Add funds to your wallet using Coinbase Onramp. Buy ETH, USDC, and other tokens directly with your credit card or bank account.
-          </p>
+        <section className="bg-[#1A1A1A] rounded-2xl p-4 mb-3 active:scale-[0.98] transition-transform">
           <Link
             href={fundUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-center transition-colors"
+            className="block"
           >
-            Buy Crypto with Coinbase
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold text-[#F5F5F5]">Buy Crypto</h2>
+                <p className="text-xs text-[#888]">Card or bank via Coinbase</p>
+              </div>
+              <svg className="w-5 h-5 text-[#666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </Link>
         </section>
 
         {/* Swap Section */}
-        <section className="bg-[#1A1A1A] rounded-xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#F5F5F5]">Swap Tokens</h2>
-              <p className="text-xs text-[#888]">Exchange tokens on Base network</p>
-            </div>
-          </div>
-          <p className="text-sm text-[#888] mb-6">
-            Swap between ETH, USDC, RAVE and other tokens on Base using Uniswap.
-          </p>
+        <section className="bg-[#1A1A1A] rounded-2xl p-4 mb-3 active:scale-[0.98] transition-transform">
           <Link
             href={swapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
+            className="block"
           >
-            Swap on Uniswap
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold text-[#F5F5F5]">Swap Tokens</h2>
+                <p className="text-xs text-[#888]">ETH, USDC, RAVE on Uniswap</p>
+              </div>
+              <svg className="w-5 h-5 text-[#666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </Link>
         </section>
 
         {/* Get RAVE Section */}
-        <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl p-6 border border-purple-500/30">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="text-2xl">🎵</span>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#F5F5F5]">Get RAVE</h2>
-              <p className="text-xs text-purple-300">Support baseFM & unlock features</p>
-            </div>
-          </div>
-          <p className="text-sm text-[#888] mb-6">
-            Hold 5,000+ RAVE to join the community, tip DJs, and access exclusive token-gated streams.
-          </p>
+        <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-2xl p-4 border border-purple-500/20 active:scale-[0.98] transition-transform">
           <Link
             href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg text-center transition-all"
+            className="block"
           >
-            Buy RAVE on Base.meme
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🎵</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold text-[#F5F5F5]">Get RAVE</h2>
+                <p className="text-xs text-purple-300">5K+ unlocks community features</p>
+              </div>
+              <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </Link>
         </section>
 
         {/* Info */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-[#666]">
-            All transactions on Base network · Low fees · Fast confirmation
-          </p>
-        </div>
+        <p className="text-center text-xs text-[#666] mt-4">
+          Base network · Low fees · Fast
+        </p>
       </div>
     </div>
   );

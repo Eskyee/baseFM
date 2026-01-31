@@ -63,15 +63,15 @@ export default function SchedulePage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">Schedule</h1>
-          <p className="text-[#888] text-sm mt-1">Weekly programming on baseFM</p>
+        <div className="mb-5">
+          <h1 className="text-xl font-bold text-[#F5F5F5]">Schedule</h1>
+          <p className="text-[#888] text-xs mt-0.5">Weekly programming</p>
         </div>
 
-        {/* Day Selector */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 hide-scrollbar">
+        {/* Day Selector - Pill style */}
+        <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 hide-scrollbar">
           {DAY_NAMES.map((day, index) => {
             const isToday = index === currentDay;
             const isSelected = index === selectedDay;
@@ -81,15 +81,15 @@ export default function SchedulePage() {
               <button
                 key={day}
                 onClick={() => setSelectedDay(index)}
-                className={`flex-shrink-0 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                className={`flex-shrink-0 min-w-[44px] py-2.5 rounded-xl text-xs font-medium transition-all active:scale-95 ${
                   isSelected
                     ? 'bg-[#3B82F6] text-white'
-                    : 'bg-[#1A1A1A] text-[#888] hover:text-[#F5F5F5] hover:bg-[#222]'
+                    : 'bg-[#1A1A1A] text-[#888]'
                 }`}
               >
                 <span className="block">{DAY_NAMES_SHORT[index]}</span>
                 {isToday && (
-                  <span className={`block text-[10px] mt-0.5 ${isSelected ? 'text-blue-200' : 'text-[#666]'}`}>
+                  <span className={`block text-[9px] mt-0.5 ${isSelected ? 'text-blue-200' : 'text-[#666]'}`}>
                     Today
                   </span>
                 )}
@@ -103,21 +103,24 @@ export default function SchedulePage() {
 
         {/* Schedule Grid */}
         {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse bg-[#1A1A1A] rounded-xl p-4">
-                <div className="flex gap-4">
-                  <div className="w-16 h-16 bg-[#333] rounded-lg" />
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse bg-[#1A1A1A] rounded-2xl p-3">
+                <div className="flex gap-3">
+                  <div className="w-14 text-center">
+                    <div className="h-5 bg-[#333] rounded mb-1" />
+                    <div className="h-3 bg-[#333] rounded" />
+                  </div>
                   <div className="flex-1">
-                    <div className="h-5 bg-[#333] rounded w-48 mb-2" />
-                    <div className="h-4 bg-[#333] rounded w-32" />
+                    <div className="h-4 bg-[#333] rounded w-32 mb-1.5" />
+                    <div className="h-3 bg-[#333] rounded w-24" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : selectedSlots.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {selectedSlots.map((slot) => {
               const live = isSlotLive(slot);
               const past = isSlotPast(slot);
@@ -125,26 +128,26 @@ export default function SchedulePage() {
               return (
                 <div
                   key={slot.id}
-                  className={`bg-[#1A1A1A] rounded-xl p-4 transition-all ${
+                  className={`bg-[#1A1A1A] rounded-2xl p-3 transition-all active:scale-[0.98] ${
                     live
                       ? 'ring-2 ring-red-500 bg-red-500/10'
                       : past
                       ? 'opacity-50'
-                      : 'hover:bg-[#222]'
+                      : ''
                   }`}
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     {/* Time */}
-                    <div className="flex-shrink-0 w-20 text-center">
-                      <div className={`text-lg font-bold ${live ? 'text-red-500' : 'text-[#F5F5F5]'}`}>
+                    <div className="flex-shrink-0 w-14 text-center">
+                      <div className={`text-sm font-bold ${live ? 'text-red-500' : 'text-[#F5F5F5]'}`}>
                         {slot.startTime.slice(0, 5)}
                       </div>
-                      <div className="text-xs text-[#666]">
+                      <div className="text-[10px] text-[#666]">
                         {slot.endTime.slice(0, 5)}
                       </div>
                       {live && (
-                        <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
-                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                        <span className="inline-flex items-center gap-0.5 mt-1 px-1.5 py-0.5 bg-red-500 text-white text-[8px] font-bold rounded">
+                          <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
                           LIVE
                         </span>
                       )}
@@ -152,88 +155,64 @@ export default function SchedulePage() {
 
                     {/* Show Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <h3 className={`font-semibold text-lg ${past ? 'text-[#888]' : 'text-[#F5F5F5]'}`}>
-                            {slot.showName}
-                          </h3>
+                      <h3 className={`font-semibold text-sm ${past ? 'text-[#888]' : 'text-[#F5F5F5]'} truncate`}>
+                        {slot.showName}
+                      </h3>
 
-                          {slot.dj ? (
-                            <Link
-                              href={`/djs/${slot.dj.slug}`}
-                              className="text-[#888] text-sm hover:text-[#3B82F6] transition-colors"
-                            >
-                              with {slot.dj.name}
-                              {slot.dj.isResident && (
-                                <span className="ml-2 px-1.5 py-0.5 bg-purple-500/20 text-purple-400 text-[10px] rounded">
-                                  Resident
-                                </span>
-                              )}
-                            </Link>
-                          ) : slot.djWalletAddress ? (
-                            <span className="text-[#888] text-sm">
-                              with Guest DJ
-                            </span>
-                          ) : null}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {slot.dj ? (
+                          <span className="text-[#888] text-xs truncate">
+                            {slot.dj.name}
+                            {slot.dj.isResident && (
+                              <span className="ml-1 text-purple-400">•</span>
+                            )}
+                          </span>
+                        ) : slot.djWalletAddress ? (
+                          <span className="text-[#888] text-xs">Guest DJ</span>
+                        ) : null}
 
-                          {slot.genre && (
-                            <div className="mt-2">
-                              <span className="px-2 py-1 bg-[#0A0A0A] text-[#888] text-xs rounded">
-                                {slot.genre}
-                              </span>
-                            </div>
-                          )}
-
-                          {slot.description && (
-                            <p className="text-[#666] text-sm mt-2 line-clamp-2">
-                              {slot.description}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* DJ Avatar */}
-                        {slot.dj && (
-                          <Link
-                            href={`/djs/${slot.dj.slug}`}
-                            className="flex-shrink-0"
-                          >
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-[#0A0A0A]">
-                              <Image
-                                src={slot.dj.avatarUrl || DEFAULT_AVATAR}
-                                alt={slot.dj.name}
-                                width={48}
-                                height={48}
-                                className={slot.dj.avatarUrl ? 'object-cover' : 'object-contain p-2'}
-                              />
-                            </div>
-                          </Link>
+                        {slot.genre && (
+                          <span className="px-1.5 py-0.5 bg-[#0A0A0A] text-[#666] text-[10px] rounded flex-shrink-0">
+                            {slot.genre}
+                          </span>
                         )}
                       </div>
                     </div>
+
+                    {/* DJ Avatar */}
+                    {slot.dj && (
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-[#0A0A0A] flex-shrink-0">
+                        <Image
+                          src={slot.dj.avatarUrl || DEFAULT_AVATAR}
+                          alt={slot.dj.name}
+                          width={40}
+                          height={40}
+                          className={slot.dj.avatarUrl ? 'object-cover' : 'object-contain p-1.5'}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-12">
+            <div className="w-14 h-14 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z" />
               </svg>
             </div>
-            <h2 className="text-[#F5F5F5] text-xl font-bold mb-2">No Shows on {DAY_NAMES[selectedDay]}</h2>
-            <p className="text-[#888] text-sm">Check back later or browse other days</p>
+            <h2 className="text-[#F5F5F5] text-base font-bold mb-1">No Shows</h2>
+            <p className="text-[#888] text-xs">Check other days</p>
           </div>
         )}
 
         {/* Legend */}
         {selectedSlots.length > 0 && (
-          <div className="mt-8 pt-6 border-t border-[#1A1A1A]">
-            <p className="text-[#666] text-xs">
-              All times shown in your local timezone. Shows are recurring weekly unless otherwise noted.
-            </p>
-          </div>
+          <p className="text-center text-[#666] text-[10px] mt-4">
+            Local time · Weekly recurring
+          </p>
         )}
       </div>
     </div>

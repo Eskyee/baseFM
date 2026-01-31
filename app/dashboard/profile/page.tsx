@@ -166,25 +166,23 @@ export default function DJProfileEditorPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-4 py-6">
         {/* Back Link */}
         <Link
           href="/dashboard"
-          className="text-[#888] hover:text-[#F5F5F5] mb-6 inline-flex items-center gap-2 text-sm"
+          className="text-[#888] hover:text-[#F5F5F5] mb-4 inline-flex items-center gap-1 text-xs"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Dashboard
+          Back
         </Link>
 
-        <h1 className="text-2xl font-bold text-[#F5F5F5] mb-2">
-          {existingProfile ? 'Edit Profile' : 'Create Your DJ Profile'}
+        <h1 className="text-xl font-bold text-[#F5F5F5] mb-1">
+          {existingProfile ? 'Edit Profile' : 'Create Profile'}
         </h1>
-        <p className="text-[#888] text-sm mb-8">
-          {existingProfile
-            ? 'Update your profile information'
-            : 'Set up your public DJ profile that listeners can see'}
+        <p className="text-[#888] text-xs mb-5">
+          {existingProfile ? 'Update your info' : 'Set up your public DJ profile'}
         </p>
 
         {error && (
@@ -199,10 +197,10 @@ export default function DJProfileEditorPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Info */}
-          <div className="bg-[#1A1A1A] rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Basic Info</h2>
+          <div className="bg-[#1A1A1A] rounded-2xl p-4 space-y-4">
+            <h2 className="text-sm font-semibold text-[#888]">BASIC INFO</h2>
 
             <div>
               <label className="block text-sm font-medium text-[#888] mb-2">
