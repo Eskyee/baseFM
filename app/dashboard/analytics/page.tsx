@@ -87,48 +87,52 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-[#F5F5F5]">Analytics</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">Analytics</h1>
           <Link
             href="/dashboard"
-            className="text-sm text-[#888] hover:text-[#F5F5F5]"
+            className="text-xs sm:text-sm text-[#888] hover:text-[#F5F5F5] flex items-center gap-1"
           >
-            ← Back to Dashboard
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </Link>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#1A1A1A] rounded-xl p-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-[#1A1A1A] rounded-xl p-3 sm:p-4">
             <p className="text-xs text-[#888] mb-1">Total Streams</p>
-            <p className="text-2xl font-bold text-[#F5F5F5]">
+            <p className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
               {analytics?.totalStreams || 0}
             </p>
           </div>
-          <div className="bg-[#1A1A1A] rounded-xl p-4">
+          <div className="bg-[#1A1A1A] rounded-xl p-3 sm:p-4">
             <p className="text-xs text-[#888] mb-1">Total Viewers</p>
-            <p className="text-2xl font-bold text-[#F5F5F5]">
+            <p className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
               {analytics?.totalViewers || 0}
             </p>
           </div>
-          <div className="bg-[#1A1A1A] rounded-xl p-4">
+          <div className="bg-[#1A1A1A] rounded-xl p-3 sm:p-4">
             <p className="text-xs text-[#888] mb-1">Tips Received</p>
-            <p className="text-2xl font-bold text-purple-400">
-              {analytics?.totalTips || 0} RAVE
+            <p className="text-xl sm:text-2xl font-bold text-purple-400">
+              {analytics?.totalTips || 0}
             </p>
           </div>
-          <div className="bg-[#1A1A1A] rounded-xl p-4">
+          <div className="bg-[#1A1A1A] rounded-xl p-3 sm:p-4">
             <p className="text-xs text-[#888] mb-1">Stream Time</p>
-            <p className="text-2xl font-bold text-[#F5F5F5]">
+            <p className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
               {formatDuration(analytics?.totalDuration || 0)}
             </p>
           </div>
         </div>
 
         {/* Stream History */}
-        <div className="bg-[#1A1A1A] rounded-xl p-6">
+        <div className="bg-[#1A1A1A] rounded-xl p-4 sm:p-6">
           <h2 className="text-lg font-bold text-[#F5F5F5] mb-4">Stream History</h2>
 
           {analytics?.streams && analytics.streams.length > 0 ? (
@@ -136,25 +140,27 @@ export default function AnalyticsPage() {
               {analytics.streams.map((stream) => (
                 <div
                   key={stream.id}
-                  className="flex items-center justify-between p-4 bg-[#0A0A0A] rounded-lg"
+                  className="p-3 sm:p-4 bg-[#0A0A0A] rounded-lg"
                 >
-                  <div className="flex-1">
-                    <h3 className="font-medium text-[#F5F5F5]">{stream.title}</h3>
+                  {/* Title Row */}
+                  <div className="mb-2">
+                    <h3 className="font-medium text-[#F5F5F5] text-sm sm:text-base truncate">{stream.title}</h3>
                     <p className="text-xs text-[#888]">
                       {new Date(stream.createdAt).toLocaleDateString()} · {formatDuration(stream.duration)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-6 text-sm">
-                    <div className="text-center">
-                      <p className="text-[#F5F5F5] font-medium">{stream.peakViewers}</p>
+                  {/* Stats Row - Grid on mobile */}
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-[#1A1A1A] rounded-lg py-2">
+                      <p className="text-[#F5F5F5] font-medium text-sm">{stream.peakViewers}</p>
                       <p className="text-xs text-[#888]">Peak</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-[#F5F5F5] font-medium">{stream.chatMessages}</p>
+                    <div className="bg-[#1A1A1A] rounded-lg py-2">
+                      <p className="text-[#F5F5F5] font-medium text-sm">{stream.chatMessages}</p>
                       <p className="text-xs text-[#888]">Chats</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-purple-400 font-medium">{stream.totalTips}</p>
+                    <div className="bg-[#1A1A1A] rounded-lg py-2">
+                      <p className="text-purple-400 font-medium text-sm">{stream.totalTips}</p>
                       <p className="text-xs text-[#888]">Tips</p>
                     </div>
                   </div>
