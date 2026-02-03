@@ -154,6 +154,18 @@ export default function HomePage() {
                 </svg>
               </a>
             </div>
+
+            {/* Logo Above Stream */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-black px-6 py-3 rounded-lg">
+                <div className="text-white font-black text-center leading-tight tracking-tight">
+                  <div className="text-xl sm:text-2xl">RAVE</div>
+                  <div className="text-xl sm:text-2xl bg-white text-black px-2 inline-block">NIGHT</div>
+                  <div className="text-xl sm:text-2xl">CULTURE</div>
+                </div>
+              </div>
+            </div>
+
             <div className="rounded-xl overflow-hidden bg-black">
               <iframe
                 src="https://player.mux.com/X9OgXqO8Gvo3iHgtTWJqgstGJFVIloBQnT5dhpxeIBM"
@@ -161,6 +173,17 @@ export default function HomePage() {
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
+            </div>
+
+            {/* Logo Below Stream */}
+            <div className="flex justify-center mt-4">
+              <div className="bg-black px-6 py-3 rounded-lg">
+                <div className="text-white font-black text-center leading-tight tracking-tight">
+                  <div className="text-xl sm:text-2xl">RAVE</div>
+                  <div className="text-xl sm:text-2xl bg-white text-black px-2 inline-block">NIGHT</div>
+                  <div className="text-xl sm:text-2xl">CULTURE</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
