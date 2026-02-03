@@ -12,8 +12,15 @@ CREATE TABLE IF NOT EXISTS djs (
   -- Social links
   twitter_url TEXT,
   instagram_url TEXT,
+  farcaster_url TEXT,
+
+  -- Creator/Music platforms
   soundcloud_url TEXT,
   mixcloud_url TEXT,
+  youtube_url TEXT,
+  spotify_url TEXT,
+  apple_music_url TEXT,
+  bandcamp_url TEXT,
   website_url TEXT,
 
   -- Status

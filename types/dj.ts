@@ -11,8 +11,15 @@ export interface DJ {
   // Social links
   twitterUrl?: string;
   instagramUrl?: string;
+  farcasterUrl?: string;
+
+  // Creator/Music platforms
   soundcloudUrl?: string;
   mixcloudUrl?: string;
+  youtubeUrl?: string;
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  bandcampUrl?: string;
   websiteUrl?: string;
 
   // Status
@@ -39,8 +46,13 @@ export interface DJRow {
   genres: string[];
   twitter_url: string | null;
   instagram_url: string | null;
+  farcaster_url: string | null;
   soundcloud_url: string | null;
   mixcloud_url: string | null;
+  youtube_url: string | null;
+  spotify_url: string | null;
+  apple_music_url: string | null;
+  bandcamp_url: string | null;
   website_url: string | null;
   is_resident: boolean;
   is_verified: boolean;
@@ -63,8 +75,13 @@ export function djFromRow(row: DJRow): DJ {
     genres: row.genres || [],
     twitterUrl: row.twitter_url || undefined,
     instagramUrl: row.instagram_url || undefined,
+    farcasterUrl: row.farcaster_url || undefined,
     soundcloudUrl: row.soundcloud_url || undefined,
     mixcloudUrl: row.mixcloud_url || undefined,
+    youtubeUrl: row.youtube_url || undefined,
+    spotifyUrl: row.spotify_url || undefined,
+    appleMusicUrl: row.apple_music_url || undefined,
+    bandcampUrl: row.bandcamp_url || undefined,
     websiteUrl: row.website_url || undefined,
     isResident: row.is_resident,
     isVerified: row.is_verified,
@@ -85,8 +102,13 @@ export interface CreateDJInput {
   genres?: string[];
   twitterUrl?: string;
   instagramUrl?: string;
+  farcasterUrl?: string;
   soundcloudUrl?: string;
   mixcloudUrl?: string;
+  youtubeUrl?: string;
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  bandcampUrl?: string;
   websiteUrl?: string;
 }
 
@@ -98,7 +120,12 @@ export interface UpdateDJInput {
   genres?: string[];
   twitterUrl?: string;
   instagramUrl?: string;
+  farcasterUrl?: string;
   soundcloudUrl?: string;
   mixcloudUrl?: string;
+  youtubeUrl?: string;
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  bandcampUrl?: string;
   websiteUrl?: string;
 }

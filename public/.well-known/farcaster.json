@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIwMjM1NDAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+    "payload": "eyJkb21haW4iOiJiYXNlZm0udmVyY2VsLmFwcCJ9",
+    "signature": "REPLACE_WITH_ACTUAL_SIGNATURE"
+  },
+  "frame": {
+    "version": "1",
+    "name": "baseFM",
+    "iconUrl": "https://basefm.vercel.app/logo.png",
+    "homeUrl": "https://basefm.vercel.app",
+    "imageUrl": "https://basefm.vercel.app/og-image.png",
+    "buttonTitle": "Listen Live 📻",
+    "splashImageUrl": "https://basefm.vercel.app/logo.png",
+    "splashBackgroundColor": "#0A0A0A",
+    "webhookUrl": "https://basefm.vercel.app/api/webhooks/farcaster"
+  }
+}

@@ -1,103 +1,90 @@
-# baseFM
-base Miniapp Created by raveculture 
-
 # baseFM - Onchain Radio Platform
 
-Production-ready streaming infrastructure for Base-native radio.
+Production-ready streaming platform for Base-native radio. Built by [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
 
-## ✅ Phase 1 Complete: Streaming Infrastructure
+## Features
 
-This implementation includes:
-- ✅ Complete database schema (Supabase)
-- ✅ Mux live streaming integration
-- ✅ Stream lifecycle management (CREATED → PREPARING → LIVE → ENDING → ENDED)
-- ✅ API routes for DJ and listener operations
-- ✅ Webhook handling for real-time status updates
-- ✅ Wallet-based authentication foundation
-- ✅ TypeScript types for all entities
+### Core Streaming
+- **Live DJ Streaming** - RTMP to HLS via Mux
+- **Show Archives** - Automatic recording and playback of past broadcasts
+- **Weekly Schedule** - Recurring DJ timeslots
+- **DJ Profiles** - Customizable profiles with social/creator links
 
-## 🏗️ Architecture
+### Engagement
+- **Live Chat** - Real-time chat during streams (Supabase Realtime)
+- **Tipping** - Send ETH directly to DJs on Base
+- **Follow DJs** - Get notified when your favorites go live
+- **Push Notifications** - Browser notifications for live shows
 
-```
-┌─────────────────────────────────────────────┐
-│              Vercel (Next.js)               │
-│  ┌─────────────┐         ┌─────────────┐   │
-│  │  API Routes │────────▶│  Supabase   │   │
-│  │             │         │  (Postgres) │   │
-│  └──────┬──────┘         └─────────────┘   │
-│         │                                    │
-│         │ (creates/manages)                  │
-│         ▼                                    │
-│  ┌─────────────┐                            │
-│  │     Mux     │──┐                         │
-│  │  RTMP→HLS   │  │ Webhooks                │
-│  └─────────────┘  │                         │
-│         │          │                         │
-│         ▼          ▼                         │
-│  Listeners    API Updates                   │
-│  (HLS.js)     (Stream Status)               │
-└─────────────────────────────────────────────┘
-```
+### Onchain
+- **Wallet Auth** - Connect with Smart Wallet, Coinbase Wallet, or any EVM wallet
+- **Token-Gated Community** - 5000+ RAVE token holders directory
+- **Show NFTs** - Mint recordings as collectibles
+- **OnchainKit Integration** - Base names, avatars, and identity
 
-## 📋 Prerequisites
+### Mobile
+- **PWA Support** - Install as app on iOS/Android
+- **Responsive Design** - Mobile-first UI
+- **Offline Support** - Service worker caching
 
-1. **Node.js 18.17+**
-2. **Supabase Account** (free tier works)
-3. **Mux Account** (free tier: 1000 min/month)
-4. **Vercel Account** (optional for deployment)
+## Tech Stack
 
-## 🚀 Setup Instructions
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Supabase (Postgres + Realtime)
+- **Streaming**: Mux (RTMP → HLS)
+- **Blockchain**: Base (via wagmi, viem, OnchainKit)
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+
+## Quick Start
 
 ### 1. Clone and Install
 
 ```bash
-git clone <your-repo>
-cd basefm
+git clone https://github.com/Eskyee/baseFM.git
+cd baseFM
 npm install
 ```
 
-### 2. Database Setup (Supabase)
-
-1. Go to https://supabase.com/dashboard
-2. Create new project
-3. Wait for provisioning (~2 minutes)
-4. Go to **SQL Editor**
-5. Copy contents of `supabase-schema.sql`
-6. Paste and run in SQL Editor
-7. Verify tables created: `streams`, `events`, `stream_activity`
-
-### 3. Mux Setup
-
-1. Go to https://dashboard.mux.com/signup
-2. Create account
-3. Navigate to **Settings → Access Tokens**
-4. Click **Generate new token**
-5. Enable these permissions:
-   - ✅ Mux Video (Read + Write)
-   - ✅ Mux Data (Read)
-6. Copy `Token ID` and `Token Secret`
-7. Go to **Settings → Webhooks**
-8. Click **Create new webhook**
-9. Set URL: `https://your-domain.com/api/webhooks/mux`
-10. Copy the webhook signing secret
-
-### 4. Environment Variables
-
-1. Copy `.env.example` to `.env.local`:
+### 2. Environment Setup
 
 ```bash
 cp .env.example .env.local
 ```
 
-2. Fill in your values:
+Fill in your values (see [Environment Variables](#environment-variables)).
+
+### 3. Database Setup
+
+Run these SQL files in Supabase SQL Editor (in order):
+
+1. `supabase/schema-djs.sql` - DJ profiles
+2. `supabase/schema-schedule.sql` - Weekly schedule
+3. `supabase/schema-members.sql` - Community directory
+4. `supabase/schema-chat.sql` - Live chat
+5. `supabase/schema-notifications.sql` - Favorites + push
+6. `supabase/schema-tips.sql` - Tips tracking
+7. `supabase/schema-nfts.sql` - NFT collectibles
+
+**Important**: Enable Realtime for `chat_messages` table in Supabase dashboard.
+
+### 4. Run Development
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000
+
+## Environment Variables
 
 ```env
-# Supabase (from Settings → API)
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbG... # Keep secret!
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
 
-# Mux
+# Mux (https://dashboard.mux.com)
 MUX_TOKEN_ID=xxxxx
 MUX_TOKEN_SECRET=xxxxx
 MUX_WEBHOOK_SECRET=xxxxx
@@ -106,264 +93,240 @@ MUX_WEBHOOK_SECRET=xxxxx
 NEXT_PUBLIC_BASE_CHAIN_ID=8453
 NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
 
+# OnchainKit (https://portal.cdp.coinbase.com)
+NEXT_PUBLIC_ONCHAINKIT_API_KEY=
+
+# Push Notifications (npx web-push generate-vapid-keys)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 5. Run Development Server
+## Pages
 
-```bash
-npm run dev
-```
+| Page | URL | Description |
+|------|-----|-------------|
+| Home | `/` | Live stream player |
+| Schedule | `/schedule` | Weekly DJ schedule |
+| Archive | `/archive` | Past broadcasts |
+| Collect | `/collect` | NFT collectibles |
+| Community | `/community` | Token-gated member directory |
+| DJs | `/djs` | DJ profiles listing |
+| DJ Profile | `/djs/[slug]` | Individual DJ page |
+| Dashboard | `/dashboard` | DJ streaming controls |
 
-Open http://localhost:3000
-
-## 📡 API Reference
+## API Routes
 
 ### Streams
+- `GET /api/streams` - List streams
+- `POST /api/streams` - Create stream
+- `GET /api/streams/live` - Get live streams
+- `POST /api/streams/[id]/start` - Start streaming
+- `POST /api/streams/[id]/stop` - Stop streaming
 
-#### `GET /api/streams`
-List all streams with optional filters.
+### DJs
+- `GET /api/djs` - List all DJs
+- `GET /api/djs/[slug]` - Get DJ by slug
+- `GET /api/djs/me` - Get current DJ profile
+- `PUT /api/djs/me` - Update profile
 
-**Query Parameters:**
-- `status` - Filter by status: CREATED, PREPARING, LIVE, ENDING, ENDED
-- `djWalletAddress` - Filter by DJ wallet
-- `limit` - Number of results (default: 50)
-- `offset` - Pagination offset
+### Engagement
+- `GET/POST /api/chat` - Chat messages
+- `GET/POST/DELETE /api/favorites` - Follow DJs
+- `GET/POST /api/tips` - Tips
+- `GET/POST /api/nfts` - Show NFTs
+- `POST /api/nfts/mint` - Record mint
 
-**Response:**
-```json
-{
-  "streams": [
-    {
-      "id": "uuid",
-      "title": "Friday Night Vibes",
-      "djName": "DJ Alpha",
-      "status": "LIVE",
-      "hlsPlaybackUrl": "https://stream.mux.com/xxx.m3u8",
-      ...
-    }
-  ]
+### Community
+- `GET/POST /api/community` - Member directory
+
+## DJ Workflow
+
+1. **Connect wallet** on `/dashboard`
+2. **Create profile** at `/dashboard/profile`
+3. **Create stream** with title and description
+4. **Get RTMP credentials** (URL + stream key)
+5. **Connect OBS/streaming software**
+6. **Go live** - status updates automatically
+7. **End stream** - recording saved to archive
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                Vercel (Next.js)                 │
+│  ┌─────────────┐         ┌─────────────────┐   │
+│  │  API Routes │────────▶│    Supabase     │   │
+│  │             │         │ Postgres+Realtime│   │
+│  └──────┬──────┘         └─────────────────┘   │
+│         │                                       │
+│         │ RTMP                                  │
+│         ▼                                       │
+│  ┌─────────────┐     ┌──────────────┐          │
+│  │     Mux     │────▶│   Webhooks   │          │
+│  │  RTMP→HLS   │     │ Status Sync  │          │
+│  └──────┬──────┘     └──────────────┘          │
+│         │                                       │
+│         ▼ HLS                                   │
+│  ┌─────────────┐                               │
+│  │  Listeners  │                               │
+│  │ (HLS Player)│                               │
+│  └─────────────┘                               │
+│                                                 │
+│  ┌─────────────┐         ┌─────────────┐       │
+│  │    Base     │◀───────▶│  OnchainKit │       │
+│  │  Mainnet    │         │ Wallet/Auth │       │
+│  └─────────────┘         └─────────────┘       │
+└─────────────────────────────────────────────────┘
+```
+
+## Deployment
+
+### Vercel
+
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables
+4. Deploy
+
+**Post-deploy**: Update Mux webhook URL to `https://your-domain.com/api/webhooks/mux`
+
+---
+
+# Developer Guide
+
+## Project Structure
+
+```
+baseFM/
+├── app/                    # Next.js App Router pages
+│   ├── api/               # API routes
+│   ├── archive/           # Show archives
+│   ├── collect/           # NFT collectibles
+│   ├── community/         # Token-gated community
+│   ├── dashboard/         # DJ dashboard
+│   ├── djs/               # DJ profiles
+│   └── schedule/          # Weekly schedule
+├── components/            # React components
+├── lib/                   # Utilities
+│   ├── db/               # Database functions
+│   ├── mux/              # Mux API client
+│   ├── supabase/         # Supabase client
+│   └── viem/             # Viem client
+├── types/                 # TypeScript types
+├── supabase/             # SQL schema files
+└── public/               # Static assets + PWA
+```
+
+## Adding New Features
+
+### New Database Table
+
+1. Create schema file: `supabase/schema-[feature].sql`
+2. Create types: `types/[feature].ts`
+3. Create DB functions: `lib/db/[feature].ts`
+4. Create API route: `app/api/[feature]/route.ts`
+5. Create page: `app/[feature]/page.tsx`
+
+### New DJ Profile Field
+
+1. Update `types/dj.ts` (DJ, DJRow, CreateDJInput, UpdateDJInput)
+2. Update `supabase/schema-djs.sql`
+3. Update `lib/db/djs.ts` (createDJ, updateDJ)
+4. Update `app/dashboard/profile/page.tsx` (form)
+5. Update `app/djs/[slug]/page.tsx` (display)
+
+### New Component
+
+```tsx
+// components/MyComponent.tsx
+'use client';
+
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
+
+interface MyComponentProps {
+  // props
+}
+
+export function MyComponent({ }: MyComponentProps) {
+  const { address, isConnected } = useAccount();
+
+  return (
+    <div className="bg-[#1A1A1A] rounded-xl p-4">
+      {/* content */}
+    </div>
+  );
 }
 ```
 
-#### `POST /api/streams`
-Create a new stream.
+## Future Feature Ideas
 
-**Body:**
-```json
-{
-  "title": "Friday Night Vibes",
-  "description": "House music all night",
-  "djName": "DJ Alpha",
-  "djWalletAddress": "0x123...",
-  "scheduledStartTime": "2024-01-01T20:00:00Z",
-  "isGated": false
-}
-```
+### Phase 1: Enhanced Streaming
+- [ ] Multi-bitrate streaming (ABR)
+- [ ] Low-latency mode
+- [ ] Screen sharing support
+- [ ] Co-streaming (multiple DJs)
 
-**Response:**
-```json
-{
-  "stream": { ... },
-  "rtmpUrl": "rtmps://global-live.mux.com:443/app/xxx",
-  "rtmpKey": "xxx"
-}
-```
+### Phase 2: Community
+- [ ] User profiles (non-DJ listeners)
+- [ ] Chat reactions/emotes
+- [ ] Chat moderation tools
+- [ ] Private messaging
 
-#### `GET /api/streams/[id]`
-Get single stream by ID.
+### Phase 3: Monetization
+- [ ] Subscription tiers
+- [ ] Paid shows (token gate specific streams)
+- [ ] Merchandise integration
+- [ ] Sponsorship slots
 
-#### `PATCH /api/streams/[id]`
-Update stream metadata (title, description, etc).
+### Phase 4: Discovery
+- [ ] Search functionality
+- [ ] Genre filtering
+- [ ] Recommendations
+- [ ] Trending shows
+- [ ] Featured DJs
 
-#### `DELETE /api/streams/[id]`
-Delete a stream.
+### Phase 5: Analytics
+- [ ] DJ analytics dashboard
+- [ ] Listener stats
+- [ ] Revenue tracking
+- [ ] Show performance metrics
 
-#### `POST /api/streams/[id]/start`
-DJ signals ready to broadcast.
+### Phase 6: Integrations
+- [ ] External podcast RSS feeds
+- [ ] YouTube/Twitch simulcast
+- [ ] Calendar sync (Google, Apple)
+- [ ] Discord bot notifications
+- [ ] Farcaster frames
 
-**Body:**
-```json
-{
-  "djWalletAddress": "0x123...",
-  "signature": "0xabc..."
-}
-```
+### Phase 7: Advanced Onchain
+- [ ] On-chain DJ reputation
+- [ ] Governance (DAO voting)
+- [ ] Revenue sharing contracts
+- [ ] Dynamic NFT artwork
+- [ ] Loyalty rewards (POAP-style)
 
-**Response:**
-```json
-{
-  "stream": { "status": "PREPARING", ... },
-  "rtmpUrl": "rtmps://...",
-  "rtmpKey": "xxx"
-}
-```
+## Contributing
 
-#### `POST /api/streams/[id]/stop`
-DJ ends broadcast.
+1. Fork the repo
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push branch: `git push origin feature/amazing-feature`
+5. Open Pull Request
 
-#### `GET /api/streams/live`
-Get all currently live streams with listener counts.
+## Support
 
-### Webhooks
+- GitHub Issues: https://github.com/Eskyee/baseFM/issues
+- RaveCulture: https://base.app/profile/raveculture
+- Support Token: https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888
 
-#### `POST /api/webhooks/mux`
-Mux webhook endpoint (automatically called by Mux).
-
-**Events handled:**
-- `video.live_stream.active` → Updates status to LIVE
-- `video.live_stream.idle` → Updates status to ENDING
-- `video.live_stream.disconnected` → Updates status to ENDED
-
-## 🔄 Stream Lifecycle
-
-```
-CREATED
-   ↓ (POST /api/streams/[id]/start)
-PREPARING
-   ↓ (DJ connects RTMP)
-LIVE
-   ↓ (DJ disconnects or POST /api/streams/[id]/stop)
-ENDING
-   ↓ (5min grace period expires)
-ENDED
-```
-
-## 🎵 DJ Workflow
-
-1. **Create Stream**
-   ```bash
-   POST /api/streams
-   # Returns: stream ID, RTMP URL, stream key
-   ```
-
-2. **Start Stream**
-   ```bash
-   POST /api/streams/[id]/start
-   # Status: CREATED → PREPARING
-   ```
-
-3. **Connect OBS/Streaming Software**
-   - RTMP URL: `rtmps://global-live.mux.com:443/app`
-   - Stream Key: `[from API response]`
-   - Status automatically updates to LIVE when connected
-
-4. **Broadcast**
-   - Listeners can access HLS URL
-   - Status remains LIVE
-
-5. **End Stream**
-   - Option A: DJ stops RTMP (automatic)
-   - Option B: Call `POST /api/streams/[id]/stop`
-   - Status: LIVE → ENDING → ENDED (after 5min)
-
-## 🎧 Listener Workflow
-
-1. **Discover Streams**
-   ```bash
-   GET /api/streams/live
-   ```
-
-2. **Play Stream**
-   - Use `hlsPlaybackUrl` from stream object
-   - Compatible with HLS.js, video.js, or native HLS players
-
-## 🔐 Security Notes
-
-**Current Implementation:**
-- Wallet address validation ✅
-- Basic DJ ownership checks ✅
-- Mux webhook signature verification ✅
-
-**TODO for Production:**
-- [ ] Implement wallet signature verification for DJ actions
-- [ ] Add rate limiting to API routes
-- [ ] Implement CORS policies
-- [ ] Add request validation middleware
-- [ ] Implement session management
-
-## 🚢 Deployment to Vercel
-
-### Quick Deploy
-
-1. **Push to GitHub**
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
-```
-
-2. **Import to Vercel**
-- Go to https://vercel.com/new
-- Import your GitHub repo
-- Framework Preset: **Next.js** (auto-detected)
-
-3. **Add Environment Variables**
-In Vercel project settings, add all variables from `.env.local`
-
-4. **Deploy**
-Click "Deploy" - done in ~2 minutes
-
-5. **Configure Mux Webhook**
-- Get your Vercel domain: `https://basefm.vercel.app`
-- Update Mux webhook URL: `https://basefm.vercel.app/api/webhooks/mux`
-
-### Custom Domain
-
-1. Go to Vercel project → Settings → Domains
-2. Add your domain
-3. Update DNS records as instructed
-4. Update Mux webhook URL to use your domain
-
-## 📊 Database Queries
-
-### Get active listeners count
-```sql
-SELECT get_listener_count('stream-uuid');
-```
-
-### View live streams
-```sql
-SELECT * FROM live_streams;
-```
-
-### View upcoming events
-```sql
-SELECT * FROM upcoming_events;
-```
-
-## 🐛 Troubleshooting
-
-### Stream stuck in PREPARING
-- Check DJ connected RTMP correctly
-- Verify Mux webhook is configured
-- Check Mux dashboard for connection status
-
-### Webhook not updating status
-- Verify webhook secret matches
-- Check webhook URL is publicly accessible
-- Review webhook logs in Mux dashboard
-
-### RTMP connection fails
-- Ensure using `rtmps://` (secure)
-- Verify stream key is correct
-- Check firewall allows RTMP traffic
-
-## 📝 Next Steps (Phase 2-5)
-
-- [ ] Phase 2: Mux integration testing
-- [ ] Phase 3: Frontend - Listener playback (HLS.js)
-- [ ] Phase 4: Frontend - DJ broadcast flow
-- [ ] Phase 5: Token gating (optional)
-
-## 📄 License
+## License
 
 MIT
 
-## 🤝 Support
+---
 
-Questions? Check:
-- Mux Docs: https://docs.mux.com
-- Supabase Docs: https://supabase.com/docs
-- Next.js Docs: https://nextjs.org/docs
+Built with love by RaveCulture for Base Builders

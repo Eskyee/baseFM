@@ -1,6 +1,7 @@
 'use client';
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
 
 export function WalletConnect() {
   const { address, isConnected } = useAccount();
@@ -9,15 +10,25 @@ export function WalletConnect() {
 
   if (isConnected && address) {
     return (
-      <div className="flex items-center gap-3">
-        <span className="text-gray-400 text-sm">
-          {address.slice(0, 6)}...{address.slice(-4)}
+      <div className="flex items-center gap-2">
+        {/* Show avatar and name on desktop */}
+        <div className="hidden sm:flex items-center gap-2">
+          <Identity address={address} className="!bg-transparent">
+            <Avatar className="w-8 h-8 rounded-full" />
+          </Identity>
+          <Identity address={address} className="!bg-transparent">
+            <Name className="text-[#F5F5F5] text-sm font-medium max-w-[100px] truncate" />
+          </Identity>
+        </div>
+        {/* Mobile: just show short address */}
+        <span className="sm:hidden text-[#888] text-xs">
+          {address.slice(0, 4)}...{address.slice(-3)}
         </span>
         <button
           onClick={() => disconnect()}
-          className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-sm rounded-lg hover:bg-[#333] hover:text-[#F5F5F5] transition-colors"
         >
-          Disconnect
+          Exit
         </button>
       </div>
     );
@@ -27,9 +38,19 @@ export function WalletConnect() {
     <button
       onClick={() => connect({ connector: connectors[0] })}
       disabled={isPending}
-      className="px-4 py-2 bg-base-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm shadow-lg shadow-purple-500/20"
     >
-      {isPending ? 'Connecting...' : 'Connect Wallet'}
+      {isPending ? (
+        <span className="flex items-center gap-2">
+          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          Entering...
+        </span>
+      ) : (
+        'Enter'
+      )}
     </button>
   );
 }

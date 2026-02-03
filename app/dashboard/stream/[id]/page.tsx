@@ -12,6 +12,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [isSettingUpMux, setIsSettingUpMux] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
@@ -134,6 +135,35 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       setActionError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsSettingUpMux(false);
+    }
+  };
+
+  const handleCheckStatus = async () => {
+    setIsCheckingStatus(true);
+    setActionError(null);
+    setActionSuccess(null);
+
+    try {
+      const response = await fetch(`/api/streams/${stream.id}/check-status`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to check status');
+      }
+
+      if (data.updated) {
+        setActionSuccess(`Status updated: ${data.previousStatus} → ${data.currentStatus}`);
+      } else {
+        setActionSuccess(`Mux status: ${data.muxStatus} (no change needed)`);
+      }
+      refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsCheckingStatus(false);
     }
   };
 
@@ -290,9 +320,18 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
 
         {isPreparing && (
-          <p className="text-yellow-400 text-sm mt-4">
-            Waiting for video feed... Start streaming from OBS to go live.
-          </p>
+          <div className="mt-4">
+            <p className="text-yellow-400 text-sm mb-3">
+              Waiting for video feed... Start streaming from OBS to go live.
+            </p>
+            <button
+              onClick={handleCheckStatus}
+              disabled={isCheckingStatus}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
+            >
+              {isCheckingStatus ? 'Checking...' : 'Check Mux Status'}
+            </button>
+          </div>
         )}
 
         {isLive && (

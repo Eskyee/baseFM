@@ -102,8 +102,13 @@ export async function createDJ(input: CreateDJInput): Promise<DJ> {
       genres: input.genres || [],
       twitter_url: input.twitterUrl,
       instagram_url: input.instagramUrl,
+      farcaster_url: input.farcasterUrl,
       soundcloud_url: input.soundcloudUrl,
       mixcloud_url: input.mixcloudUrl,
+      youtube_url: input.youtubeUrl,
+      spotify_url: input.spotifyUrl,
+      apple_music_url: input.appleMusicUrl,
+      bandcamp_url: input.bandcampUrl,
       website_url: input.websiteUrl,
     })
     .select()
@@ -129,8 +134,13 @@ export async function updateDJ(walletAddress: string, input: UpdateDJInput): Pro
   if (input.genres !== undefined) updateData.genres = input.genres;
   if (input.twitterUrl !== undefined) updateData.twitter_url = input.twitterUrl;
   if (input.instagramUrl !== undefined) updateData.instagram_url = input.instagramUrl;
+  if (input.farcasterUrl !== undefined) updateData.farcaster_url = input.farcasterUrl;
   if (input.soundcloudUrl !== undefined) updateData.soundcloud_url = input.soundcloudUrl;
   if (input.mixcloudUrl !== undefined) updateData.mixcloud_url = input.mixcloudUrl;
+  if (input.youtubeUrl !== undefined) updateData.youtube_url = input.youtubeUrl;
+  if (input.spotifyUrl !== undefined) updateData.spotify_url = input.spotifyUrl;
+  if (input.appleMusicUrl !== undefined) updateData.apple_music_url = input.appleMusicUrl;
+  if (input.bandcampUrl !== undefined) updateData.bandcamp_url = input.bandcampUrl;
   if (input.websiteUrl !== undefined) updateData.website_url = input.websiteUrl;
 
   const { data, error } = await supabase
