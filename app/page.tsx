@@ -139,8 +139,8 @@ export default function HomePage() {
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-purple-500/20">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h2 className="text-[#F5F5F5] text-lg font-bold">Preview Stream</h2>
-                <p className="text-[#888] text-sm">Powered by RaveCulture</p>
+                <h2 className="text-[#F5F5F5] text-lg font-bold">raveculture®</h2>
+                <p className="text-[#888] text-sm">Underground culture. Onchain access.</p>
               </div>
               <a
                 href="https://raveculture.vercel.app"
