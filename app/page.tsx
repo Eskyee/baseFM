@@ -174,17 +174,6 @@ export default function HomePage() {
                 allowFullScreen
               />
             </div>
-
-            {/* Logo Below Stream */}
-            <div className="flex justify-center mt-4">
-              <div className="bg-black px-6 py-3 rounded-lg">
-                <div className="text-white font-black text-center leading-tight tracking-tight">
-                  <div className="text-xl sm:text-2xl">RAVE</div>
-                  <div className="text-xl sm:text-2xl bg-white text-black px-2 inline-block">NIGHT</div>
-                  <div className="text-xl sm:text-2xl">CULTURE</div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
