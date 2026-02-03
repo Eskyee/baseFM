@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useStreams } from '@/hooks/useStreams';
 import { useDJAccess } from '@/hooks/useDJAccess';
@@ -8,8 +9,35 @@ import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import Link from 'next/link';
 
+interface ActivityLog {
+  id: string;
+  message: string;
+  time: Date;
+  type: 'info' | 'success' | 'warning';
+}
+
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
+  const [activityLog, setActivityLog] = useState<ActivityLog[]>([]);
+  const [connectedAt, setConnectedAt] = useState<Date | null>(null);
+
+  // Track connection
+  useEffect(() => {
+    if (isConnected && address) {
+      const now = new Date();
+      setConnectedAt(now);
+      addActivity(`Wallet connected: ${address.slice(0, 6)}...${address.slice(-4)}`, 'success');
+    }
+  }, [isConnected, address]);
+
+  const addActivity = (message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    setActivityLog(prev => [{
+      id: Date.now().toString(),
+      message,
+      time: new Date(),
+      type
+    }, ...prev].slice(0, 10)); // Keep last 10
+  };
   const { hasAccess, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
   const { streams, isLoading } = useStreams({
     djWalletAddress: address,
@@ -161,6 +189,38 @@ export default function DashboardPage() {
               </svg>
               <span>Schedule</span>
             </Link>
+          </div>
+
+          {/* Activity Log */}
+          <div className="mt-4 bg-[#1A1A1A] rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-[#F5F5F5]">Activity Log</h3>
+              {connectedAt && (
+                <span className="text-xs text-[#888]">
+                  Connected {connectedAt.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {activityLog.length === 0 ? (
+                <p className="text-xs text-[#666]">No recent activity</p>
+              ) : (
+                activityLog.map((log) => (
+                  <div key={log.id} className="flex items-start gap-2 text-xs">
+                    <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${
+                      log.type === 'success' ? 'bg-green-500' :
+                      log.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[#888]">{log.message}</span>
+                      <span className="text-[#555] ml-2">
+                        {log.time.toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
