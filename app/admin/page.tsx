@@ -91,7 +91,7 @@ export default function AdminPage() {
         )}
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Link
             href="/admin/schedule"
             className="bg-[#1A1A1A] rounded-lg p-6 hover:bg-[#222] transition-colors group"
@@ -116,6 +116,19 @@ export default function AdminPage() {
             </div>
             <h3 className="text-[#F5F5F5] font-medium mb-1">DJ Management</h3>
             <p className="text-[#888] text-sm">Manage DJs & permissions</p>
+          </Link>
+
+          <Link
+            href="/admin/community"
+            className="bg-[#1A1A1A] rounded-lg p-6 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-4 group-hover:bg-orange-500/30 transition-colors">
+              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium mb-1">Community</h3>
+            <p className="text-[#888] text-sm">Manage members & verification</p>
           </Link>
 
           <Link
