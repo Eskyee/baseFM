@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { OnchainProvider } from '@/components/providers/OnchainProvider';
 import { AppShell } from '@/components/AppShell';
+import { SplashScreen } from '@/components/SplashScreen';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -68,7 +69,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-[#0A0A0A] min-h-screen`}>
         <OnchainProvider>
-          <AppShell>{children}</AppShell>
+          <SplashScreen>
+            <AppShell>{children}</AppShell>
+          </SplashScreen>
         </OnchainProvider>
         <script
           dangerouslySetInnerHTML={{
