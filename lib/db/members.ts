@@ -57,8 +57,11 @@ export async function getMemberByWallet(walletAddress: string): Promise<Member |
 }
 
 // Join community (create or update member)
-export async function joinCommunity(input: JoinCommunityInput & { tokenBalance?: number }): Promise<Member | null> {
+export async function joinCommunity(input: JoinCommunityInput & { tokenBalance?: number }): Promise<{ member: Member | null; error?: string }> {
   const supabase = createServerClient();
+
+  console.log('[joinCommunity] Attempting to join with wallet:', input.walletAddress);
+  console.log('[joinCommunity] Token balance:', input.tokenBalance);
 
   // Use upsert to handle both new and existing members
   const { data, error } = await supabase
@@ -76,11 +79,15 @@ export async function joinCommunity(input: JoinCommunityInput & { tokenBalance?:
     .single();
 
   if (error) {
-    console.error('Failed to join community:', error);
-    return null;
+    console.error('[joinCommunity] Supabase error:', JSON.stringify(error, null, 2));
+    console.error('[joinCommunity] Error code:', error.code);
+    console.error('[joinCommunity] Error message:', error.message);
+    console.error('[joinCommunity] Error details:', error.details);
+    return { member: null, error: `${error.code}: ${error.message}` };
   }
 
-  return memberFromRow(data as MemberRow);
+  console.log('[joinCommunity] Success! Member data:', data);
+  return { member: memberFromRow(data as MemberRow) };
 }
 
 // Update member profile

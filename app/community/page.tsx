@@ -143,7 +143,8 @@ export default function CommunityPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setJoinError(data.error || 'Failed to join');
+        console.error('Join error response:', data);
+        setJoinError(data.details || data.error || 'Failed to join');
         return;
       }
 

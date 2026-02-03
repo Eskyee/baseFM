@@ -66,18 +66,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Create or update member with current token balance
-    const member = await joinCommunity({
+    const result = await joinCommunity({
       walletAddress,
       displayName,
       bio,
       tokenBalance,
     });
 
-    if (!member) {
-      return NextResponse.json({ error: 'Failed to join community' }, { status: 500 });
+    if (!result.member) {
+      console.error('[API /community] Join failed:', result.error);
+      return NextResponse.json({
+        error: 'Failed to join community',
+        details: result.error
+      }, { status: 500 });
     }
 
-    return NextResponse.json({ member, tokenBalance });
+    return NextResponse.json({ member: result.member, tokenBalance });
   } catch (error) {
     console.error('Community POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
