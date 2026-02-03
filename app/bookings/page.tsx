@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -24,7 +24,7 @@ const eventTypes = [
   'Other',
 ];
 
-export default function BookingsPage() {
+function BookingForm() {
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -298,5 +298,39 @@ export default function BookingsPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+function BookingFormFallback() {
+  return (
+    <div className="min-h-screen pb-24">
+      <div className="bg-gradient-to-b from-purple-900/40 to-transparent">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#F5F5F5] mb-3">
+              Book Our Services
+            </h1>
+            <p className="text-[#888] text-sm sm:text-base max-w-lg mx-auto">
+              Tell us about your event and we'll put together a custom quote.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="animate-pulse space-y-6">
+          <div className="bg-[#1A1A1A] rounded-2xl p-5 h-48"></div>
+          <div className="bg-[#1A1A1A] rounded-2xl p-5 h-64"></div>
+          <div className="bg-[#1A1A1A] rounded-2xl p-5 h-32"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function BookingsPage() {
+  return (
+    <Suspense fallback={<BookingFormFallback />}>
+      <BookingForm />
+    </Suspense>
   );
 }
