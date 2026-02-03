@@ -58,7 +58,7 @@ export default function HomePage() {
                 <p className="text-[#888] text-sm">Powered by RaveCulture</p>
               </div>
               <a
-                href="https://www.base.org/name/raveculture.base.eth"
+                href="https://raveculture.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-sm font-semibold hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
