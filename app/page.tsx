@@ -41,6 +41,14 @@ export default function HomePage() {
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        {/* Welcome Header */}
+        <section className="text-center mb-8">
+          <h1 className="text-[#F5F5F5] text-2xl sm:text-3xl font-bold mb-2">Welcome to baseFM</h1>
+          <p className="text-[#888] text-sm sm:text-base max-w-md mx-auto">
+            The onchain radio platform on Base. Connect your wallet to go live or check back for upcoming shows.
+          </p>
+        </section>
+
         {/* Preview Stream */}
         <section className="mb-8">
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-purple-500/20">
@@ -157,20 +165,6 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* Empty State */}
-        {!featuredStream && upcomingStreams.length === 0 && !liveLoading && !upcomingLoading && (
-          <section className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </div>
-            <h2 className="text-[#F5F5F5] text-2xl font-bold mb-2">Welcome to baseFM</h2>
-            <p className="text-[#888] text-sm max-w-md mx-auto mb-6">
-              The onchain radio platform on Base. Connect your wallet to go live or check back for upcoming shows.
-            </p>
-          </section>
-        )}
       </div>
     </div>
   );
