@@ -175,29 +175,29 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const canStop = isLive || isPreparing;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24">
       {/* Back Link */}
       <Link
         href="/dashboard"
-        className="text-gray-400 hover:text-white mb-6 inline-flex items-center gap-2"
+        className="text-gray-400 hover:text-white mb-4 sm:mb-6 inline-flex items-center gap-2 py-2 -ml-2 pl-2 active:bg-white/5 rounded-lg transition-colors"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Back to Dashboard
+        <span className="text-sm sm:text-base">Back to Dashboard</span>
       </Link>
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-white">{stream.title}</h1>
-          <p className="text-gray-400">Stream Control Panel</p>
+      {/* Header - Mobile optimized */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-3xl font-bold text-white truncate">{stream.title}</h1>
+          <p className="text-gray-400 text-sm sm:text-base">Stream Control Panel</p>
         </div>
         <div className="flex items-center gap-2">
           <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm font-semibold ${
               isLive
-                ? 'bg-red-500 text-white'
+                ? 'bg-red-500 text-white animate-pulse'
                 : isPreparing
                 ? 'bg-yellow-500 text-black'
                 : stream.status === 'ENDED'
@@ -205,6 +205,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 : 'bg-gray-700 text-white'
             }`}
           >
+            {isLive && <span className="inline-block w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />}
             {stream.status}
           </span>
         </div>
