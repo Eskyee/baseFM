@@ -3,6 +3,7 @@
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
@@ -134,6 +135,87 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Featured Event Card */}
+        <section className="mb-12">
+          <h2 className="text-[#F5F5F5] text-lg font-bold mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 bg-purple-500 rounded-full" />
+            Featured Event
+          </h2>
+          <Link
+            href="/events/strobe-soundsystem"
+            className="block group"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/60 via-black to-black border border-purple-500/20 hover:border-purple-500/40 transition-all active:scale-[0.99]">
+              {/* Grid Pattern */}
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                                    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+                  backgroundSize: '30px 30px',
+                }}
+              />
+
+              <div className="relative p-5 sm:p-6">
+                {/* Badges */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2.5 py-1 bg-white text-black text-[10px] font-bold uppercase rounded-full">
+                    Launch Event
+                  </span>
+                  <span className="px-2.5 py-1 bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase rounded-full">
+                    16 Stacks
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-white text-xl sm:text-2xl font-black mb-1 group-hover:text-purple-200 transition-colors">
+                  STROBE SOUNDSYSTEM
+                </h3>
+                <p className="text-[#8E8E93] text-sm mb-4">
+                  2 Areas: Dub to Live Techno & Drum & Bass
+                </p>
+
+                {/* Headliners */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="px-3 py-1.5 bg-[#1C1C1E] text-white text-xs font-medium rounded-lg">
+                    SAYTEK LIVE
+                  </span>
+                  <span className="px-3 py-1.5 bg-[#1C1C1E] text-white text-xs font-medium rounded-lg">
+                    JAH SCOOP
+                  </span>
+                  <span className="px-3 py-1.5 bg-[#1C1C1E] text-white text-xs font-medium rounded-lg">
+                    ORIGINAL DUBMAN
+                  </span>
+                  <span className="px-3 py-1.5 bg-[#1C1C1E] text-[#8E8E93] text-xs font-medium rounded-lg">
+                    +15 more
+                  </span>
+                </div>
+
+                {/* Gold Necklace Bonus */}
+                <div className="flex items-center gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl mb-4">
+                  <span className="text-lg">🏆</span>
+                  <p className="text-yellow-200/80 text-xs">
+                    Early bird tickets include commemorative gold necklace
+                  </p>
+                </div>
+
+                {/* CTA */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[#8E8E93] text-xs">
+                    360 Warehouse
+                  </span>
+                  <span className="flex items-center gap-2 text-white text-sm font-semibold group-hover:gap-3 transition-all">
+                    View Event
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </section>
 
         {/* Preview Stream */}
         <section className="mt-8">
