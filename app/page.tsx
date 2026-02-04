@@ -263,23 +263,23 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Logo Above Stream */}
-            <div className="flex justify-center mb-4">
-              <Image
-                src="/IMG_raveculture.png"
-                alt="RaveCulture"
-                width={200}
-                height={200}
-                className="rounded-lg"
-              />
-            </div>
-
             <div className="rounded-xl overflow-hidden bg-black">
               <iframe
                 src="https://player.mux.com/X9OgXqO8Gvo3iHgtTWJqgstGJFVIloBQnT5dhpxeIBM"
                 className="w-full border-none aspect-video"
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
+              />
+            </div>
+
+            {/* Logo Below Stream */}
+            <div className="flex justify-center mt-4">
+              <Image
+                src="/IMG_raveculture.png"
+                alt="RaveCulture"
+                width={200}
+                height={200}
+                className="rounded-lg"
               />
             </div>
           </div>
