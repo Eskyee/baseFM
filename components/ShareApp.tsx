@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 const APP_URL = 'https://base-fm.vercel.app';
+const BASE_SOCIAL_URL = 'https://base.app/profile/raveculture';
 const APP_NAME = 'baseFM';
 const APP_DESCRIPTION = 'The onchain radio platform on Base. Listen to live DJ sets, discover underground music, and tip artists with crypto.';
 
@@ -68,6 +69,17 @@ export function ShareApp({ variant = 'inline', className = '' }: ShareAppProps) 
             <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
           </svg>
         </a>
+        <a
+          href={BASE_SOCIAL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2.5 bg-[#0052FF] text-white rounded-full hover:bg-[#0047E0] transition-all active:scale-[0.97]"
+          title="Follow on Base"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 111 111" fill="currentColor">
+            <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z"/>
+          </svg>
+        </a>
         <button
           onClick={handleCopyLink}
           className="p-2.5 bg-[#2C2C2E] text-white rounded-full hover:bg-[#3C3C3E] transition-all active:scale-[0.97]"
@@ -129,6 +141,18 @@ export function ShareApp({ variant = 'inline', className = '' }: ShareAppProps) 
               <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
             </svg>
             Share on Farcaster
+          </a>
+
+          <a
+            href={BASE_SOCIAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#0052FF] text-white rounded-full text-sm font-semibold hover:bg-[#0047E0] transition-all active:scale-[0.97]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 111 111" fill="currentColor">
+              <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z"/>
+            </svg>
+            Follow on Base
           </a>
 
           <button
@@ -193,6 +217,17 @@ export function ShareApp({ variant = 'inline', className = '' }: ShareAppProps) 
           <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
         </svg>
         Farcaster
+      </a>
+      <a
+        href={BASE_SOCIAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0052FF] text-white rounded-full text-xs font-medium hover:bg-[#0047E0] transition-all active:scale-[0.97]"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 111 111" fill="currentColor">
+          <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z"/>
+        </svg>
+        Base
       </a>
       <button
         onClick={handleCopyLink}
