@@ -154,7 +154,7 @@ export default function DashboardPage() {
             {/* Go Live - Always visible */}
             <Link
               href="/dashboard/create"
-              className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#3B82F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm"
+              className="px-4 sm:px-5 py-2 sm:py-2.5 bg-white text-black rounded-lg hover:bg-[#E5E5E5] transition-colors font-medium text-sm active:scale-[0.97]"
             >
               Go Live
             </Link>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
             </p>
             <Link
               href="/dashboard/create"
-              className="px-5 py-2.5 bg-[#3B82F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm inline-block"
+              className="px-5 py-2.5 bg-white text-black rounded-lg hover:bg-[#E5E5E5] transition-colors font-medium text-sm inline-block active:scale-[0.97]"
             >
               Create Your First Stream
             </Link>

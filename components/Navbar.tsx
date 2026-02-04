@@ -135,6 +135,7 @@ export function Navbar() {
             <Link
               href="https://talent.app/raveculture.base.eth"
               target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-[#888]"
             >
               RaveCulture
@@ -143,6 +144,7 @@ export function Navbar() {
             <Link
               href="https://base.org"
               target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-[#888]"
             >
               Base

@@ -157,7 +157,7 @@ export default function GalleryPage() {
       <div className="flex flex-col items-center justify-center pt-12 pb-8 px-4">
         <div className="mb-6">
           <Image
-            src="/EC2CCBEC-37E8-4407-AEB8-C3C48FCEC02F.png"
+            src="/IMG_raveculture.png"
             alt="RaveCulture"
             width={180}
             height={180}
@@ -197,6 +197,7 @@ export default function GalleryPage() {
                 <Link
                   href={`https://app.uniswap.org/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-purple-400 text-sm hover:underline"
                 >
                   Get {DJ_TOKEN_CONFIG.symbol} →
@@ -267,11 +268,11 @@ export default function GalleryPage() {
       <footer className="py-12 text-center">
         <p className="text-white/30 text-sm">
           Powered by{' '}
-          <Link href="https://cloudinary.com" target="_blank" className="text-white/50 hover:text-white transition-colors">
+          <Link href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors">
             Cloudinary
           </Link>
           {' '}&{' '}
-          <Link href="https://base.org" target="_blank" className="text-white/50 hover:text-white transition-colors">
+          <Link href="https://base.org" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors">
             Base
           </Link>
         </p>

@@ -1,16 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useReadContract } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
+import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
+
+const balanceOfAbi = [
+  {
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
 
 export default function CreateStreamPage() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Check RAVE token balance for premium tier
+  const { data: balanceData } = useReadContract({
+    address: DJ_TOKEN_CONFIG.address,
+    abi: balanceOfAbi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
+
+  const tokenBalance = balanceData
+    ? Number(balanceData / BigInt(10 ** DJ_TOKEN_CONFIG.decimals))
+    : 0;
+
+  // Premium tier = 1 billion+ RAVE tokens
+  const isPremium = tokenBalance >= DJ_TOKEN_CONFIG.premiumAmount;
 
   const [formData, setFormData] = useState({
     title: '',
@@ -43,6 +70,11 @@ export default function CreateStreamPage() {
     setIsSubmitting(true);
     setError(null);
 
+    // Determine token address based on premium status
+    const tokenAddress = isPremium
+      ? formData.requiredTokenAddress
+      : DJ_TOKEN_CONFIG.address;
+
     try {
       const response = await fetch('/api/streams', {
         method: 'POST',
@@ -56,7 +88,7 @@ export default function CreateStreamPage() {
           tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()) : undefined,
           coverImageUrl: formData.coverImageUrl || undefined,
           isGated: formData.isGated,
-          requiredTokenAddress: formData.isGated ? formData.requiredTokenAddress : undefined,
+          requiredTokenAddress: formData.isGated ? tokenAddress : undefined,
           requiredTokenAmount: formData.isGated ? parseInt(formData.requiredTokenAmount, 10) : undefined,
         }),
       });
@@ -209,65 +241,87 @@ export default function CreateStreamPage() {
             </div>
           </div>
 
-          {/* Token Gating */}
-          <div className="bg-[#1A1A1A] rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Token Gating</h2>
-
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="isGated"
-                id="isGated"
-                checked={formData.isGated}
-                onChange={handleChange}
-                className="w-4 h-4 rounded bg-[#0A0A0A] border-[#333] text-[#3B82F6] focus:ring-[#3B82F6]"
-              />
-              <label htmlFor="isGated" className="text-[#888] text-sm">
-                Require tokens to access this stream
-              </label>
-            </div>
-
-            {formData.isGated && (
-              <div className="space-y-4 pt-4 border-t border-[#333]">
-                <div>
-                  <label className="block text-sm font-medium text-[#888] mb-2">
-                    Token Contract Address *
-                  </label>
-                  <input
-                    type="text"
-                    name="requiredTokenAddress"
-                    value={formData.requiredTokenAddress}
-                    onChange={handleChange}
-                    required={formData.isGated}
-                    className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] font-mono text-sm"
-                    placeholder="0x..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[#888] mb-2">
-                    Required Amount *
-                  </label>
-                  <input
-                    type="number"
-                    name="requiredTokenAmount"
-                    value={formData.requiredTokenAmount}
-                    onChange={handleChange}
-                    required={formData.isGated}
-                    min="1"
-                    className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
-                    placeholder="1"
-                  />
-                </div>
+          {/* Token Gating - Premium Feature Only */}
+          {isPremium && (
+            <div className="bg-[#1A1A1A] rounded-lg p-6 space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-[#F5F5F5]">Token Gating</h2>
+                <span className="px-3 py-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-xs font-semibold flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                  </svg>
+                  PREMIUM
+                </span>
               </div>
-            )}
-          </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="isGated"
+                  id="isGated"
+                  checked={formData.isGated}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded bg-[#0A0A0A] border-[#333] text-[#3B82F6] focus:ring-[#3B82F6]"
+                />
+                <label htmlFor="isGated" className="text-[#888] text-sm">
+                  Require tokens to access this stream
+                </label>
+              </div>
+
+              {formData.isGated && (
+                <div className="space-y-4 pt-4 border-t border-[#333]">
+                  <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/30 rounded-lg p-4">
+                    <p className="text-purple-300 text-sm mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                      </svg>
+                      Premium Feature: Use your own token
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Gate your streams with any ERC-20 token on Base.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-[#888] mb-2">
+                      Token Contract Address *
+                    </label>
+                    <input
+                      type="text"
+                      name="requiredTokenAddress"
+                      value={formData.requiredTokenAddress}
+                      onChange={handleChange}
+                      required={formData.isGated}
+                      className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] font-mono text-sm"
+                      placeholder="0x..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-[#888] mb-2">
+                      Required Amount *
+                    </label>
+                    <input
+                      type="number"
+                      name="requiredTokenAmount"
+                      value={formData.requiredTokenAmount}
+                      onChange={handleChange}
+                      required={formData.isGated}
+                      min="1"
+                      className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                      placeholder="1"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-[#3B82F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 bg-white text-black rounded-xl hover:bg-[#E5E5E5] transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] touch-target"
           >
             {isSubmitting ? 'Creating...' : 'Create Stream'}
           </button>

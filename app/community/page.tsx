@@ -201,6 +201,7 @@ export default function CommunityPage() {
                 <Link
                   href={`https://app.uniswap.org/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-xs text-purple-400"
                 >
                   Get {DJ_TOKEN_CONFIG.symbol} →
