@@ -2,6 +2,7 @@
 
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
@@ -157,13 +158,13 @@ export default function HomePage() {
 
             {/* Logo Above Stream */}
             <div className="flex justify-center mb-4">
-              <div className="bg-black px-6 py-3 rounded-lg">
-                <div className="text-white font-black text-center leading-tight tracking-tight">
-                  <div className="text-xl sm:text-2xl">RAVE</div>
-                  <div className="text-xl sm:text-2xl bg-white text-black px-2 inline-block">NIGHT</div>
-                  <div className="text-xl sm:text-2xl">CULTURE</div>
-                </div>
-              </div>
+              <Image
+                src="/EC2CCBEC-37E8-4407-AEB8-C3C48FCEC02F.png"
+                alt="RaveCulture"
+                width={200}
+                height={200}
+                className="rounded-lg"
+              />
             </div>
 
             <div className="rounded-xl overflow-hidden bg-black">
