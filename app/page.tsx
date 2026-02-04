@@ -148,7 +148,7 @@ export default function HomePage() {
                   href="https://warpcast.com/raveculture"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#8B5CF6] rounded-full text-white text-sm font-semibold hover:bg-[#7C3AED] transition-all active:scale-[0.97] touch-target"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-[#E5E5E5] transition-all active:scale-[0.97] touch-target"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
@@ -159,7 +159,7 @@ export default function HomePage() {
                   href="https://base.app/profile/raveculture"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0052FF] rounded-full text-white text-sm font-semibold hover:bg-[#0040CC] transition-all active:scale-[0.97] touch-target"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-semibold hover:bg-[#3C3C3E] transition-all active:scale-[0.97] touch-target"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 111 111" fill="none">
                     <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z" fill="white"/>
@@ -170,7 +170,7 @@ export default function HomePage() {
                   href="https://raveculture.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-sm font-semibold hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.97] touch-target"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-semibold hover:bg-[#3C3C3E] transition-all active:scale-[0.97] touch-target"
                 >
                   <span>Website</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

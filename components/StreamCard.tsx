@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Stream } from '@/types/stream';
 
 // Default fallback image - baseFM logo
@@ -17,11 +18,11 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
   const isPreparing = stream.status === 'PREPARING';
 
   const statusColors = {
-    CREATED: 'bg-gray-500',
-    PREPARING: 'bg-yellow-500',
-    LIVE: 'bg-red-500',
-    ENDING: 'bg-orange-500',
-    ENDED: 'bg-gray-600',
+    CREATED: 'bg-[#48484A]',
+    PREPARING: 'bg-[#FF9F0A]',
+    LIVE: 'bg-[#FF453A]',
+    ENDING: 'bg-[#FF9F0A]',
+    ENDED: 'bg-[#48484A]',
   };
 
   const statusLabels = {
@@ -34,26 +35,28 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
 
   // Use provided cover image or fall back to logo
   const coverImage = stream.coverImageUrl || DEFAULT_COVER;
+  const hasCustomImage = !!stream.coverImageUrl;
 
   return (
-    <div className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors">
+    <div className="bg-[#1C1C1E] rounded-2xl overflow-hidden hover:bg-[#2C2C2E] transition-all active:scale-[0.98]">
       {/* Cover Image */}
-      <div className="relative aspect-video bg-gray-900">
-        <img
+      <div className="relative aspect-video bg-[#0A0A0A]">
+        <Image
           src={coverImage}
           alt={stream.title}
-          className={`w-full h-full ${
-            stream.coverImageUrl ? 'object-cover' : 'object-contain p-8 bg-[#0A0A0A]'
+          fill
+          className={`${
+            hasCustomImage ? 'object-cover' : 'object-contain p-8'
           }`}
         />
 
         {/* Status Badge */}
-        <div className="absolute top-2 left-2">
+        <div className="absolute top-3 left-3">
           <span
-            className={`px-2 py-1 rounded text-xs font-medium text-white ${statusColors[stream.status]}`}
+            className={`px-2.5 py-1 rounded-full text-xs font-semibold text-white ${statusColors[stream.status]} flex items-center gap-1.5`}
           >
             {isLive && (
-              <span className="inline-block w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
             )}
             {statusLabels[stream.status]}
           </span>
@@ -61,8 +64,8 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
 
         {/* Token Gated Badge */}
         {stream.isGated && (
-          <div className="absolute top-2 right-2">
-            <span className="px-2 py-1 rounded text-xs font-medium text-white bg-purple-600">
+          <div className="absolute top-3 right-3">
+            <span className="px-2.5 py-1 rounded-full text-xs font-semibold text-black bg-[#F59E0B]">
               Token Gated
             </span>
           </div>
@@ -71,19 +74,19 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-white font-semibold text-lg mb-1 truncate">
+        <h3 className="text-white font-semibold text-base mb-1 truncate">
           {stream.title}
         </h3>
-        <p className="text-gray-400 text-sm mb-2">by {stream.djName}</p>
+        <p className="text-[#8E8E93] text-sm mb-2">by {stream.djName}</p>
 
         {stream.genre && (
-          <span className="inline-block px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300 mb-3">
+          <span className="inline-block px-2.5 py-1 bg-[#2C2C2E] rounded-full text-xs text-[#8E8E93] mb-3">
             {stream.genre}
           </span>
         )}
 
         {stream.description && (
-          <p className="text-gray-500 text-sm line-clamp-2 mb-4">
+          <p className="text-[#636366] text-sm line-clamp-2 mb-4">
             {stream.description}
           </p>
         )}
@@ -93,17 +96,17 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
           {showDJControls ? (
             <Link
               href={`${linkPrefix}/stream/${stream.id}`}
-              className="flex-1 px-4 py-2 bg-base-blue text-white text-center rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+              className="flex-1 px-4 py-2.5 bg-white text-black text-center rounded-xl transition-all text-sm font-semibold hover:bg-[#E5E5E5] active:scale-[0.97]"
             >
               Manage Stream
             </Link>
           ) : (
             <Link
               href={`/stream/${stream.id}`}
-              className={`flex-1 px-4 py-2 text-white text-center rounded-lg transition-colors text-sm font-medium ${
+              className={`flex-1 px-4 py-2.5 text-center rounded-xl transition-all text-sm font-semibold active:scale-[0.97] ${
                 isLive || isPreparing
-                  ? 'bg-base-blue hover:bg-blue-600'
-                  : 'bg-gray-700 hover:bg-gray-600'
+                  ? 'bg-white text-black hover:bg-[#E5E5E5]'
+                  : 'bg-[#2C2C2E] text-white hover:bg-[#3C3C3E]'
               }`}
             >
               {isLive ? 'Listen Now' : isPreparing ? 'Starting Soon' : 'View Details'}

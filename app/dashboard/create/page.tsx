@@ -321,7 +321,7 @@ export default function CreateStreamPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-[#3B82F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 bg-white text-black rounded-xl hover:bg-[#E5E5E5] transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] touch-target"
           >
             {isSubmitting ? 'Creating...' : 'Create Stream'}
           </button>
