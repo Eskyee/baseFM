@@ -157,7 +157,7 @@ export default function GalleryPage() {
       <div className="flex flex-col items-center justify-center pt-12 pb-8 px-4">
         <div className="mb-6">
           <Image
-            src="/IMG_6851.png"
+            src="/EC2CCBEC-37E8-4407-AEB8-C3C48FCEC02F.png"
             alt="RaveCulture"
             width={180}
             height={180}
