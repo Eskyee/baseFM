@@ -48,7 +48,7 @@ export default function HomePage() {
         <section className="text-center mb-8">
           <h1 className="text-[#F5F5F5] text-2xl sm:text-3xl font-bold mb-2">Welcome to baseFM</h1>
           <p className="text-[#888] text-sm sm:text-base max-w-md mx-auto">
-            Underground radio, onchain. DJs, plug in your wallet to broadcast live and get paid instantly.
+            Underground radio, onchain. DJs, plug in your wallet to broadcast live. Crew members get paid instantly.
           </p>
         </section>
 
