@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const APP_URL = 'https://basefm.xyz';
+const APP_URL = 'https://base-fm.vercel.app';
 const APP_NAME = 'baseFM';
 const APP_DESCRIPTION = 'The onchain radio platform on Base. Listen to live DJ sets, discover underground music, and tip artists with crypto.';
 
