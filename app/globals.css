@@ -354,3 +354,236 @@ select {
   scroll-snap-align: start;
   flex-shrink: 0;
 }
+
+/* ========== Apple-Level Polish ========== */
+
+/* iOS-style system colors */
+:root {
+  --ios-blue: #0A84FF;
+  --ios-green: #30D158;
+  --ios-red: #FF453A;
+  --ios-orange: #FF9F0A;
+  --ios-yellow: #FFD60A;
+  --ios-purple: #BF5AF2;
+  --ios-pink: #FF375F;
+  --ios-gray: #8E8E93;
+  --ios-gray-2: #636366;
+  --ios-gray-3: #48484A;
+  --ios-gray-4: #3A3A3C;
+  --ios-gray-5: #2C2C2E;
+  --ios-gray-6: #1C1C1E;
+}
+
+/* Spring animation for iOS-like feel */
+@keyframes spring-in {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-spring {
+  animation: spring-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* iOS modal slide up */
+@keyframes ios-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-ios-slide-up {
+  animation: ios-slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Scale in animation */
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Blur backdrop for modals */
+.backdrop-blur-ios {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* iOS-style pressed state */
+.ios-press {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.ios-press:active {
+  transform: scale(0.97);
+  opacity: 0.8;
+}
+
+/* iOS-style button */
+.ios-button {
+  position: relative;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-button:active {
+  transform: scale(0.97);
+}
+
+.ios-button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* iOS-style card with subtle shadow */
+.ios-card {
+  background: var(--ios-gray-6);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS-style input */
+.ios-input {
+  background: var(--ios-gray-5);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+  font-size: 17px;
+  transition: box-shadow 0.15s ease;
+}
+
+.ios-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
+}
+
+.ios-input::placeholder {
+  color: var(--ios-gray-3);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 0.3s ease;
+}
+
+img[loading] {
+  opacity: 0;
+}
+
+img.loaded {
+  opacity: 1;
+}
+
+/* Better text rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Haptic-style feedback for interactive elements */
+@media (hover: none) and (pointer: coarse) {
+  .haptic:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Hide spin buttons on number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Consistent focus rings */
+:focus-visible {
+  outline: 2px solid var(--ios-blue);
+  outline-offset: 2px;
+}
+
+/* Better scrolling performance */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Rubber band effect prevention for modals */
+.no-bounce {
+  overscroll-behavior: none;
+}
+
+/* Loading pulse animation */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-checkmark {
+  stroke-dasharray: 100;
+  animation: checkmark 0.4s ease-out forwards;
+}
