@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 // Default fallback image - baseFM logo
@@ -33,6 +32,7 @@ export function LiveShowCard({
 }: LiveShowCardProps) {
   // Use provided artwork or fall back to logo
   const imageUrl = artwork || DEFAULT_ARTWORK;
+  const hasCustomArtwork = !!artwork;
 
   const content = (
     <>
@@ -46,12 +46,11 @@ export function LiveShowCard({
             : 'aspect-square rounded-lg'
         }`}
       >
-        <Image
+        <img
           src={imageUrl}
           alt={title}
-          fill
-          className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
-            !artwork ? 'object-contain p-8 bg-[#0A0A0A]' : ''
+          className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+            hasCustomArtwork ? 'object-cover' : 'object-contain p-8 bg-[#0A0A0A]'
           }`}
         />
 
