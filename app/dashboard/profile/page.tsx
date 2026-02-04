@@ -241,10 +241,10 @@ export default function DJProfileEditorPage() {
                     key={genre}
                     type="button"
                     onClick={() => toggleGenre(genre)}
-                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    className={`px-3 py-1.5 rounded-xl text-sm transition-all active:scale-[0.97] ${
                       formData.genres.includes(genre)
-                        ? 'bg-[#3B82F6] text-white'
-                        : 'bg-[#0A0A0A] text-[#888] hover:text-[#F5F5F5] border border-[#333]'
+                        ? 'bg-white text-black font-semibold'
+                        : 'bg-[#2C2C2E] text-[#8E8E93] hover:text-white'
                     }`}
                   >
                     {genre}
@@ -443,11 +443,11 @@ export default function DJProfileEditorPage() {
           </div>
 
           {/* Submit */}
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 py-3 bg-[#3B82F6] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3.5 bg-white text-black rounded-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#E5E5E5] active:scale-[0.98]"
             >
               {isSaving ? 'Saving...' : existingProfile ? 'Update Profile' : 'Create Profile'}
             </button>
@@ -455,7 +455,7 @@ export default function DJProfileEditorPage() {
             {existingProfile && (
               <Link
                 href={`/djs/${existingProfile.slug}`}
-                className="px-6 py-3 bg-[#1A1A1A] text-[#F5F5F5] rounded-lg hover:bg-[#333] transition-colors font-medium text-center"
+                className="px-6 py-3.5 bg-[#2C2C2E] text-white rounded-xl hover:bg-[#3C3C3E] transition-all font-semibold text-center active:scale-[0.98]"
               >
                 View Profile
               </Link>

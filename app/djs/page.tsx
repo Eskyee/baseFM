@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { DJ } from '@/types/dj';
 
@@ -48,20 +47,20 @@ export default function DJsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
                 filter === 'all'
-                  ? 'bg-[#3B82F6] text-white'
-                  : 'bg-[#1A1A1A] text-[#888] hover:text-[#F5F5F5]'
+                  ? 'bg-white text-black'
+                  : 'bg-[#2C2C2E] text-[#8E8E93] hover:text-white'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setFilter('residents')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
                 filter === 'residents'
-                  ? 'bg-[#3B82F6] text-white'
-                  : 'bg-[#1A1A1A] text-[#888] hover:text-[#F5F5F5]'
+                  ? 'bg-white text-black'
+                  : 'bg-[#2C2C2E] text-[#8E8E93] hover:text-white'
               }`}
             >
               Residents
@@ -127,6 +126,8 @@ export default function DJsPage() {
 }
 
 function DJCard({ dj }: { dj: DJ }) {
+  const hasAvatar = !!dj.avatarUrl;
+
   return (
     <Link
       href={`/djs/${dj.slug}`}
@@ -134,12 +135,11 @@ function DJCard({ dj }: { dj: DJ }) {
     >
       {/* Avatar */}
       <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3">
-        <Image
+        <img
           src={dj.avatarUrl || DEFAULT_AVATAR}
           alt={dj.name}
-          fill
-          className={`transition-transform duration-300 group-hover:scale-105 ${
-            dj.avatarUrl ? 'object-cover' : 'object-contain p-8'
+          className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+            hasAvatar ? 'object-cover' : 'object-contain p-8'
           }`}
         />
 
