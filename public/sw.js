@@ -1,14 +1,25 @@
-const CACHE_NAME = 'basefm-v1';
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `basefm-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `basefm-dynamic-${CACHE_VERSION}`;
+const IMAGE_CACHE = `basefm-images-${CACHE_VERSION}`;
+
+// Static assets to cache on install
 const STATIC_ASSETS = [
   '/',
   '/logo.png',
   '/manifest.json',
+  '/icon-192.png',
+  '/icon-32.png',
+  '/apple-touch-icon.png',
+  '/schedule',
+  '/gallery',
+  '/community',
 ];
 
 // Install - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(STATIC_CACHE).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -21,7 +32,10 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => {
+            return name.startsWith('basefm-') &&
+                   !name.includes(CACHE_VERSION);
+          })
           .map((name) => caches.delete(name))
       );
     })
@@ -67,14 +81,12 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // Check if there's already a window open
       for (const client of windowClients) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.navigate(url);
           return client.focus();
         }
       }
-      // Open new window
       if (clients.openWindow) {
         return clients.openWindow(url);
       }
@@ -82,34 +94,105 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// Fetch - network first, fallback to cache
+// Fetch - smart caching strategies
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
+  const { request } = event;
+  const url = new URL(request.url);
 
-  // Skip API routes and streaming URLs
-  const url = new URL(event.request.url);
-  if (url.pathname.startsWith('/api/') ||
-      url.hostname.includes('mux.com') ||
+  // Skip non-GET requests
+  if (request.method !== 'GET') return;
+
+  // Skip API routes
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Skip streaming URLs (Mux, Cloudinary videos)
+  if (url.hostname.includes('mux.com') ||
       url.hostname.includes('stream.mux.com')) {
     return;
   }
 
+  // Image caching strategy - cache first, then network
+  if (request.destination === 'image' ||
+      url.hostname.includes('cloudinary.com') ||
+      url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i)) {
+    event.respondWith(
+      caches.open(IMAGE_CACHE).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          const fetchPromise = fetch(request).then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch(() => cachedResponse);
+
+          return cachedResponse || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
+
+  // Static assets - cache first
+  if (STATIC_ASSETS.some(asset => url.pathname === asset || url.pathname.endsWith(asset))) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        return cachedResponse || fetch(request).then((response) => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  // Navigation requests - network first with offline fallback
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(DYNAMIC_CACHE).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || caches.match('/');
+          });
+        })
+    );
+    return;
+  }
+
+  // Default - network first, fallback to cache
   event.respondWith(
-    fetch(event.request)
+    fetch(request)
       .then((response) => {
-        // Clone and cache successful responses
         if (response.status === 200) {
           const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(request, responseClone);
           });
         }
         return response;
       })
       .catch(() => {
-        // Fallback to cache
-        return caches.match(event.request);
+        return caches.match(request);
       })
   );
+});
+
+// Background sync for when user comes back online
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-pending-actions') {
+    event.waitUntil(Promise.resolve());
+  }
 });
