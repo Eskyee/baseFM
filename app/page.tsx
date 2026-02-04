@@ -159,7 +159,7 @@ export default function HomePage() {
             {/* Logo Above Stream */}
             <div className="flex justify-center mb-4">
               <Image
-                src="/EC2CCBEC-37E8-4407-AEB8-C3C48FCEC02F.png"
+                src="/IMG_raveculture.png"
                 alt="RaveCulture"
                 width={200}
                 height={200}
