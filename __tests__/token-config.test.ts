@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   DJ_TOKEN_CONFIG,
   LISTENER_CONFIG,
+  PREMIUM_FEATURES,
   formatTokenAmount,
   parseTokenAmount,
 } from '@/lib/token/config';
@@ -15,6 +16,14 @@ describe('DJ_TOKEN_CONFIG', () => {
     expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(5000);
   });
 
+  it('should require 1 billion tokens for premium tier', () => {
+    expect(DJ_TOKEN_CONFIG.premiumAmount).toBe(1_000_000_000);
+  });
+
+  it('should have premium amount greater than required amount', () => {
+    expect(DJ_TOKEN_CONFIG.premiumAmount).toBeGreaterThan(DJ_TOKEN_CONFIG.requiredAmount);
+  });
+
   it('should have 18 decimals (standard ERC-20)', () => {
     expect(DJ_TOKEN_CONFIG.decimals).toBe(18);
   });
@@ -25,6 +34,20 @@ describe('DJ_TOKEN_CONFIG', () => {
 
   it('should have RAVE as symbol', () => {
     expect(DJ_TOKEN_CONFIG.symbol).toBe('RAVE');
+  });
+});
+
+describe('PREMIUM_FEATURES', () => {
+  it('should enable custom token gating for premium users', () => {
+    expect(PREMIUM_FEATURES.customTokenGating).toBe(true);
+  });
+
+  it('should enable priority support for premium users', () => {
+    expect(PREMIUM_FEATURES.prioritySupport).toBe(true);
+  });
+
+  it('should enable featured placement for premium users', () => {
+    expect(PREMIUM_FEATURES.featuredPlacement).toBe(true);
   });
 });
 

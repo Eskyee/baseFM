@@ -8,6 +8,9 @@ export const DJ_TOKEN_CONFIG = {
   // Minimum tokens required to DJ (5000 tokens)
   requiredAmount: 5000,
 
+  // Premium tier - 1 billion tokens to use custom token gating
+  premiumAmount: 1_000_000_000,
+
   // Token decimals (standard ERC-20 is 18)
   decimals: 18,
 
@@ -17,6 +20,16 @@ export const DJ_TOKEN_CONFIG = {
 
   // Chain
   chainId: 8453, // Base mainnet
+};
+
+// Premium tier benefits
+export const PREMIUM_FEATURES = {
+  // Can use their own token for stream gating
+  customTokenGating: true,
+  // Priority support
+  prioritySupport: true,
+  // Featured placement
+  featuredPlacement: true,
 };
 
 // Listener access is always free
