@@ -281,7 +281,7 @@ export default function HomePage() {
         {/* RaveCulture Logo */}
         <section className="mt-8 flex justify-center pb-8">
           <img
-            src="/IMG_raveculture.png"
+            src="/IMG_6851.png"
             alt="RaveCulture"
             width={200}
             height={200}
