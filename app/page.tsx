@@ -3,7 +3,6 @@
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -280,8 +279,8 @@ export default function HomePage() {
         </section>
 
         {/* RaveCulture Logo */}
-        <section className="mt-8 flex justify-center">
-          <Image
+        <section className="mt-8 flex justify-center pb-8">
+          <img
             src="/IMG_raveculture.png"
             alt="RaveCulture"
             width={200}

@@ -8,12 +8,12 @@
   "frame": {
     "version": "1",
     "name": "baseFM",
-    "iconUrl": "https://basefm.vercel.app/logo.png",
-    "homeUrl": "https://basefm.vercel.app",
-    "imageUrl": "https://basefm.vercel.app/og-image.png",
+    "iconUrl": "https://base-fm.vercel.app/logo.png",
+    "homeUrl": "https://base-fm.vercel.app",
+    "imageUrl": "https://base-fm.vercel.app/og-image.png",
     "buttonTitle": "Listen Live 📻",
-    "splashImageUrl": "https://basefm.vercel.app/logo.png",
+    "splashImageUrl": "https://base-fm.vercel.app/logo.png",
     "splashBackgroundColor": "#0A0A0A",
-    "webhookUrl": "https://basefm.vercel.app/api/webhooks/farcaster"
+    "webhookUrl": "https://base-fm.vercel.app/api/webhooks/farcaster"
   }
 }
