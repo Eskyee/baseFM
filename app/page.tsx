@@ -48,7 +48,7 @@ export default function HomePage() {
         <section className="text-center mb-8">
           <h1 className="text-[#F5F5F5] text-2xl sm:text-3xl font-bold mb-2">Welcome to baseFM</h1>
           <p className="text-[#888] text-sm sm:text-base max-w-md mx-auto">
-            Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised. DJs, plug in to broadcast live, get paid instantly, and receive Crew Passes. 🥷
+            Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised. Part of the Base ecosystem, open source — we all own it. 🥷
           </p>
         </section>
 
