@@ -16,7 +16,7 @@ export function Navbar() {
     { href: '/schedule', label: 'Schedule', icon: 'M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z' },
     { href: '/gallery', label: 'Gallery', icon: 'M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z' },
     { href: '/archive', label: 'Archive', icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2h-4v2h4v2H9V7h6v2z' },
-    { href: '/shop', label: 'Shop', icon: 'M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z' },
+    { href: 'https://shop.basefm.space', label: 'Shop', icon: 'M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z', external: true },
     { href: '/agency', label: 'Agency', icon: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z' },
     { href: '/community', label: 'Community', icon: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z' },
     { href: '/djs', label: 'DJs', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' },
@@ -35,7 +35,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[#0A0A0A] backdrop-blur-md border-b border-[#1A1A1A] safe-area-top">
+      <header className="sticky top-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top" style={{ isolation: 'isolate' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -54,19 +54,31 @@ export function Navbar() {
 
             {/* Navigation Links - Desktop */}
             <nav className="hidden md:flex items-center gap-1">
-              {allLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    pathname === link.href
-                      ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                      : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {allLinks.map((link) =>
+                'external' in link && link.external ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      pathname === link.href
+                        ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                        : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              )}
             </nav>
 
             {/* Right: Wallet + Mobile Menu */}
@@ -109,23 +121,39 @@ export function Navbar() {
         }`}
       >
         <div className="p-4 space-y-2">
-          {allLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                pathname === link.href
-                  ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                  : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-              }`}
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d={link.icon} />
-              </svg>
-              {link.label}
-            </Link>
-          ))}
+          {allLinks.map((link) =>
+            'external' in link && link.external ? (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d={link.icon} />
+                </svg>
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === link.href
+                    ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                    : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d={link.icon} />
+                </svg>
+                {link.label}
+              </Link>
+            )
+          )}
         </div>
 
         {/* Mobile Footer Links */}
