@@ -271,23 +271,23 @@ export default function HomePage() {
                 allowFullScreen
               />
             </div>
-
-            {/* Logo Below Stream */}
-            <div className="flex justify-center mt-4">
-              <Image
-                src="/IMG_raveculture.png"
-                alt="RaveCulture"
-                width={200}
-                height={200}
-                className="rounded-lg"
-              />
-            </div>
           </div>
         </section>
 
         {/* Share App Section */}
         <section className="mt-8">
           <ShareApp variant="full" />
+        </section>
+
+        {/* RaveCulture Logo */}
+        <section className="mt-8 flex justify-center">
+          <Image
+            src="/IMG_raveculture.png"
+            alt="RaveCulture"
+            width={200}
+            height={200}
+            className="rounded-lg"
+          />
         </section>
 
       </div>
