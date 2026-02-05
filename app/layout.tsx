@@ -8,8 +8,9 @@ import { SplashScreen } from '@/components/SplashScreen';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://base-fm.vercel.app'),
   title: 'baseFM - Onchain Radio on Base',
-  description: 'Base-native, token-gated streaming radio platform',
+  description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -29,14 +30,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'baseFM - Onchain Radio on Base',
-    description: 'Base-native, token-gated streaming radio platform',
+    description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
     url: 'https://base-fm.vercel.app',
     siteName: 'baseFM',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://base-fm.vercel.app/og-image.png',
         width: 1200,
         height: 630,
+        alt: 'baseFM - Onchain Radio on Base',
       },
     ],
     locale: 'en_US',
@@ -45,8 +47,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'baseFM - Onchain Radio on Base',
-    description: 'Base-native, token-gated streaming radio platform',
-    images: ['/og-image.png'],
+    description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
+    images: ['https://base-fm.vercel.app/og-image.png'],
   },
 };
 
@@ -62,10 +64,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         {/* Farcaster Frame Meta Tags */}
         <meta property="fc:frame" content="vNext" />
-        <meta property="fc:frame:image" content="https://basefm.vercel.app/og-image.png" />
+        <meta property="fc:frame:image" content="https://base-fm.vercel.app/og-image.png" />
         <meta property="fc:frame:button:1" content="Listen Live 📻" />
         <meta property="fc:frame:button:1:action" content="link" />
-        <meta property="fc:frame:button:1:target" content="https://basefm.vercel.app" />
+        <meta property="fc:frame:button:1:target" content="https://base-fm.vercel.app" />
       </head>
       <body className={`${inter.className} bg-[#0A0A0A] min-h-screen`}>
         <OnchainProvider>
