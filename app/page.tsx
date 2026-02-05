@@ -278,8 +278,15 @@ export default function HomePage() {
           <ShareApp variant="full" />
         </section>
 
-        {/* RaveCulture Logo */}
-        <section className="mt-8 flex justify-center pb-8">
+        {/* Brand Logos */}
+        <section className="mt-8 flex flex-col items-center gap-6 pb-8">
+          <img
+            src="/logo.png"
+            alt="baseFM"
+            width={80}
+            height={80}
+            className="rounded-xl"
+          />
           <img
             src="/IMG_6851.png"
             alt="RaveCulture"

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { WalletConnect } from './WalletConnect';
@@ -41,7 +40,7 @@ export function Navbar() {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <Image
+              <img
                 src="/logo.png"
                 alt="baseFM"
                 width={32}
