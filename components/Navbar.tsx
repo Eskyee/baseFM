@@ -35,9 +35,9 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top overflow-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 min-w-0">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <img
@@ -82,13 +82,13 @@ export function Navbar() {
             </nav>
 
             {/* Right: Wallet + Mobile Menu */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <WalletConnect />
 
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A] transition-colors"
+                className="md:hidden p-1.5 sm:p-2 rounded-lg text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A] transition-colors flex-shrink-0"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
