@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `basefm-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `basefm-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `basefm-images-${CACHE_VERSION}`;

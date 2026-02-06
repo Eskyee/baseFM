@@ -134,38 +134,6 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* === COMING UP === */}
-        {hasUpcoming && (
-          <section>
-            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
-              Coming Up
-            </h2>
-            <div className="flex gap-3 overflow-x-auto carousel-scroll hide-scrollbar pb-2">
-              {upcomingStreams.map((stream) => (
-                <LiveShowCard
-                  key={stream.id}
-                  id={stream.id}
-                  title={stream.title}
-                  djName={stream.djName}
-                  artwork={stream.coverImageUrl}
-                  genre={stream.genre}
-                  isLive={false}
-                  isTokenGated={stream.isGated}
-                  startTime={
-                    stream.scheduledStartTime
-                      ? new Date(stream.scheduledStartTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : undefined
-                  }
-                  variant="carousel"
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
         {/* === EVENT === */}
         <section>
           <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
@@ -259,6 +227,38 @@ export default function HomePage() {
         <section className="pb-4">
           <ShareApp variant="compact" className="justify-center" />
         </section>
+
+        {/* === COMING UP === */}
+        {hasUpcoming && (
+          <section>
+            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
+              Coming Up
+            </h2>
+            <div className="flex gap-3 overflow-x-auto carousel-scroll hide-scrollbar pb-2">
+              {upcomingStreams.map((stream) => (
+                <LiveShowCard
+                  key={stream.id}
+                  id={stream.id}
+                  title={stream.title}
+                  djName={stream.djName}
+                  artwork={stream.coverImageUrl}
+                  genre={stream.genre}
+                  isLive={false}
+                  isTokenGated={stream.isGated}
+                  startTime={
+                    stream.scheduledStartTime
+                      ? new Date(stream.scheduledStartTime).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : undefined
+                  }
+                  variant="carousel"
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
       </div>
     </div>

@@ -10,8 +10,8 @@ export function WalletConnect() {
 
   if (isConnected && address) {
     return (
-      <div className="flex items-center gap-2">
-        {/* Show avatar and name on desktop */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Desktop: avatar + name */}
         <div className="hidden sm:flex items-center gap-2">
           <Identity address={address} className="!bg-transparent">
             <Avatar className="w-8 h-8 rounded-full" />
@@ -20,13 +20,15 @@ export function WalletConnect() {
             <Name className="text-[#F5F5F5] text-sm font-medium max-w-[100px] truncate" />
           </Identity>
         </div>
-        {/* Mobile: just show short address */}
-        <span className="sm:hidden text-[#888] text-xs">
-          {address.slice(0, 4)}...{address.slice(-3)}
-        </span>
+        {/* Mobile: just avatar dot, no text */}
+        <div className="sm:hidden">
+          <Identity address={address} className="!bg-transparent">
+            <Avatar className="w-7 h-7 rounded-full" />
+          </Identity>
+        </div>
         <button
           onClick={() => disconnect()}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-sm rounded-lg hover:bg-[#333] hover:text-[#F5F5F5] transition-colors"
+          className="px-2 py-1 sm:px-3 sm:py-1.5 bg-[#1A1A1A] text-[#888] text-xs sm:text-sm rounded-lg hover:bg-[#333] hover:text-[#F5F5F5] transition-colors"
         >
           Exit
         </button>
