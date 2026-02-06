@@ -4,6 +4,7 @@ import './globals.css';
 import { OnchainProvider } from '@/components/providers/OnchainProvider';
 import { AppShell } from '@/components/AppShell';
 import { SplashScreen } from '@/components/SplashScreen';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -75,6 +76,7 @@ export default function RootLayout({
             <AppShell>{children}</AppShell>
           </SplashScreen>
         </OnchainProvider>
+        <SpeedInsights />
         <script
           dangerouslySetInnerHTML={{
             __html: `
