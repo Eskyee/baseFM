@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const APP_URL = 'https://base-fm.vercel.app';
+const APP_URL = 'https://basefm.space';
 const BASE_SOCIAL_URL = 'https://base.app/profile/raveculture';
 const BASE_SOCIAL_COFOUNDER = 'https://base.app/profile/maximnoize';
 const APP_NAME = 'baseFM';

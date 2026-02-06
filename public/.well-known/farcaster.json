@@ -10,23 +10,23 @@
     "name": "baseFM",
     "subtitle": "Onchain Radio on Base",
     "description": "Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised. Part of the Base ecosystem.",
-    "iconUrl": "https://base-fm.vercel.app/logo.png",
-    "homeUrl": "https://base-fm.vercel.app",
-    "imageUrl": "https://base-fm.vercel.app/og-image.png",
+    "iconUrl": "https://basefm.space/logo.png",
+    "homeUrl": "https://basefm.space",
+    "imageUrl": "https://basefm.space/og-image.png",
     "buttonTitle": "Listen Live",
-    "splashImageUrl": "https://base-fm.vercel.app/logo.png",
+    "splashImageUrl": "https://basefm.space/logo.png",
     "splashBackgroundColor": "#0A0A0A",
-    "webhookUrl": "https://base-fm.vercel.app/api/webhooks/farcaster",
+    "webhookUrl": "https://basefm.space/api/webhooks/farcaster",
     "primaryCategory": "entertainment",
     "tags": ["music", "radio", "crypto", "onchain", "base", "streaming", "events", "tickets"],
     "tagline": "Underground radio, fully onchain",
-    "heroImageUrl": "https://base-fm.vercel.app/og-image.png",
+    "heroImageUrl": "https://basefm.space/og-image.png",
     "screenshotUrls": [
-      "https://base-fm.vercel.app/og-image.png"
+      "https://basefm.space/og-image.png"
     ],
     "ogTitle": "baseFM - Onchain Radio on Base",
     "ogDescription": "Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.",
-    "ogImageUrl": "https://base-fm.vercel.app/og-image.png",
+    "ogImageUrl": "https://basefm.space/og-image.png",
     "noindex": false
   }
 }
