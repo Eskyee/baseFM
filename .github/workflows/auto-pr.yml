@@ -1,0 +1,94 @@
+name: Auto PR for Claude branches
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    name: Create PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for existing PR
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          EXISTING=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "PR #$EXISTING already exists for $BRANCH"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "pr_number=$EXISTING" >> $GITHUB_OUTPUT
+          else
+            echo "No existing PR for $BRANCH"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get commit summary
+        if: steps.check.outputs.exists == 'false'
+        id: summary
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          # Get all commit messages from this branch vs main
+          COMMITS=$(git log origin/main..HEAD --oneline --no-merges)
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Get changed files
+          FILES=$(git diff origin/main...HEAD --stat)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          TITLE=$(git log -1 --format='%s')
+
+          gh pr create \
+            --title "$TITLE" \
+            --base main \
+            --head "$BRANCH" \
+            --body "$(cat <<'BODY'
+          ## Auto-generated PR from Claude branch
+
+          **Branch:** \`${{ github.ref_name }}\`
+
+          ### Commits
+          ${{ steps.summary.outputs.commits }}
+
+          ### Changed files
+          \`\`\`
+          ${{ steps.summary.outputs.files }}
+          \`\`\`
+
+          ---
+          > Review the preview deployment on Vercel, then merge when ready.
+          > Use **Squash and merge** for a clean commit history.
+          BODY
+          )"
+
+      - name: Comment on existing PR
+        if: steps.check.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMIT_MSG=$(git log -1 --format='%s')
+          gh pr comment ${{ steps.check.outputs.pr_number }} \
+            --body "New push: **${COMMIT_MSG}** — preview will update automatically."
