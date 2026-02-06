@@ -148,35 +148,13 @@ export default function HomePage() {
         {/* Preview Stream */}
         <section className="mt-8">
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-purple-500/20">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <div>
-                <h2 className="text-[#F5F5F5] text-lg font-bold">
-                  raveculture®
-                </h2>
-                <p className="text-[#888] text-sm">
-                  Underground culture. Onchain access.
-                </p>
-              </div>
-
-              {/* Website only */}
-              <div className="flex">
-                <a
-                  href="https://raveculture.vercel.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-semibold hover:bg-[#3C3C3E] transition-all active:scale-[0.97] touch-target"
-                >
-                  <span>Website</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-              </div>
+            <div className="mb-4">
+              <h2 className="text-[#F5F5F5] text-lg font-bold">
+                raveculture®
+              </h2>
+              <p className="text-[#888] text-sm">
+                Underground culture. Onchain access.
+              </p>
             </div>
 
             <div className="rounded-xl overflow-hidden bg-black">
