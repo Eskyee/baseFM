@@ -3,7 +3,6 @@
 import Link from 'next/link';
 
 interface LineupSlot {
-  time: string;
   artist: string;
   genre: string;
   isLive?: boolean;
@@ -61,15 +60,15 @@ const EVENT_DATA: {
     {
       name: '360 WAREHOUSE AUDIOVISUAL SYSTEM',
       lineup: [
-        { time: '2-5pm', artist: 'Original Dubman', genre: 'Roots Dub' },
-        { time: '5-6pm', artist: 'Zeb', genre: 'Wavefront Records', isAV: true },
-        { time: '6-7pm', artist: 'ROWLAND UK', genre: '', isAV: true },
-        { time: '7-8pm', artist: 'KINDRED', genre: 'Melodic', isLive: true },
-        { time: '8-9pm', artist: 'Rebecca Gough', genre: 'DJ Set' },
-        { time: '9-10pm', artist: 'Fresh Lov3', genre: '', isLive: true, isAV: true },
-        { time: '10-11pm', artist: 'SECRET HEADLINER', genre: '', isSecret: true },
-        { time: '11-12:30am', artist: 'Jah Scoop', genre: 'Reggae Acid Techno' },
-        { time: '12:30-2am', artist: 'Saytek', genre: 'Live Techno', isLive: true },
+        { artist: 'Original Dubman', genre: 'Roots Dub' },
+        { artist: 'Zeb', genre: 'Wavefront Records', isAV: true },
+        { artist: 'ROWLAND UK', genre: '', isAV: true },
+        { artist: 'KINDRED', genre: 'Melodic', isLive: true },
+        { artist: 'Rebecca Gough', genre: 'DJ Set' },
+        { artist: 'Fresh Lov3', genre: '', isLive: true, isAV: true },
+        { artist: 'SECRET HEADLINER', genre: '', isSecret: true },
+        { artist: 'Jah Scoop', genre: 'Reggae Acid Techno' },
+        { artist: 'Saytek', genre: 'Live Techno', isLive: true },
       ],
     },
     {
@@ -77,18 +76,17 @@ const EVENT_DATA: {
       subtitle: 'Roots to Drum & Bass',
       hostedBy: 'MC Tempo',
       lineup: [
-        { time: '2pm', artist: 'K0TTI', genre: 'Minimal' },
-        { time: '3pm', artist: 'COMPETITION WINNER', genre: '', isSpecial: true },
-        { time: '4pm', artist: 'Medeea Haruki', genre: 'Melodic • Decom' },
-        { time: '5pm', artist: 'DJ Toilette', genre: 'Melodic' },
-        { time: '6pm', artist: 'Nosa', genre: '' },
-        { time: '7pm', artist: 'Alex Hexxen', genre: 'Esoteric / Collide' },
-        { time: '8pm', artist: 'Mr. Clottey', genre: 'UK Garage' },
-        { time: '9pm', artist: 'Rosie Flow', genre: 'DNB', isLive: true },
-        { time: '10pm', artist: 'Digital Pilgrimz', genre: '' },
-        { time: '11pm', artist: 'Serkus', genre: 'DNB & Jungle • Oddessy' },
-        { time: '12am', artist: 'Serkus', genre: '' },
-        { time: '1am', artist: 'Soundwave Travellers', genre: 'Free Party DNB/140' },
+        { artist: 'K0TTI', genre: 'Minimal' },
+        { artist: 'COMPETITION WINNER', genre: '', isSpecial: true },
+        { artist: 'Medeea Haruki', genre: 'Melodic' },
+        { artist: 'DJ Toilette', genre: 'Melodic' },
+        { artist: 'Nosa', genre: '' },
+        { artist: 'Alex Hexxen', genre: 'Esoteric / Collide' },
+        { artist: 'Mr. Clottey', genre: 'UK Garage' },
+        { artist: 'Rosie Flow', genre: 'DNB', isLive: true },
+        { artist: 'Digital Pilgrimz', genre: '' },
+        { artist: 'Serkus', genre: 'DNB & Jungle' },
+        { artist: 'Soundwave Travellers', genre: 'Free Party DNB/140' },
       ],
     },
   ],
@@ -242,23 +240,17 @@ export default function StrobeSoundsystemPage() {
             </p>
           )}
 
-          {/* Timeline */}
+          {/* Artist List */}
           <div className="space-y-1">
             {stage.lineup.map((slot, index) => (
               <div
-                key={`${slot.time}-${index}`}
-                className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${
+                key={`${slot.artist}-${index}`}
+                className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
                   slot.isSecret
                     ? 'bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30'
                     : 'hover:bg-[#1C1C1E]'
                 }`}
               >
-                {/* Time */}
-                <span className="w-20 text-[#8E8E93] text-sm font-mono flex-shrink-0">
-                  {slot.time}
-                </span>
-
-                {/* Artist */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`font-semibold truncate ${
