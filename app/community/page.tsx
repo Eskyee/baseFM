@@ -166,7 +166,16 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-lg mx-auto px-4 py-6">
-        {/* Header */}
+        {/* Back + Header */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-[#888] hover:text-[#F5F5F5] transition-colors mb-4"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="text-sm">Back</span>
+        </Link>
         <div className="mb-5">
           <h1 className="text-xl font-bold text-[#F5F5F5] mb-1">
             Community

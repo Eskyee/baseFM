@@ -206,6 +206,15 @@ a:focus-visible {
 
 /* ========== Mobile-First Enhancements ========== */
 
+/* Navbar height variable (includes safe area for notched devices) */
+:root {
+  --navbar-height: calc(3.5rem + env(safe-area-inset-top, 0px));
+}
+
+.navbar-spacer {
+  height: var(--navbar-height);
+}
+
 /* Safe area support for notched devices */
 .safe-area-top {
   padding-top: env(safe-area-inset-top);

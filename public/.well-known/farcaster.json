@@ -1,18 +1,32 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjIwMjM1NDAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
-    "payload": "eyJkb21haW4iOiJiYXNlZm0udmVyY2VsLmFwcCJ9",
-    "signature": "REPLACE_WITH_ACTUAL_SIGNATURE"
+    "header": "eyJmaWQiOjE2MjY2NjUsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg1RTA1RkZkOTgxZmM0OTdhMTJGQ0NlMmMwZDg3NzY3RjFlNzk0QzMwIn0",
+    "payload": "eyJkb21haW4iOiJiYXNlLWZtLnZlcmNlbC5hcHAifQ",
+    "signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABuvibJ5bG4DJGAu2TAJ6dhxBH_yXvEdDDMex7o_X87FAfkU5SII7aBguSRVfBRYDKQO5gAnSfHz9eaxWL1VoyTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAl8ZgIay2xclZzG8RWZzuWvO8j9R0fus3XxDee9lRlVy8dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACKeyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoidjBHMG9SNHRVcldOWnEtblByaHBYcHN4WkNqRmcxb19hQ1FGdjV4VVc1cyIsIm9yaWdpbiI6Imh0dHBzOi8va2V5cy5jb2luYmFzZS5jb20iLCJjcm9zc09yaWdpbiI6ZmFsc2V9AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   },
+
   "frame": {
     "version": "1",
     "name": "baseFM",
-    "iconUrl": "https://basefm.vercel.app/logo.png",
-    "homeUrl": "https://basefm.vercel.app",
-    "imageUrl": "https://basefm.vercel.app/og-image.png",
-    "buttonTitle": "Listen Live 📻",
-    "splashImageUrl": "https://basefm.vercel.app/logo.png",
+    "subtitle": "Onchain Radio on Base",
+    "description": "Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised. Part of the Base ecosystem.",
+    "iconUrl": "https://base-fm.vercel.app/logo.png",
+    "homeUrl": "https://base-fm.vercel.app",
+    "imageUrl": "https://base-fm.vercel.app/og-image.png",
+    "buttonTitle": "Listen Live",
+    "splashImageUrl": "https://base-fm.vercel.app/logo.png",
     "splashBackgroundColor": "#0A0A0A",
-    "webhookUrl": "https://basefm.vercel.app/api/webhooks/farcaster"
+    "webhookUrl": "https://base-fm.vercel.app/api/webhooks/farcaster",
+    "primaryCategory": "entertainment",
+    "tags": ["music", "radio", "crypto", "onchain", "base", "streaming", "events", "tickets"],
+    "tagline": "Underground radio, fully onchain",
+    "heroImageUrl": "https://base-fm.vercel.app/og-image.png",
+    "screenshotUrls": [
+      "https://base-fm.vercel.app/og-image.png"
+    ],
+    "ogTitle": "baseFM - Onchain Radio on Base",
+    "ogDescription": "Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.",
+    "ogImageUrl": "https://base-fm.vercel.app/og-image.png",
+    "noindex": false
   }
 }

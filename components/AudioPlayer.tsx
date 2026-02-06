@@ -202,11 +202,6 @@ export function AudioPlayer({
         </div>
       </div>
 
-      {/* Live Indicator */}
-      <div className="mt-4 flex items-center gap-2">
-        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-        <span className="text-red-500 text-xs font-medium uppercase">Live</span>
-      </div>
     </div>
   );
 }

@@ -42,6 +42,9 @@ next-env.d.ts
 coverage/
 .nyc_output/
 
+# Test media
+test-stream.mp4
+
 # Misc
 *.log
 *.pid

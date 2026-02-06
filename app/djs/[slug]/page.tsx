@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { DJ } from '@/types/dj';
 import { Stream } from '@/types/stream';
@@ -78,17 +77,18 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const liveStream = streams.find(s => s.status === 'LIVE');
   const pastStreams = streams.filter(s => s.status === 'ENDED').slice(0, 6);
   const upcomingStreams = streams.filter(s => s.status === 'CREATED' || s.status === 'PREPARING');
+  const hasAvatar = !!dj.avatarUrl;
+  const hasCover = !!dj.coverImageUrl;
 
   return (
     <div className="min-h-screen pb-20">
       {/* Cover Image */}
       <div className="relative h-48 md:h-64 bg-[#1A1A1A]">
-        {dj.coverImageUrl ? (
-          <Image
+        {hasCover ? (
+          <img
             src={dj.coverImageUrl}
             alt={dj.name}
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]" />
@@ -101,12 +101,11 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         <div className="relative -mt-16 mb-8">
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Avatar */}
-            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A]">
-              <Image
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] flex-shrink-0">
+              <img
                 src={dj.avatarUrl || DEFAULT_AVATAR}
                 alt={dj.name}
-                fill
-                className={dj.avatarUrl ? 'object-cover' : 'object-contain p-4'}
+                className={`w-full h-full ${hasAvatar ? 'object-cover' : 'object-contain p-4'}`}
               />
             </div>
 
@@ -277,20 +276,17 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                 >
                   <div className="aspect-video bg-[#0A0A0A] relative">
                     {stream.coverImageUrl ? (
-                      <Image
+                      <img
                         src={stream.coverImageUrl}
                         alt={stream.title}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image
+                        <img
                           src="/logo.png"
                           alt="baseFM"
-                          width={48}
-                          height={48}
-                          className="opacity-50"
+                          className="w-12 h-12 opacity-50 object-contain"
                         />
                       </div>
                     )}
