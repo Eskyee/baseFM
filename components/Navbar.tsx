@@ -35,7 +35,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top" style={{ isolation: 'isolate' }}>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -116,9 +116,13 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       <nav
-        className={`fixed top-14 right-0 z-50 w-[min(16rem,80vw)] max-w-[80vw] bg-[#0A0A0A] border-l border-[#1A1A1A] h-[calc(100vh-3.5rem)] h-[calc(100dvh-3.5rem)] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
+        className={`fixed right-0 z-50 w-[min(16rem,80vw)] max-w-[80vw] bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{
+          top: 'var(--navbar-height)',
+          height: 'calc(100dvh - var(--navbar-height))',
+        }}
       >
         <div className="p-4 space-y-2">
           {allLinks.map((link) =>

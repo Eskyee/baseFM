@@ -48,6 +48,7 @@ export function AppShell({ children }: AppShellProps) {
     >
       <div className="flex flex-col min-h-screen">
         <Navbar />
+        <div className="navbar-spacer" aria-hidden="true" />
         <main className={`flex-1 ${currentShow ? 'pb-[72px]' : ''}`}>
           {children}
         </main>
