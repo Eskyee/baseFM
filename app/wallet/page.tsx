@@ -27,7 +27,7 @@ export default function WalletPage() {
   const fundUrl = 'https://wallet.coinbase.com/buy';
 
   // Uniswap swap URL for RAVE token on Base
-  const swapUrl = `https://app.uniswap.org/#/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`;
+  const swapUrl = `https://wallet.coinbase.com/swap';
 
   if (!isConnected) {
     return (
