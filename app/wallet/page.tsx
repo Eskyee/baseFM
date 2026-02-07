@@ -24,10 +24,10 @@ export default function WalletPage() {
   });
 
   // Coinbase buy URL (reliable, always works)
-  const fundUrl = 'https://wallet.coinbase.com/buy';
+  const fundUrl = 'https://www.coinbase.com/buy';
 
   // Uniswap swap URL for RAVE token on Base
-  const fundUrl = `https://wallet.coinbase.com/swap';
+  const swapUrl = `https://app.uniswap.org/#/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`;
 
   if (!isConnected) {
     return (
