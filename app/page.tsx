@@ -4,6 +4,7 @@ import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import Link from 'next/link';
+import SponsorCard from '@/components/SponsorCard'
 
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
