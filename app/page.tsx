@@ -260,13 +260,7 @@ export default function HomePage() {
           </section>
         )}
 
-          <div className="w-full max-w-[600px]">
-  <iframe
-    src="https://github.com/sponsors/Eskyee/card"
-    title="Sponsor Eskyee"
-    className="w-full h-[225px] border-0"
-  />
-</div>
+          <SponsorCard />
 
       </div>
     </div>
