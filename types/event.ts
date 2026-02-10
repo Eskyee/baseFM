@@ -2,10 +2,15 @@
 
 export type EventStatus = 'draft' | 'active' | 'ended';
 export type NFTType = 'ERC721' | 'ERC1155';
+export type EventType = 'physical' | 'livestream';
 
 export type Event = {
   id: string;
   name: string;
+  description?: string;
+  location?: string;
+  eventType: EventType;
+  creator?: string;
   startTime: number;
   endTime: number;
   maxSupply: number;
@@ -15,6 +20,22 @@ export type Event = {
   artistAddress?: `0x${string}`;
   revenueSplitId?: string;
   status: EventStatus;
+  streamUrl?: string;
+};
+
+/** Public-safe event (no admin fields like nftContract, artistAddress) */
+export type PublicEvent = {
+  id: string;
+  name: string;
+  description?: string;
+  location?: string;
+  eventType: EventType;
+  creator?: string;
+  startTime: number;
+  endTime: number;
+  status: EventStatus;
+  spotsLeft: number;
+  streamUrl?: string;
 };
 
 export type AccessToken = {
@@ -30,6 +51,10 @@ export type AccessToken = {
 export type EventRow = {
   id: string;
   name: string;
+  description: string | null;
+  location: string | null;
+  event_type: string | null;
+  creator: string | null;
   start_time: number;
   end_time: number;
   max_supply: number;
@@ -39,6 +64,7 @@ export type EventRow = {
   artist_address: string | null;
   revenue_split_id: string | null;
   status: string;
+  stream_url: string | null;
   created_at: string;
 };
 
@@ -69,6 +95,10 @@ export function eventFromRow(row: EventRow): Event {
   return {
     id: row.id,
     name: row.name,
+    description: row.description ?? undefined,
+    location: row.location ?? undefined,
+    eventType: (row.event_type as EventType) ?? 'physical',
+    creator: row.creator ?? undefined,
     startTime: row.start_time,
     endTime: row.end_time,
     maxSupply: row.max_supply,
@@ -78,6 +108,24 @@ export function eventFromRow(row: EventRow): Event {
     artistAddress: row.artist_address as `0x${string}` | undefined,
     revenueSplitId: row.revenue_split_id ?? undefined,
     status: row.status as EventStatus,
+    streamUrl: row.stream_url ?? undefined,
+  };
+}
+
+/** Convert Event → PublicEvent (strips admin/onchain fields) */
+export function toPublicEvent(event: Event): PublicEvent {
+  return {
+    id: event.id,
+    name: event.name,
+    description: event.description,
+    location: event.location,
+    eventType: event.eventType,
+    creator: event.creator,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    status: event.status,
+    spotsLeft: Math.max(0, event.maxSupply - event.minted),
+    streamUrl: event.eventType === 'livestream' ? event.streamUrl : undefined,
   };
 }
 

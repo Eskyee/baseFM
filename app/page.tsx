@@ -1,6 +1,7 @@
 'use client';
 
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
+import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import Link from 'next/link';
@@ -12,6 +13,7 @@ export default function HomePage() {
     status: ['CREATED', 'PREPARING'],
     limit: 10,
   });
+  const { events: upcomingEvents, isLoading: eventsLoading } = useEvents({ limit: 3 });
 
   const featuredStream = liveStreams[0];
   const otherLiveStreams = liveStreams.slice(1);
@@ -135,10 +137,76 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* === EVENT === */}
+        {/* === UPCOMING EVENTS (dynamic) === */}
+        {!eventsLoading && upcomingEvents.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider">
+                Upcoming Events
+              </h2>
+              <Link
+                href="/events"
+                className="text-[#888] text-xs font-medium transition-colors active:scale-[0.97]"
+              >
+                View All →
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {upcomingEvents.map((event) => (
+                <Link
+                  key={event.id}
+                  href={`/events/${event.id}`}
+                  className="block bg-gradient-to-r from-purple-900/40 to-[#1A1A1A] rounded-2xl overflow-hidden border border-purple-500/10 active:scale-[0.98] transition-transform"
+                >
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase rounded-full">
+                        {event.eventType === 'livestream' ? 'Livestream' : 'In Person'}
+                      </span>
+                    </div>
+                    <h3 className="text-white font-bold text-base leading-tight mb-1">
+                      {event.name}
+                    </h3>
+                    <div className="flex items-center gap-3 text-xs text-[#8E8E93]">
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {new Date(event.startTime * 1000).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {event.location || (event.eventType === 'livestream' ? 'Livestream' : 'TBA')}
+                      </span>
+                      {event.creator && (
+                        <span>By {event.creator}</span>
+                      )}
+                    </div>
+                    <div className="mt-3">
+                      <span className="inline-flex items-center gap-1 text-white text-xs font-semibold">
+                        View Event
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* === EVENT (featured / hardcoded) === */}
         <section>
           <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
-            Events
+            Featured
           </h2>
           <Link
             href="/events/strobe-soundsystem"
