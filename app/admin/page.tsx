@@ -152,7 +152,7 @@ export default function AdminPage() {
         )}
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Link
             href="/admin/schedule"
             className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
@@ -178,11 +178,23 @@ export default function AdminPage() {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/admin/events"
             className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
           >
             <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-3 group-hover:bg-green-500/30 transition-colors">
               <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium text-sm">Events</h3>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center mb-3 group-hover:bg-orange-500/30 transition-colors">
+              <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </div>
