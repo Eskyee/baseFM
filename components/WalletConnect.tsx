@@ -13,17 +13,33 @@ export function WalletConnect() {
       <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Desktop: avatar + name */}
         <div className="hidden sm:flex items-center gap-2">
-          <Identity address={address} className="!bg-transparent">
-            <Avatar className="w-8 h-8 rounded-full" />
+          <Identity address={address} className="!bg-transparent !p-0">
+            <Avatar
+              address={address}
+              className="w-8 h-8 rounded-full bg-[#1A1A1A]"
+              defaultComponent={
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                  {address.slice(2, 4).toUpperCase()}
+                </div>
+              }
+            />
           </Identity>
-          <Identity address={address} className="!bg-transparent">
+          <Identity address={address} className="!bg-transparent !p-0">
             <Name className="text-[#F5F5F5] text-sm font-medium max-w-[100px] truncate" />
           </Identity>
         </div>
-        {/* Mobile: just avatar dot, no text */}
+        {/* Mobile: just avatar, no text */}
         <div className="sm:hidden">
-          <Identity address={address} className="!bg-transparent">
-            <Avatar className="w-7 h-7 rounded-full" />
+          <Identity address={address} className="!bg-transparent !p-0">
+            <Avatar
+              address={address}
+              className="w-7 h-7 rounded-full bg-[#1A1A1A]"
+              defaultComponent={
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-[10px] font-bold">
+                  {address.slice(2, 4).toUpperCase()}
+                </div>
+              }
+            />
           </Identity>
         </div>
         <button
