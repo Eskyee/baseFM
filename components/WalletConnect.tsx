@@ -1,6 +1,7 @@
 'use client';
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
 
 export function WalletConnect() {
@@ -11,37 +12,15 @@ export function WalletConnect() {
   if (isConnected && address) {
     return (
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Desktop: avatar + name */}
-        <div className="hidden sm:flex items-center gap-2">
-          <Identity address={address} className="!bg-transparent !p-0">
-            <Avatar
-              address={address}
-              className="w-8 h-8 rounded-full bg-[#1A1A1A]"
-              defaultComponent={
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
-                  {address.slice(2, 4).toUpperCase()}
-                </div>
-              }
-            />
-          </Identity>
-          <Identity address={address} className="!bg-transparent !p-0">
-            <Name className="text-[#F5F5F5] text-sm font-medium max-w-[100px] truncate" />
-          </Identity>
-        </div>
-        {/* Mobile: just avatar, no text */}
-        <div className="sm:hidden">
-          <Identity address={address} className="!bg-transparent !p-0">
-            <Avatar
-              address={address}
-              className="w-7 h-7 rounded-full bg-[#1A1A1A]"
-              defaultComponent={
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-[10px] font-bold">
-                  {address.slice(2, 4).toUpperCase()}
-                </div>
-              }
-            />
-          </Identity>
-        </div>
+        {/* Avatar + Name using official OnchainKit Identity */}
+        <Identity
+          address={address}
+          chain={base}
+          className="!bg-transparent !p-0 !gap-2"
+        >
+          <Avatar className="w-8 h-8" />
+          <Name className="hidden sm:block text-[#F5F5F5] text-sm font-medium max-w-[100px] truncate" />
+        </Identity>
         <button
           onClick={() => disconnect()}
           className="px-2 py-1 sm:px-3 sm:py-1.5 bg-[#1A1A1A] text-[#888] text-xs sm:text-sm rounded-lg hover:bg-[#333] hover:text-[#F5F5F5] transition-colors"
