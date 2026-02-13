@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
   content: [
@@ -12,9 +13,16 @@ const config: Config = {
         'base-blue': '#0052FF',
         'base-dark': '#0A0B0D',
       },
+      screens: {
+        'landscape': { 'raw': '(orientation: landscape) and (max-height: 500px)' },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function({ addVariant }) {
+      addVariant('landscape', '@media (orientation: landscape) and (max-height: 500px)');
+    }),
+  ],
 };
 
 export default config;

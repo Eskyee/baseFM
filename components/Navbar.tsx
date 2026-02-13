@@ -36,8 +36,14 @@ export function Navbar() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top overflow-hidden">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 min-w-0">
+        <div
+          className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8"
+          style={{
+            paddingLeft: 'max(0.75rem, env(safe-area-inset-left))',
+            paddingRight: 'max(0.75rem, env(safe-area-inset-right))',
+          }}
+        >
+          <div className="flex items-center justify-between h-14 landscape:h-11 min-w-0">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <img
@@ -116,15 +122,18 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       <nav
-        className={`fixed right-0 z-50 w-[min(16rem,80vw)] max-w-[80vw] bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
+        className={`fixed z-50 bg-[#0A0A0A]/95 backdrop-blur-lg border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
           top: 'var(--navbar-height)',
           height: 'calc(100dvh - var(--navbar-height))',
+          right: 'env(safe-area-inset-right, 0px)',
+          width: 'min(14rem, 60vw)',
+          maxWidth: 'calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 60px)',
         }}
       >
-        <div className="p-4 space-y-2">
+        <div className="p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100% - 50px)' }}>
           {allLinks.map((link) =>
             'external' in link && link.external ? (
               <a
@@ -133,53 +142,53 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50 active:scale-[0.98]"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d={link.icon} />
                 </svg>
-                {link.label}
+                <span className="truncate">{link.label}</span>
               </a>
             ) : (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors active:scale-[0.98] ${
                   pathname === link.href
                     ? 'text-[#F5F5F5] bg-[#1A1A1A]'
                     : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
                 }`}
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d={link.icon} />
                 </svg>
-                {link.label}
+                <span className="truncate">{link.label}</span>
               </Link>
             )
           )}
         </div>
 
         {/* Mobile Footer Links */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#1A1A1A]">
-          <div className="flex items-center justify-center gap-4 text-xs text-[#666]">
-            <Link
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#1A1A1A] bg-[#0A0A0A]">
+          <div className="flex items-center justify-center gap-3 text-xs text-[#666]">
+            <a
               href="https://talent.app/raveculture.base.eth"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#888]"
             >
               RaveCulture
-            </Link>
+            </a>
             <span>·</span>
-            <Link
+            <a
               href="https://base.org"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#888]"
             >
               Base
-            </Link>
+            </a>
           </div>
         </div>
       </nav>
