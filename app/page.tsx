@@ -4,6 +4,10 @@ import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import Link from 'next/link';
+import {
+  getNextUpcomingEvent,
+  hasAnyEvents,
+} from '@/lib/events/config';
 
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
@@ -135,42 +139,94 @@ export default function HomePage() {
         )}
 
         {/* === EVENT === */}
-        <section>
-          <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
-            Events
-          </h2>
-          <Link
-            href="/events/strobe-soundsystem"
-            className="block bg-gradient-to-r from-purple-900/40 to-black rounded-2xl overflow-hidden border border-purple-500/20 group active:scale-[0.98] transition-transform"
-          >
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 bg-white text-black text-[10px] font-bold uppercase rounded-full">
-                  Launch Event
-                </span>
-                <span className="px-2 py-0.5 bg-[#2C2C2E] text-[#8E8E93] text-[10px] font-medium rounded-full">
-                  16 Stacks
-                </span>
-              </div>
-              <h3 className="text-white font-bold text-lg leading-tight mb-1">
-                STROBE SOUNDSYSTEM
-              </h3>
-              <p className="text-[#8E8E93] text-sm mb-3">
-                Dub to Live Techno &amp; Drum &amp; Bass
-              </p>
-              <div className="flex items-center gap-4 text-xs text-[#8E8E93]">
-                <span className="flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  360 Warehouse
-                </span>
-                <span>SAYTEK LIVE &bull; JAH SCOOP &bull; +20 artists</span>
-              </div>
-            </div>
-          </Link>
-        </section>
+        {(() => {
+          const nextEvent = getNextUpcomingEvent();
+          const hasEvents = hasAnyEvents();
+
+          // Show featured card for upcoming event
+          if (nextEvent) {
+            return (
+              <section>
+                <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  Upcoming Event
+                </h2>
+                <Link
+                  href={`/events/${nextEvent.slug}`}
+                  className="block bg-gradient-to-r from-purple-900/40 to-black rounded-2xl overflow-hidden border border-purple-500/20 group active:scale-[0.98] transition-transform"
+                >
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      {nextEvent.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 bg-[#2C2C2E] text-[#8E8E93] text-[10px] font-medium rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-white font-bold text-lg leading-tight mb-1">
+                      {nextEvent.title}
+                    </h3>
+                    <p className="text-[#8E8E93] text-sm mb-3">
+                      {nextEvent.subtitle}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-[#8E8E93]">
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {nextEvent.displayDate}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {nextEvent.venue}
+                      </span>
+                    </div>
+                    {nextEvent.headliners.length > 0 && (
+                      <p className="text-[#666] text-xs mt-3 line-clamp-1">
+                        {nextEvent.headliners.slice(0, 3).join(' • ')}
+                        {nextEvent.headliners.length > 3 && ` +${nextEvent.headliners.length - 3} more`}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </section>
+            );
+          }
+
+          // No upcoming event but has past events - show smaller browse link
+          if (hasEvents) {
+            return (
+              <Link
+                href="/events"
+                className="flex items-center justify-between px-4 py-3 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors active:scale-[0.98] group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-[#F5F5F5] font-medium text-sm">Browse Events</span>
+                    <p className="text-[#666] text-xs">View past events</p>
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-[#666] group-hover:text-[#888] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            );
+          }
+
+          // No events at all - hide section
+          return null;
+        })()}
 
         {/* === QUICK LINKS — always visible === */}
         <section>
