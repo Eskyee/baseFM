@@ -113,19 +113,19 @@ export default function StrobeSoundsystemPage() {
         <div className="relative max-w-2xl mx-auto px-4 pt-6 pb-8">
           {/* Back Button */}
           <Link
-            href="/"
+            href="/events"
             className="inline-flex items-center gap-2 text-[#8E8E93] hover:text-white mb-6 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="text-sm font-medium">Back</span>
+            <span className="text-sm font-medium">All Events</span>
           </Link>
 
           {/* Event Badge */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="px-3 py-1 bg-white text-black text-xs font-bold uppercase rounded-full">
-              Launch Event
+            <span className="px-3 py-1 bg-[#2C2C2E] text-[#8E8E93] text-xs font-bold uppercase rounded-full">
+              Past Event
             </span>
             <span className="px-3 py-1 bg-[#2C2C2E] text-[#8E8E93] text-xs font-medium rounded-full">
               16 Stacks
@@ -151,27 +151,11 @@ export default function StrobeSoundsystemPage() {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <a
-            href={EVENT_DATA.ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-4 bg-white text-black rounded-2xl font-bold text-base transition-all hover:bg-[#E5E5E5] active:scale-[0.98] touch-target"
-          >
-            <span>Get Tickets</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-
-          {/* Ticket Bonus */}
-          <div className="mt-4 p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500/30 rounded-2xl">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🏆</span>
-              <p className="text-yellow-200/90 text-sm leading-relaxed">
-                {EVENT_DATA.ticketBonus}
-              </p>
-            </div>
+          {/* Past Event Notice */}
+          <div className="p-4 bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl">
+            <p className="text-[#8E8E93] text-sm text-center">
+              This event has ended. Thanks to everyone who attended!
+            </p>
           </div>
         </div>
       </div>
@@ -286,43 +270,17 @@ export default function StrobeSoundsystemPage() {
         </div>
       ))}
 
-      {/* Bottom CTA */}
+      {/* Bottom Section */}
       <div className="max-w-2xl mx-auto px-4 pt-4">
-        <a
-          href={EVENT_DATA.ticketUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 py-4 bg-white text-black rounded-2xl font-bold text-base transition-all hover:bg-[#E5E5E5] active:scale-[0.98] touch-target"
+        <Link
+          href="/events"
+          className="w-full flex items-center justify-center gap-2 py-4 bg-[#1C1C1E] text-white rounded-2xl font-bold text-base transition-all hover:bg-[#2C2C2E] active:scale-[0.98] touch-target"
         >
-          <span>Get Tickets on RA</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-        </a>
-
-        {/* Share Links */}
-        <div className="flex justify-center gap-4 mt-6">
-          <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('STROBE SOUNDSYSTEM LAUNCHES - 16 Stacks: Dub to Live Techno & DNB')}&url=${encodeURIComponent(EVENT_DATA.ticketUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-3 bg-[#1C1C1E] rounded-xl hover:bg-[#2C2C2E] transition-colors active:scale-[0.97]"
-          >
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-          </a>
-          <a
-            href={`https://warpcast.com/~/compose?text=${encodeURIComponent('STROBE SOUNDSYSTEM LAUNCHES\n\n16 Stacks: 2 Areas: Dub to Live Techno & DNB\n\nFeaturing SAYTEK LIVE, JAH SCOOP, ORIGINAL DUBMAN and more\n\n' + EVENT_DATA.ticketUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-3 bg-[#1C1C1E] rounded-xl hover:bg-[#2C2C2E] transition-colors active:scale-[0.97]"
-          >
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
-            </svg>
-          </a>
-        </div>
+          <span>View All Events</span>
+        </Link>
 
         <p className="text-center text-[#636366] text-xs mt-6">
           Powered by baseFM
