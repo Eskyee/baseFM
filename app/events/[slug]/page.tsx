@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Event } from '@/types/event';
+import { TicketPurchase } from '@/components/TicketPurchase';
 
 export default function EventDetailPage({
   params,
@@ -184,18 +185,25 @@ export default function EventDetailPage({
           </div>
         </div>
 
-        {/* Ticket Button */}
+        {/* Onchain Ticket Purchase */}
+        {!event.isPast && event.id && (
+          <div className="mb-8">
+            <TicketPurchase eventId={event.id} eventTitle={event.title} />
+          </div>
+        )}
+
+        {/* External Ticket Link (fallback if no onchain tickets) */}
         {event.ticketUrl && !event.isPast && (
           <a
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-4 bg-white text-black rounded-xl font-bold text-lg mb-8 hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-4 bg-[#1A1A1A] text-[#F5F5F5] rounded-xl font-medium text-lg mb-8 hover:bg-[#222] transition-colors border border-[#333]"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            {event.ticketPrice ? `Get Tickets - ${event.ticketPrice}` : 'Get Tickets'}
+            {event.ticketPrice ? `External Tickets - ${event.ticketPrice}` : 'External Tickets'}
           </a>
         )}
 
