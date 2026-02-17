@@ -62,24 +62,24 @@ export async function GET(request: NextRequest) {
       const events = eventTickets?.events as Record<string, unknown> | null;
 
       return {
-        id: p.id,
-        ticketId: p.ticket_id,
-        ticketName: eventTickets?.name || 'Unknown',
-        eventId: p.event_id,
-        eventTitle: events?.title || 'Unknown Event',
-        buyerWallet: p.buyer_wallet,
-        quantity: p.quantity,
-        amountUsdc: parseFloat(p.amount_usdc as string),
-        txHash: p.tx_hash,
-        promoterWallet: p.promoter_wallet,
-        status: p.status,
-        purchasedAt: p.purchased_at,
+        id: p.id as string,
+        ticketId: p.ticket_id as string,
+        ticketName: (eventTickets?.name as string) || 'Unknown',
+        eventId: p.event_id as string,
+        eventTitle: (events?.title as string) || 'Unknown Event',
+        buyerWallet: p.buyer_wallet as string,
+        quantity: (p.quantity as number) || 0,
+        amountUsdc: parseFloat(p.amount_usdc as string) || 0,
+        txHash: p.tx_hash as string,
+        promoterWallet: p.promoter_wallet as string,
+        status: p.status as string,
+        purchasedAt: p.purchased_at as string,
       };
     });
 
     // Calculate summary
-    const totalRevenue = sales.reduce((sum: number, s: { amountUsdc: number }) => sum + s.amountUsdc, 0);
-    const totalSold = sales.reduce((sum: number, s: { quantity: number }) => sum + s.quantity, 0);
+    const totalRevenue = sales.reduce((sum, s) => sum + s.amountUsdc, 0);
+    const totalSold = sales.reduce((sum, s) => sum + s.quantity, 0);
 
     // Event breakdown
     const eventMap = new Map<string, { eventId: string; eventTitle: string; revenue: number; ticketsSold: number; promoterWallet: string }>();
