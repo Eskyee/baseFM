@@ -14,6 +14,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home', icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z' },
     { href: '/schedule', label: 'Schedule', icon: 'M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z' },
+    { href: '/clawbotdj', label: 'ClawbotDJ', icon: 'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z', featured: true },
     { href: '/tools', label: 'Tools', icon: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z' },
     { href: '/farcaster', label: 'Farcaster', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' },
     { href: '/gallery', label: 'Gallery', icon: 'M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z' },
@@ -82,6 +83,8 @@ export function Navbar() {
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       pathname === link.href
                         ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                        : 'featured' in link && link.featured
+                        ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
                         : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
                     }`}
                   >

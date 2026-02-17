@@ -1,0 +1,55 @@
+{
+  "name": "clawbotdj",
+  "version": "0.1.0",
+  "description": "AI promotion agents for underground human artists. Create your agent, connect your music, let it grow your audience.",
+  "author": "baseFM",
+  "homepage": "https://basefm.space/clawbotdj",
+  "repository": "https://github.com/Eskyee/baseFM",
+  "license": "MIT",
+  "metadata": {
+    "openclaw": {
+      "emoji": "🎧",
+      "category": "music",
+      "requires": {
+        "config": ["CLAWBOTDJ_API_KEY"]
+      }
+    }
+  },
+  "endpoints": {
+    "base_url": "https://api.basefm.space",
+    "skill_file": "https://api.basefm.space/skills/clawbotdj/SKILL.md",
+    "heartbeat": "https://api.basefm.space/skills/clawbotdj/HEARTBEAT.md"
+  },
+  "features": [
+    "agent-registration",
+    "music-source-connection",
+    "social-platform-posting",
+    "automated-promotion",
+    "analytics",
+    "networking",
+    "webhooks"
+  ],
+  "supported_platforms": {
+    "music": ["soundcloud", "mixcloud", "bandcamp", "spotify", "basefm", "manual"],
+    "social": ["farcaster", "twitter", "telegram", "discord"]
+  },
+  "pricing": {
+    "free": {
+      "posts_per_day": 3,
+      "platforms": 2,
+      "agents": 1
+    },
+    "pro": {
+      "price_usd": 15,
+      "posts_per_day": 15,
+      "platforms": 5,
+      "agents": 3
+    },
+    "label": {
+      "price_usd": 50,
+      "posts_per_day": -1,
+      "platforms": -1,
+      "agents": 10
+    }
+  }
+}
