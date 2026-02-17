@@ -398,10 +398,48 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* === SPONSOR / CREATOR INFO === */}
-        <section className="pt-4 border-t border-[#1A1A1A]">
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-4">
+        {/* === SUPPORT THE PLATFORM === */}
+        <section className="pt-6 border-t border-[#1A1A1A]">
+          <div className="bg-gradient-to-br from-purple-900/20 via-[#1A1A1A] to-blue-900/20 rounded-2xl p-5 border border-[#2A2A2A]">
+            <div className="text-center mb-4">
+              <h3 className="text-[#F5F5F5] font-bold text-lg mb-1">Support baseFM</h3>
+              <p className="text-[#888] text-sm">
+                Help fund the backend, improve the platform, or support the community
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* Donate ETH/Crypto */}
+              <Link
+                href="https://www.coinbase.com/pay?address=eskyee.base.eth&currency=ETH"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-sm font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Donate</span>
+              </Link>
+              {/* Buy baseFM Token */}
+              <Link
+                href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-full text-[#F5F5F5] text-sm font-medium hover:bg-[#1A1A1A] hover:border-purple-500/50 transition-all active:scale-[0.98]"
+              >
+                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <span>Buy baseFM Token</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* === CREATOR INFO === */}
+        <section className="pt-4">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-3">
               <Link
                 href="https://github.com/Eskyee"
                 target="_blank"
