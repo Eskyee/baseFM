@@ -17,13 +17,12 @@ import {
   FiMessageCircle,
   FiBriefcase,
   FiDisc,
-  FiWallet,
   FiMail,
   FiGrid,
   FiBook
 } from 'react-icons/fi';
 import { SiFarcaster } from 'react-icons/si';
-import { BsTicketPerforated } from 'react-icons/bs';
+import { BsTicketPerforated, BsWallet2 } from 'react-icons/bs';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -58,7 +57,7 @@ export function Navbar() {
   // Only show these links if wallet is connected
   const connectedLinks = isConnected
     ? [
-        { href: '/wallet', label: 'Wallet', Icon: FiWallet },
+        { href: '/wallet', label: 'Wallet', Icon: BsWallet2 },
         { href: '/messages', label: 'Messages', Icon: FiMail },
         { href: '/dashboard', label: 'Dashboard', Icon: FiGrid },
       ]
