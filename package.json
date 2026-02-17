@@ -11,6 +11,9 @@
     "test": "vitest",
     "test:run": "vitest run"
   },
+  "overrides": {
+    "x402-fetch": "latest"
+  },
   "dependencies": {
     "@bankr/sdk": "^0.1.0-alpha.8",
     "@coinbase/onchainkit": "^1.1.0",
