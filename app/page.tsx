@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
@@ -9,12 +10,43 @@ import {
   hasAnyEvents,
 } from '@/lib/events/config';
 
+interface DJOfTheDay {
+  dj: {
+    id: string;
+    name: string;
+    slug: string;
+    avatarUrl: string | null;
+    genres: string[];
+    isVerified: boolean;
+    totalShows: number;
+  };
+  reason: string;
+}
+
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
   const { streams: upcomingStreams, isLoading: upcomingLoading } = useStreams({
     status: ['CREATED', 'PREPARING'],
     limit: 10,
   });
+  const [djOfTheDay, setDjOfTheDay] = useState<DJOfTheDay | null>(null);
+
+  useEffect(() => {
+    async function fetchDJOfTheDay() {
+      try {
+        const res = await fetch('/api/dj-of-the-day');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.djOfTheDay) {
+            setDjOfTheDay(data.djOfTheDay);
+          }
+        }
+      } catch (err) {
+        // Silently fail - DJ of the day is optional
+      }
+    }
+    fetchDJOfTheDay();
+  }, []);
 
   const featuredStream = liveStreams[0];
   const otherLiveStreams = liveStreams.slice(1);
@@ -227,6 +259,56 @@ export default function HomePage() {
           // No events at all - hide section
           return null;
         })()}
+
+        {/* === DJ OF THE DAY === */}
+        {djOfTheDay && (
+          <section>
+            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 bg-purple-500 rounded-full" />
+              DJ of the Day
+            </h2>
+            <Link
+              href={`/djs/${djOfTheDay.dj.slug}`}
+              className="block bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
+                  {djOfTheDay.dj.avatarUrl ? (
+                    <img
+                      src={djOfTheDay.dj.avatarUrl}
+                      alt={djOfTheDay.dj.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <img src="/logo.png" alt="" className="w-8 h-8 opacity-50" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-[#F5F5F5] font-bold text-lg truncate">{djOfTheDay.dj.name}</h3>
+                    {djOfTheDay.dj.isVerified && (
+                      <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-[#888] text-sm mb-2">{djOfTheDay.reason}</p>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="text-[#666]">{djOfTheDay.dj.totalShows} shows</span>
+                    {djOfTheDay.dj.genres.length > 0 && (
+                      <span className="text-purple-400">{djOfTheDay.dj.genres.slice(0, 2).join(' • ')}</span>
+                    )}
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </section>
+        )}
 
         {/* === QUICK LINKS — always visible === */}
         <section>
