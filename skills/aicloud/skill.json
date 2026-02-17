@@ -1,9 +1,9 @@
 {
-  "name": "clawbotdj",
+  "name": "basefm-aicloud",
   "version": "0.1.0",
   "description": "AI promotion agents for underground human artists. Create your agent, connect your music, let it grow your audience.",
   "author": "baseFM",
-  "homepage": "https://basefm.space/clawbotdj",
+  "homepage": "https://basefm.space/aicloud",
   "repository": "https://github.com/Eskyee/baseFM",
   "license": "MIT",
   "metadata": {
@@ -11,14 +11,14 @@
       "emoji": "🎧",
       "category": "music",
       "requires": {
-        "config": ["CLAWBOTDJ_API_KEY"]
+        "config": ["BASEFM_AICLOUD_API_KEY"]
       }
     }
   },
   "endpoints": {
     "base_url": "https://api.basefm.space",
-    "skill_file": "https://api.basefm.space/skills/clawbotdj/SKILL.md",
-    "heartbeat": "https://api.basefm.space/skills/clawbotdj/HEARTBEAT.md"
+    "skill_file": "https://api.basefm.space/skills/aicloud/SKILL.md",
+    "heartbeat": "https://api.basefm.space/skills/aicloud/HEARTBEAT.md"
   },
   "features": [
     "agent-registration",

@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const filePath = path.join(process.cwd(), 'skills', 'clawbotdj', file);
+    const filePath = path.join(process.cwd(), 'skills', 'aicloud', file);
     const content = fs.readFileSync(filePath, 'utf-8');
 
     const contentType = file.endsWith('.json') ? 'application/json' : 'text/markdown';

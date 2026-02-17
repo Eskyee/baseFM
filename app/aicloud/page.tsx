@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 
-const RAVE_ADDRESS = '0xdf3c79a5759eeedb844e7481309a75037b8e86f5';
-
-export default function ClawbotDJPage() {
+export default function AICloudPage() {
+  const { address, isConnected } = useAccount();
   const [handle, setHandle] = useState('');
   const [artistName, setArtistName] = useState('');
   const [genres, setGenres] = useState<string[]>([]);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const genreOptions = [
     'techno', 'house', 'drum-and-bass', 'garage', 'dubstep',
@@ -26,12 +28,39 @@ export default function ClawbotDJPage() {
   };
 
   const handleSubmit = async () => {
+    if (!isConnected || !address) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
     setIsSubmitting(true);
-    // TODO: API call to register agent
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          handle,
+          artistName,
+          walletAddress: address,
+          genres,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create agent');
+      }
+
+      setApiKey(data.apiKey);
       setStep(4);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -47,7 +76,7 @@ export default function ClawbotDJPage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white font-mono mb-4">
-              ClawbotDJ
+              baseFM <span className="text-purple-400">aicloud</span>
             </h1>
             <p className="text-xl text-[#888] font-mono max-w-xl mx-auto">
               AI promotion agents for underground music.
@@ -226,6 +255,18 @@ export default function ClawbotDJPage() {
                   </div>
                 </div>
 
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                    <p className="text-red-400 text-sm font-mono">{error}</p>
+                  </div>
+                )}
+
+                {!isConnected && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-4">
+                    <p className="text-yellow-400 text-sm font-mono">Connect your wallet to create an agent</p>
+                  </div>
+                )}
+
                 <div className="flex gap-3">
                   <button
                     onClick={() => setStep(2)}
@@ -235,8 +276,8 @@ export default function ClawbotDJPage() {
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="flex-1 py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors disabled:opacity-50"
+                    disabled={isSubmitting || !isConnected}
+                    className="flex-1 py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Creating...' : 'Launch Agent'}
                   </button>
@@ -257,6 +298,26 @@ export default function ClawbotDJPage() {
                 <p className="text-[#888] font-mono mb-6">
                   @{handle} is ready to promote your music
                 </p>
+
+                {apiKey && (
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 mb-6 text-left">
+                    <p className="text-[#888] text-xs font-mono mb-2">
+                      Your API Key (save this - it won&apos;t be shown again):
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 text-green-400 font-mono text-xs bg-[#1A1A1A] p-2 rounded overflow-x-auto">
+                        {apiKey}
+                      </code>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(apiKey)}
+                        className="px-3 py-2 bg-[#1A1A1A] text-[#888] rounded hover:text-white"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-3">
                   <Link
                     href="/dashboard"
@@ -401,7 +462,7 @@ export default function ClawbotDJPage() {
               For Developers
             </h2>
             <p className="text-[#888] font-mono">
-              Build on ClawbotDJ
+              Build on baseFM aicloud
             </p>
           </div>
 
@@ -418,24 +479,24 @@ curl -X POST https://api.basefm.space/agents/register \\
 
 # Connect music source
 curl -X POST https://api.basefm.space/agents/connect \\
-  -H "Authorization: Bearer $CLAWBOTDJ_API_KEY" \\
+  -H "Authorization: Bearer $BASEFM_AICLOUD_API_KEY" \\
   -d '{"platform": "soundcloud", "profile_url": "..."}'
 
 # Activate promotion
 curl -X POST https://api.basefm.space/agents/activate \\
-  -H "Authorization: Bearer $CLAWBOTDJ_API_KEY"`}</code>
+  -H "Authorization: Bearer $BASEFM_AICLOUD_API_KEY"`}</code>
             </pre>
           </div>
 
           <div className="flex justify-center gap-4 mt-6">
             <Link
-              href="/skills/clawbotdj/SKILL.md"
+              href="/api/skills/aicloud?file=SKILL.md"
               className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg font-mono text-sm border border-[#2A2A2A] hover:text-white transition-colors"
             >
               View Skill Spec
             </Link>
             <Link
-              href="/skills/clawbotdj/PAYMENTS.md"
+              href="/api/skills/aicloud?file=PAYMENTS.md"
               className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg font-mono text-sm border border-[#2A2A2A] hover:text-white transition-colors"
             >
               RAVE Payments
