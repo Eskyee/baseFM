@@ -1,7 +1,10 @@
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const STATIC_CACHE = `basefm-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `basefm-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `basefm-images-${CACHE_VERSION}`;
+
+// Force update check interval (15 minutes)
+const UPDATE_CHECK_INTERVAL = 15 * 60 * 1000;
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
@@ -14,6 +17,9 @@ const STATIC_ASSETS = [
   '/schedule',
   '/gallery',
   '/community',
+  '/events',
+  '/wallet',
+  '/guide',
 ];
 
 // Install - cache static assets
@@ -26,7 +32,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate - clean old caches
+// Activate - clean old caches and notify clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -38,9 +44,35 @@ self.addEventListener('activate', (event) => {
           })
           .map((name) => caches.delete(name))
       );
+    }).then(() => {
+      // Notify all clients that a new version is active
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
+        });
+      });
     })
   );
   self.clients.claim();
+});
+
+// Message handler for cache management
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  if (event.data === 'CLEAR_CACHE') {
+    caches.keys().then((cacheNames) => {
+      cacheNames.forEach((name) => {
+        if (name.startsWith('basefm-')) {
+          caches.delete(name);
+        }
+      });
+    });
+  }
+  if (event.data === 'GET_VERSION') {
+    event.ports[0].postMessage({ version: CACHE_VERSION });
+  }
 });
 
 // Push notifications

@@ -5,6 +5,8 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { PersistentPlayer } from './PersistentPlayer';
 import { NowPlayingMarquee } from './NowPlayingMarquee';
+import { PageTransition } from './PageTransition';
+import { UpdateBanner } from './UpdateBanner';
 
 interface CurrentShow {
   title: string;
@@ -52,10 +54,11 @@ export function AppShell({ children }: AppShellProps) {
         <div className="navbar-spacer" aria-hidden="true" />
         <NowPlayingMarquee />
         <main className={`flex-1 ${currentShow ? 'pb-[72px]' : ''}`}>
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         {!currentShow && <Footer />}
         <PersistentPlayer currentShow={currentShow} />
+        <UpdateBanner />
       </div>
     </PlayerContext.Provider>
   );

@@ -1,6 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable React strict mode for better development experience
+  reactStrictMode: true,
+
+  // Optimize for production
+  swcMinify: true,
+
+  // Compress responses
+  compress: true,
+
+  // Enable experimental features for better performance
+  experimental: {
+    // Optimize package imports for faster builds
+    optimizePackageImports: ['lucide-react', '@coinbase/onchainkit', 'wagmi', 'viem'],
+  },
+
   images: {
+    // Use modern formats
+    formats: ['image/avif', 'image/webp'],
+    // Optimize image loading
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
     remotePatterns: [
       {
         protocol: 'https',
@@ -14,8 +33,13 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'image.mux.com',
+      },
     ],
   },
+
   async rewrites() {
     return [
       {
@@ -24,19 +48,53 @@ const nextConfig = {
       },
     ];
   },
+
   async headers() {
     return [
+      // CORS for Farcaster
       {
         source: '/.well-known/:path*',
         headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET',
-          },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET' },
+        ],
+      },
+      // Cache static assets aggressively
+      {
+        source: '/(.*)\\.(ico|png|jpg|jpeg|gif|webp|svg|woff|woff2)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Cache JS/CSS with revalidation
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Service worker - no cache
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      // Security headers
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+        ],
+      },
+      // API routes - short cache for dynamic data
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=10, stale-while-revalidate=59' },
         ],
       },
     ];
