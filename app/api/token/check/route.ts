@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkTokenAccess } from '@/lib/token/tokenGate';
 import { isValidWalletAddress } from '@/lib/auth/wallet';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;

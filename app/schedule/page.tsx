@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ import { ScheduleSlot, DAY_NAMES, DAY_NAMES_SHORT } from '@/types/schedule';
 
 const DEFAULT_AVATAR = '/logo.png';
 
-export default function SchedulePage() {
+function ScheduleContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const dayParam = searchParams.get('day');
@@ -251,5 +251,36 @@ export default function SchedulePage() {
         )}
       </div>
     </div>
+  );
+}
+
+function SchedulePageSkeleton() {
+  return (
+    <div className="min-h-screen pb-20">
+      <div className="max-w-lg mx-auto px-4 py-6">
+        <div className="mb-5">
+          <div className="h-6 bg-[#1A1A1A] rounded w-24 mb-1" />
+          <div className="h-3 bg-[#1A1A1A] rounded w-32" />
+        </div>
+        <div className="flex gap-1.5 mb-5">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="w-11 h-12 bg-[#1A1A1A] rounded-xl" />
+          ))}
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse bg-[#1A1A1A] rounded-2xl p-3 h-16" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SchedulePage() {
+  return (
+    <Suspense fallback={<SchedulePageSkeleton />}>
+      <ScheduleContent />
+    </Suspense>
   );
 }

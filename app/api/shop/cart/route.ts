@@ -7,6 +7,8 @@ import {
   removeFromCart,
 } from '@/lib/shopify/storefront';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/shop/cart?cartId=xxx
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

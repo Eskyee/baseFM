@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDJByWallet, updateDJ, createDJ } from '@/lib/db/djs';
 import { isValidWalletAddress } from '@/lib/auth/wallet';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const walletAddress = request.headers.get('x-wallet-address');

@@ -2,6 +2,8 @@ import { getProducts } from '@/lib/shopify/storefront';
 import { ProductCard } from '@/components/shop/ProductCard';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Shop | baseFM',
   description: 'Official RaveCulture merch. Pay with card or USDC on Base.',

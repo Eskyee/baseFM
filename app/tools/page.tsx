@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -9,7 +9,7 @@ const DEPLOY_URL = 'https://www.clanker.world/clanker';
 
 type Tab = 'tokens' | 'agents' | 'bankr';
 
-export default function ToolsPage() {
+function ToolsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get('tab') as Tab | null;
@@ -458,5 +458,36 @@ function BankrSection() {
         </button>
       </div>
     </div>
+  );
+}
+
+function ToolsPageSkeleton() {
+  return (
+    <div className="min-h-screen pb-20">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="h-8 bg-[#1A1A1A] rounded w-24 mb-2" />
+          <div className="h-4 bg-[#1A1A1A] rounded w-48" />
+        </div>
+        <div className="flex gap-2 mb-8">
+          <div className="h-10 bg-[#1A1A1A] rounded-lg w-28" />
+          <div className="h-10 bg-[#1A1A1A] rounded-lg w-24" />
+          <div className="h-10 bg-[#1A1A1A] rounded-lg w-20" />
+        </div>
+        <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A] animate-pulse">
+          <div className="h-6 bg-[#1A1A1A] rounded w-32 mb-4" />
+          <div className="h-4 bg-[#1A1A1A] rounded w-64 mb-6" />
+          <div className="h-32 bg-[#1A1A1A] rounded" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ToolsPage() {
+  return (
+    <Suspense fallback={<ToolsPageSkeleton />}>
+      <ToolsContent />
+    </Suspense>
   );
 }

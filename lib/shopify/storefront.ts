@@ -3,8 +3,17 @@
 
 import { SHOPIFY_CONFIG, STOREFRONT_API_URL } from './config';
 
+// Check if Shopify is configured
+function isShopifyConfigured(): boolean {
+  return !!(SHOPIFY_CONFIG.storeDomain && SHOPIFY_CONFIG.storefrontAccessToken);
+}
+
 // GraphQL client for Storefront API
 async function storefrontFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+  if (!isShopifyConfigured()) {
+    throw new Error('Shopify is not configured. Set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_ACCESS_TOKEN environment variables.');
+  }
+
   const response = await fetch(STOREFRONT_API_URL, {
     method: 'POST',
     headers: {
