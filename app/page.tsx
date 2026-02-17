@@ -436,6 +436,20 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* === GITHUB SPONSORS === */}
+        <section className="pt-4">
+          <div className="flex flex-col items-center">
+            <div className="w-full max-w-[600px] rounded-xl overflow-hidden bg-[#0d1117]">
+              <iframe
+                src="https://github.com/sponsors/Eskyee/card"
+                title="Sponsor Eskyee"
+                height="225"
+                className="w-full border-0"
+              />
+            </div>
+          </div>
+        </section>
+
         {/* === CREATOR INFO === */}
         <section className="pt-4">
           <div className="flex flex-col items-center gap-3">
