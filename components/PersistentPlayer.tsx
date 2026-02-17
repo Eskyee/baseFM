@@ -121,8 +121,8 @@ export function PersistentPlayer({ currentShow, onShowClick }: PersistentPlayerP
       <audio ref={audioRef} preload="none" />
 
       {/* Fixed bottom player */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A] border-t border-[#1A1A1A]">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A] border-t border-[#1A1A1A] safe-area-bottom">
+        <div className="max-w-7xl mx-auto px-4 safe-area-left safe-area-right">
           <div className="flex items-center justify-between h-[72px]">
 
             {/* Left: Show Info */}
