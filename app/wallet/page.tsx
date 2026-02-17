@@ -131,6 +131,39 @@ export default function WalletPage() {
           </div>
         </section>
 
+        {/* GBP Conversion Guide for UK Users */}
+        <section className="bg-[#1A1A1A] rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">🇬🇧</span>
+            <h3 className="text-sm font-semibold text-[#F5F5F5]">USD → GBP Guide</h3>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-xs">
+            <div className="flex-1 text-center p-2 bg-[#0A0A0A] rounded-lg">
+              <p className="text-[#888]">$1</p>
+              <p className="text-[#F5F5F5] font-medium">£0.79</p>
+            </div>
+            <div className="flex-1 text-center p-2 bg-[#0A0A0A] rounded-lg">
+              <p className="text-[#888]">$10</p>
+              <p className="text-[#F5F5F5] font-medium">£7.90</p>
+            </div>
+            <div className="flex-1 text-center p-2 bg-[#0A0A0A] rounded-lg">
+              <p className="text-[#888]">$25</p>
+              <p className="text-[#F5F5F5] font-medium">£19.75</p>
+            </div>
+            <div className="flex-1 text-center p-2 bg-[#0A0A0A] rounded-lg">
+              <p className="text-[#888]">$50</p>
+              <p className="text-[#F5F5F5] font-medium">£39.50</p>
+            </div>
+            <div className="flex-1 text-center p-2 bg-[#0A0A0A] rounded-lg">
+              <p className="text-[#888]">$100</p>
+              <p className="text-[#F5F5F5] font-medium">£79</p>
+            </div>
+          </div>
+          <p className="text-[#666] text-[10px] mt-2 text-center">
+            1 USDC = $1 USD · Approximate GBP rates
+          </p>
+        </section>
+
         {/* Buy Crypto — fixed URL */}
         <section className="bg-[#1A1A1A] rounded-2xl p-4 active:scale-[0.98] transition-transform">
           <Link
