@@ -22,11 +22,20 @@ Production-ready streaming platform for Base-native radio. Built by [Eskyee](htt
 - **Push Notifications** - Browser notifications for live shows
 - **Community Threads** - Discussions and posts
 
-### Events & Tickets (NEW)
+### Events & Tickets
 - **Event Listings** - Community events and parties
 - **Onchain Tickets** - Buy with USDC, pay promoters directly
 - **Promoter Profiles** - Collectives, venues, labels
 - **Ticket Verification** - Wallet-based entry check
+- **POS System** - QR payment generation + ticket scanner for door staff
+- **Crew Management** - 35+ production roles for festival organizers
+
+### Promoter Tools (NEW)
+- **Crew Dashboard** - Manage event staff and production crew
+- **Role Categories** - Management, Front of House, Safety, Technical, Production, Artists, Vendors
+- **Check-in System** - Track crew arrivals at events
+- **Crew Notifications** - Slack integration for team updates
+- **Accounting** - Revenue tracking with GBP conversion guide
 
 ### Onchain
 - **Wallet Auth** - Base Wallet (no seed phrases!)
@@ -39,6 +48,14 @@ Production-ready streaming platform for Base-native radio. Built by [Eskyee](htt
 - **PWA Support** - Install as app on iOS/Android
 - **Responsive Design** - Mobile-first UI
 - **Offline Support** - Service worker caching
+
+### Performance (Vercel Pro Optimized)
+- **Loading States** - Page-specific skeleton loaders
+- **Page Transitions** - Smooth fade animations between pages
+- **Smart Caching** - Service worker v4 with cache management
+- **Update Notifications** - Banner prompts for new versions
+- **Optimized Imports** - Tree-shaking for lucide-react, wagmi, viem
+- **Image Optimization** - AVIF/WebP with 30-day cache
 
 ### Developer Experience
 - **CI/CD Pipeline** - GitHub Actions with lint, test, build
@@ -138,7 +155,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | Events | `/events` | Community events |
 | Event Detail | `/events/[slug]` | Event info + tickets |
 | Dashboard | `/dashboard` | DJ streaming controls |
-| Wallet | `/wallet` | Balances + swap |
+| Wallet | `/wallet` | Balances + swap + GBP guide |
+| POS | `/pos` | Payment QR + ticket scanner |
+| Promoter | `/promoter` | Crew management dashboard |
+| Admin Accounting | `/admin/accounting` | Revenue tracking |
+| Admin Crew | `/admin/crew` | Full crew management |
 
 ## API Routes
 
@@ -173,6 +194,13 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 - `POST /api/tickets` - Create ticket tier
 - `POST /api/tickets/purchase` - Record purchase after USDC payment
 - `GET /api/tickets/purchase?wallet=xxx&eventId=xxx` - Check ticket ownership
+
+### Crew Management
+- `GET /api/crew?eventId=xxx` - Get crew for event
+- `POST /api/crew` - Add crew member
+- `DELETE /api/crew?id=xxx` - Remove crew member
+- `PATCH /api/crew` - Update crew (check-in, role change)
+- `POST /api/crew/notify` - Send crew notifications via Slack
 
 ## DJ Workflow
 

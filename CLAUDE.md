@@ -82,11 +82,15 @@ app/                          # Next.js pages (App Router)
   promoters/page.tsx          # Promoter info
   collect/page.tsx            # NFT collection
   shows/[slug]/page.tsx       # Individual show page
+  pos/page.tsx                 # POS payment QR + ticket scanner
+  promoter/page.tsx             # Promoter crew management dashboard
   admin/                      # Admin panel (ADMIN_WALLET_ADDRESS env var)
     page.tsx                  #   Admin dashboard
     djs/page.tsx              #   Manage DJs
     schedule/page.tsx         #   Manage schedule
     community/page.tsx        #   Manage members
+    crew/page.tsx             #   Full crew management (all events)
+    accounting/page.tsx       #   Revenue tracking + GBP conversion
 
 components/                   # Shared components
   Navbar.tsx                  # Fixed top nav (PWA safe-area aware, compact mobile)
@@ -110,6 +114,8 @@ components/                   # Shared components
   BaseAd.tsx                  # Base network promo
   Footer.tsx                  # App footer
   SplashScreen.tsx            # Loading splash (800ms min)
+  PageTransition.tsx          # Smooth page transitions with fade animation
+  UpdateBanner.tsx            # Service worker update notification banner
   providers/
     OnchainProvider.tsx       # Root: WagmiProvider + OnchainKit + ReactQuery
   shop/
@@ -124,6 +130,7 @@ hooks/                        # Custom React hooks
   useTokenGate.ts             # Check token balance for stream gating
   useStream.ts                # Single stream with realtime updates
   useStreams.ts               # Multiple streams + useLiveStreams() helper
+  useServiceWorker.ts         # Cache management + update detection
 
 lib/                          # Server & shared utilities
   admin/config.ts             # Admin wallet list from env
@@ -135,6 +142,7 @@ lib/                          # Server & shared utilities
     schedule.ts               #   Schedule slots
     streams.ts                #   Stream management
     tickets.ts                #   Ticket purchases (USDC payments)
+    crew.ts                   #   Event crew management (35+ roles)
   onchain/minter.ts           # Server-side token minting (ERC20/721/1155)
   schedule.ts                 # Schedule formatting utilities
   shopify/
@@ -157,9 +165,10 @@ public/
   logo.png                    # App logo
   icon-192.png, icon-32.png   # PWA icons
 
-supabase/                     # Database schemas (12 files)
+supabase/                     # Database schemas (13 files)
   schema-bookings.sql         # Booking inquiries
   schema-chat.sql             # Live chat messages (realtime enabled)
+  schema-crew.sql             # Event crew members (35+ production roles)
   schema-djs.sql              # DJ profiles
   schema-members.sql          # Community members (token-gated visibility)
   schema-moderation.sql       # Bans, timeouts, deleted messages
@@ -179,7 +188,7 @@ __tests__/                    # Unit tests (55+ tests)
     test-utils.tsx            # Mock data, render helpers, Supabase mocks
 ```
 
-## API Routes (45+ total)
+## API Routes (50+ total)
 ```
 # Streaming (core)
 GET/POST   /api/streams              # List/create streams
@@ -226,6 +235,13 @@ GET        /api/tickets              # Get tickets for event (?eventId=xxx)
 POST       /api/tickets              # Create ticket tier
 POST       /api/tickets/purchase     # Record purchase after USDC payment
 GET        /api/tickets/purchase     # Check ticket ownership (?wallet=xxx&eventId=xxx)
+
+# Crew Management
+GET        /api/crew                 # Get crew (?eventId=xxx)
+POST       /api/crew                 # Add crew member
+DELETE     /api/crew                 # Remove crew (?id=xxx)
+PATCH      /api/crew                 # Update crew (check-in, role)
+POST       /api/crew/notify          # Send Slack notification to crew
 
 # System
 GET        /api/token/check          # Check token balance
@@ -279,7 +295,9 @@ ADMIN_WALLET_ADDRESS=              # Comma-separated admin wallets
 - CSS var `--navbar-height` + `.navbar-spacer` div in AppShell for content offset
 - Always design mobile-first, test at iPhone width
 - Service worker (`public/sw.js`) caches aggressively - bump `CACHE_VERSION` after big UI changes
-- Current cache version: v3
+- Current cache version: v4
+- UpdateBanner component shows when new version available
+- useServiceWorker hook for cache management
 
 ### Wallet / Web3
 - Coinbase Smart Wallet ONLY (configured in OnchainProvider.tsx)
@@ -392,6 +410,11 @@ Features:
 13. **User guide should use simple English** - Teaching noobs, not developers
 14. **Keep comments for development** - Owner wants code comments preserved
 15. **Gradient buttons look better** - Use `bg-gradient-to-r` for premium styling
+16. **Base Wallet not Coinbase** - Use "Base Wallet" branding for decentralized feel
+17. **GBP conversion helps UK users** - $1 = ~£0.79, show common amounts
+18. **Crew roles are categorized** - Group 35+ roles into Management, FOH, Safety, Technical, etc.
+19. **Page transitions improve UX** - 150ms fade with translate-y for smooth navigation
+20. **Loading skeletons per page** - Custom skeletons for schedule, events, gallery, DJs, wallet
 
 ## Don'ts
 - Don't change Shop link to internal (owner explicitly said no)
@@ -415,8 +438,12 @@ Features:
 | `/guide` | Beginner user guide | 9 sections, simple English, advanced features |
 | `/events` | Event listings | Upcoming/past toggle, promoter info |
 | `/events/[slug]` | Event detail | Ticket purchase with USDC, direct payments |
-| `/wallet` | Token management | Balances, swap, RAVE chart, buy crypto |
+| `/wallet` | Token management | Balances, swap, RAVE chart, GBP guide |
 | `/community` | Token-gated directory | 5000 RAVE requirement |
+| `/pos` | Point of Sale | USDC payment QR, ticket scanner mode |
+| `/promoter` | Crew management | Add/remove crew, check-ins, notifications |
+| `/admin/crew` | Admin crew panel | Full crew management for all events |
+| `/admin/accounting` | Revenue tracking | Ticket sales, tips, GBP conversion guide |
 
 ## Future Expansion Notes
 - Underground rave culture history knowledge base (for community education)
