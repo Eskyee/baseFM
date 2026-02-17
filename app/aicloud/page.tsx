@@ -126,34 +126,48 @@ export default function AICloudPage() {
 
           {/* Registration Form */}
           <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-6 md:p-8">
+            {/* Progress Steps */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono ${
+                    step >= s ? 'bg-purple-500 text-white' : 'bg-[#2A2A2A] text-[#666]'
+                  }`}>
+                    {step > s ? '✓' : s}
+                  </div>
+                  {s < 3 && <div className={`w-8 h-0.5 ${step > s ? 'bg-purple-500' : 'bg-[#2A2A2A]'}`} />}
+                </div>
+              ))}
+            </div>
+
             {step === 1 && (
               <div className="space-y-6">
-                <div>
+                <div className="text-center">
                   <h2 className="text-xl font-bold text-white font-mono mb-2">
-                    Create Your Agent
+                    What should we call you?
                   </h2>
-                  <p className="text-[#888] text-sm font-mono">
-                    Step 1 of 3: Basic info
+                  <p className="text-[#666] text-sm font-mono">
+                    This is how fans will find your agent
                   </p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-[#888] text-xs font-mono mb-2">
-                      Artist Name
+                      Your Artist Name
                     </label>
                     <input
                       type="text"
                       value={artistName}
                       onChange={(e) => setArtistName(e.target.value)}
-                      placeholder="Your DJ/artist name"
+                      placeholder="e.g. DJ Shadow, Burial, Four Tet"
                       className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl text-white font-mono placeholder:text-[#666] focus:outline-none focus:border-purple-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-[#888] text-xs font-mono mb-2">
-                      Agent Handle
+                      Pick a unique handle for your agent
                     </label>
                     <div className="flex">
                       <span className="px-3 py-3 bg-[#0A0A0A] border border-r-0 border-[#2A2A2A] rounded-l-xl text-[#666] font-mono">
@@ -163,31 +177,34 @@ export default function AICloudPage() {
                         type="text"
                         value={handle}
                         onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                        placeholder="your-agent"
+                        placeholder="your-name"
                         className="flex-1 px-4 py-3 bg-[#0A0A0A] border border-[#2A2A2A] rounded-r-xl text-white font-mono placeholder:text-[#666] focus:outline-none focus:border-purple-500"
                       />
                     </div>
+                    <p className="text-[#555] text-xs font-mono mt-2">
+                      Letters, numbers, and hyphens only. This is your agent&apos;s username.
+                    </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setStep(2)}
-                  disabled={!artistName || !handle}
+                  disabled={!artistName || !handle || handle.length < 3}
                   className="w-full py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Continue
+                  Next: Pick Your Sound
                 </button>
               </div>
             )}
 
             {step === 2 && (
               <div className="space-y-6">
-                <div>
+                <div className="text-center">
                   <h2 className="text-xl font-bold text-white font-mono mb-2">
-                    Select Genres
+                    What kind of music do you make?
                   </h2>
-                  <p className="text-[#888] text-sm font-mono">
-                    Step 2 of 3: What do you play? (up to 5)
+                  <p className="text-[#666] text-sm font-mono">
+                    Pick up to 5 genres so your agent finds the right listeners
                   </p>
                 </div>
 
@@ -207,6 +224,12 @@ export default function AICloudPage() {
                   ))}
                 </div>
 
+                {genres.length > 0 && (
+                  <p className="text-center text-[#555] text-xs font-mono">
+                    Selected: {genres.length}/5
+                  </p>
+                )}
+
                 <div className="flex gap-3">
                   <button
                     onClick={() => setStep(1)}
@@ -219,7 +242,7 @@ export default function AICloudPage() {
                     disabled={genres.length === 0}
                     className="flex-1 py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Continue
+                    Review & Launch
                   </button>
                 </div>
               </div>
@@ -227,43 +250,48 @@ export default function AICloudPage() {
 
             {step === 3 && (
               <div className="space-y-6">
-                <div>
+                <div className="text-center">
                   <h2 className="text-xl font-bold text-white font-mono mb-2">
-                    Review & Launch
+                    Looking good!
                   </h2>
-                  <p className="text-[#888] text-sm font-mono">
-                    Step 3 of 3: Confirm your agent
+                  <p className="text-[#666] text-sm font-mono">
+                    Check everything looks right, then launch your agent
                   </p>
                 </div>
 
-                <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-[#888] font-mono text-sm">Artist</span>
-                    <span className="text-white font-mono">{artistName}</span>
+                <div className="bg-[#0A0A0A] rounded-xl p-5 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#666] font-mono text-sm">Artist Name</span>
+                    <span className="text-white font-mono font-medium">{artistName}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#888] font-mono text-sm">Agent</span>
-                    <span className="text-purple-400 font-mono">@{handle}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#666] font-mono text-sm">Agent Handle</span>
+                    <span className="text-purple-400 font-mono font-medium">@{handle}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#888] font-mono text-sm">Genres</span>
-                    <span className="text-white font-mono text-right">{genres.join(', ')}</span>
+                  <div className="flex justify-between items-start">
+                    <span className="text-[#666] font-mono text-sm">Genres</span>
+                    <span className="text-white font-mono text-right max-w-[60%]">{genres.join(', ')}</span>
                   </div>
-                  <div className="flex justify-between pt-2 border-t border-[#2A2A2A]">
-                    <span className="text-[#888] font-mono text-sm">Plan</span>
-                    <span className="text-green-400 font-mono">Free (3 posts/day)</span>
+                  <div className="flex justify-between items-center pt-3 border-t border-[#2A2A2A]">
+                    <span className="text-[#666] font-mono text-sm">Plan</span>
+                    <div className="text-right">
+                      <span className="text-green-400 font-mono font-medium">Free</span>
+                      <p className="text-[#555] text-xs font-mono">3 posts per day</p>
+                    </div>
                   </div>
                 </div>
 
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
                     <p className="text-red-400 text-sm font-mono">{error}</p>
                   </div>
                 )}
 
                 {!isConnected && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-4">
-                    <p className="text-yellow-400 text-sm font-mono">Connect your wallet to create an agent</p>
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+                    <p className="text-yellow-400 text-sm font-mono text-center">
+                      Connect your wallet (top right) to create an agent
+                    </p>
                   </div>
                 )}
 
@@ -277,9 +305,9 @@ export default function AICloudPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting || !isConnected}
-                    className="flex-1 py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-4 bg-purple-500 text-white rounded-xl font-mono font-bold text-lg hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? 'Creating...' : 'Launch Agent'}
+                    {isSubmitting ? 'Creating your agent...' : 'Launch My Agent'}
                   </button>
                 </div>
               </div>
@@ -287,48 +315,53 @@ export default function AICloudPage() {
 
             {step === 4 && (
               <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-white font-mono mb-2">
-                  Agent Created!
+                <h2 className="text-3xl font-bold text-white font-mono mb-3">
+                  You&apos;re all set!
                 </h2>
-                <p className="text-[#888] font-mono mb-6">
-                  @{handle} is ready to promote your music
+                <p className="text-[#888] font-mono mb-8 text-lg">
+                  <span className="text-purple-400">@{handle}</span> is now live and ready to promote your music
                 </p>
 
-                {apiKey && (
-                  <div className="bg-[#0A0A0A] rounded-xl p-4 mb-6 text-left">
-                    <p className="text-[#888] text-xs font-mono mb-2">
-                      Your API Key (save this - it won&apos;t be shown again):
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 text-green-400 font-mono text-xs bg-[#1A1A1A] p-2 rounded overflow-x-auto">
-                        {apiKey}
-                      </code>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(apiKey)}
-                        className="px-3 py-2 bg-[#1A1A1A] text-[#888] rounded hover:text-white"
-                      >
-                        Copy
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <Link
                     href="/dashboard"
-                    className="block w-full py-3 bg-purple-500 text-white rounded-xl font-mono font-semibold hover:bg-purple-600 transition-colors"
+                    className="block w-full py-4 bg-purple-500 text-white rounded-xl font-mono font-bold text-lg hover:bg-purple-600 transition-colors"
                   >
-                    Go to Dashboard
+                    Set Up My Agent
                   </Link>
-                  <p className="text-[#666] text-xs font-mono">
-                    Next: Connect your music sources and social accounts
+                  <p className="text-[#666] text-sm font-mono">
+                    Connect your SoundCloud, link your socials, and start growing
                   </p>
                 </div>
+
+                {apiKey && (
+                  <details className="mt-8 text-left">
+                    <summary className="text-[#555] text-xs font-mono cursor-pointer hover:text-[#888]">
+                      Developer? Click to see your API key
+                    </summary>
+                    <div className="bg-[#0A0A0A] rounded-xl p-4 mt-3">
+                      <p className="text-[#666] text-xs font-mono mb-2">
+                        Save this key securely - it won&apos;t be shown again:
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-green-400 font-mono text-xs bg-[#1A1A1A] p-2 rounded overflow-x-auto">
+                          {apiKey}
+                        </code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(apiKey)}
+                          className="px-3 py-2 bg-[#1A1A1A] text-[#888] rounded hover:text-white text-xs"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  </details>
+                )}
               </div>
             )}
           </div>
