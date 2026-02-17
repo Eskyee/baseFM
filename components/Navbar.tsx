@@ -5,35 +5,62 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { WalletConnect } from './WalletConnect';
+import {
+  FiHome,
+  FiCalendar,
+  FiCloud,
+  FiTool,
+  FiImage,
+  FiArchive,
+  FiShoppingBag,
+  FiUsers,
+  FiMessageCircle,
+  FiBriefcase,
+  FiDisc,
+  FiWallet,
+  FiMail,
+  FiGrid,
+  FiBook
+} from 'react-icons/fi';
+import { SiFarcaster } from 'react-icons/si';
+import { BsTicketPerforated } from 'react-icons/bs';
 
 export function Navbar() {
   const pathname = usePathname();
   const { isConnected } = useAccount();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Nav links organized by category for better UX
+  // Order: Core > Content > Social > Featured > Commerce > Help
   const navLinks = [
-    { href: '/', label: 'Home', icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z' },
-    { href: '/schedule', label: 'Schedule', icon: 'M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z' },
-    { href: '/aicloud', label: 'aicloud', icon: 'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z', featured: true },
-    { href: '/tools', label: 'Tools', icon: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z' },
-    { href: '/farcaster', label: 'Farcaster', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' },
-    { href: '/gallery', label: 'Gallery', icon: 'M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z' },
-    { href: '/archive', label: 'Archive', icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2h-4v2h4v2H9V7h6v2z' },
-    { href: '/events', label: 'Events', icon: 'M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z' },
-    { href: 'https://shop.basefm.space', label: 'Shop', icon: 'M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z', external: true },
-    { href: '/partnership', label: 'Partnership', icon: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h7v-2.5c0-.86.29-1.64.78-2.27A12.3 12.3 0 008 13zm8 0c-.29 0-.62.02-.97.05.02.01.97.93.97 2.45V19h7v-2.5c0-2.33-4.67-3.5-7-3.5z' },
-    { href: '/agency', label: 'Agency', icon: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z' },
-    { href: '/community', label: 'Community', icon: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z' },
-    { href: '/threads', label: 'Threads', icon: 'M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z', featured: true },
-    { href: '/djs', label: 'DJs', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' },
+    // Core navigation - what users need most
+    { href: '/', label: 'Home', Icon: FiHome },
+    { href: '/schedule', label: 'Schedule', Icon: FiCalendar },
+    { href: '/events', label: 'Events', Icon: BsTicketPerforated },
+    { href: '/djs', label: 'DJs', Icon: FiDisc },
+    // Content - media & archives
+    { href: '/gallery', label: 'Gallery', Icon: FiImage },
+    { href: '/archive', label: 'Archive', Icon: FiArchive },
+    // Social - community & connections
+    { href: '/community', label: 'Community', Icon: FiUsers },
+    { href: '/farcaster', label: 'Farcaster', Icon: SiFarcaster },
+    { href: '/threads', label: 'Threads', Icon: FiMessageCircle, featured: true },
+    // Featured tools
+    { href: '/aicloud', label: 'AI Cloud', Icon: FiCloud, featured: true },
+    { href: '/tools', label: 'Tools', Icon: FiTool },
+    // Business & commerce
+    { href: '/agency', label: 'Agency', Icon: FiBriefcase },
+    { href: 'https://shop.basefm.space', label: 'Shop', Icon: FiShoppingBag, external: true },
+    // Help
+    { href: '/guide', label: 'Guide', Icon: FiBook },
   ];
 
   // Only show these links if wallet is connected
   const connectedLinks = isConnected
     ? [
-        { href: '/wallet', label: 'Wallet', icon: 'M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z' },
-        { href: '/messages', label: 'Messages', icon: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z' },
-        { href: '/dashboard', label: 'Dashboard', icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z' },
+        { href: '/wallet', label: 'Wallet', Icon: FiWallet },
+        { href: '/messages', label: 'Messages', Icon: FiMail },
+        { href: '/dashboard', label: 'Dashboard', Icon: FiGrid },
       ]
     : [];
 
@@ -64,35 +91,52 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Navigation Links - Desktop */}
-            <nav className="hidden md:flex items-center gap-1">
-              {allLinks.map((link) =>
-                'external' in link && link.external ? (
+            {/* Navigation Links - Desktop (icons only) */}
+            <nav className="hidden md:flex items-center gap-0.5">
+              {allLinks.map((link) => {
+                const Icon = link.Icon;
+                const isActive = pathname === link.href;
+                const isFeatured = 'featured' in link && link.featured;
+                const isExternal = 'external' in link && link.external;
+
+                const iconClasses = `p-2 rounded-lg transition-colors relative group ${
+                  isActive
+                    ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                    : isFeatured
+                    ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+                    : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`;
+
+                const tooltip = (
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#1A1A1A] text-[#F5F5F5] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 border border-[#333]">
+                    {link.label}
+                  </span>
+                );
+
+                return isExternal ? (
                   <a
                     key={link.href}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50"
+                    className={iconClasses}
+                    aria-label={link.label}
                   >
-                    {link.label}
+                    <Icon className="w-5 h-5" />
+                    {tooltip}
                   </a>
                 ) : (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      pathname === link.href
-                        ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                        : 'featured' in link && link.featured
-                        ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-                        : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-                    }`}
+                    className={iconClasses}
+                    aria-label={link.label}
                   >
-                    {link.label}
+                    <Icon className="w-5 h-5" />
+                    {tooltip}
                   </Link>
-                )
-              )}
+                );
+              })}
             </nav>
 
             {/* Right: Wallet + Mobile Menu */}
@@ -142,19 +186,30 @@ export function Navbar() {
         }}
       >
         <div className="p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100% - 50px)' }}>
-          {allLinks.map((link) =>
-            'external' in link && link.external ? (
+          {allLinks.map((link) => {
+            const Icon = link.Icon;
+            const isActive = pathname === link.href;
+            const isFeatured = 'featured' in link && link.featured;
+            const isExternal = 'external' in link && link.external;
+
+            const linkClasses = `flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors active:scale-[0.98] ${
+              isActive
+                ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                : isFeatured
+                ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+                : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+            }`;
+
+            return isExternal ? (
               <a
                 key={link.href}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50 active:scale-[0.98]"
+                className={linkClasses}
               >
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d={link.icon} />
-                </svg>
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">{link.label}</span>
               </a>
             ) : (
@@ -162,19 +217,13 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors active:scale-[0.98] ${
-                  pathname === link.href
-                    ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                    : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-                }`}
+                className={linkClasses}
               >
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d={link.icon} />
-                </svg>
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">{link.label}</span>
               </Link>
-            )
-          )}
+            );
+          })}
         </div>
 
         {/* Mobile Footer Links */}
