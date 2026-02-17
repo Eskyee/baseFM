@@ -224,6 +224,16 @@ export default function AdminAccountingPage() {
           <div className="text-center py-12 text-[#888]">Loading accounting data...</div>
         ) : (
           <>
+            {/* Currency Notice */}
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-6 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-blue-400 font-bold text-sm">$</span>
+              </div>
+              <p className="text-blue-300 text-sm">
+                Default accounting currency: <strong>USDC on Base</strong>
+              </p>
+            </div>
+
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-[#1A1A1A] rounded-xl p-5">
@@ -231,7 +241,7 @@ export default function AdminAccountingPage() {
                 <div className="text-2xl font-bold text-green-400">
                   {formatCurrency(summary?.totalTicketRevenue || 0)}
                 </div>
-                <div className="text-xs text-[#666] mt-1">USDC</div>
+                <div className="text-xs text-[#666] mt-1">USDC on Base</div>
               </div>
               <div className="bg-[#1A1A1A] rounded-xl p-5">
                 <div className="text-sm text-[#888] mb-1">Tickets Sold</div>
@@ -241,11 +251,11 @@ export default function AdminAccountingPage() {
                 <div className="text-xs text-[#666] mt-1">Total</div>
               </div>
               <div className="bg-[#1A1A1A] rounded-xl p-5">
-                <div className="text-sm text-[#888] mb-1">DJ Tips</div>
+                <div className="text-sm text-[#888] mb-1">DJ Tips (est.)</div>
                 <div className="text-2xl font-bold text-purple-400">
                   {formatCurrency(summary?.totalTips || 0)}
                 </div>
-                <div className="text-xs text-[#666] mt-1">All tokens</div>
+                <div className="text-xs text-[#666] mt-1">USDC equivalent</div>
               </div>
               <div className="bg-[#1A1A1A] rounded-xl p-5">
                 <div className="text-sm text-[#888] mb-1">Tip Count</div>
@@ -451,7 +461,7 @@ export default function AdminAccountingPage() {
             {/* Note about direct payments */}
             <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
               <p className="text-blue-300 text-sm">
-                <strong>Note:</strong> All ticket payments go directly to promoter wallets. All tips go directly to DJ wallets. baseFM does not hold or process any funds - this page shows onchain transaction records for transparency.
+                <strong>Note:</strong> All ticket payments are in USDC on Base and go directly to promoter wallets. Tips can be in ETH, USDC, RAVE, or cbBTC and go directly to DJ wallets. baseFM does not hold or process any funds - this page shows onchain transaction records for transparency.
               </p>
             </div>
           </>
