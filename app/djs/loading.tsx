@@ -1,4 +1,4 @@
-import { DJSkeleton } from '@/components/ui/Skeleton';
+import { DJCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function DJsLoading() {
   return (
@@ -7,7 +7,7 @@ export default function DJsLoading() {
         <div className="h-8 w-16 bg-[#1A1A1A] rounded-lg animate-pulse mb-6" />
         <div className="grid gap-4 md:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <DJSkeleton key={i} />
+            <DJCardSkeleton key={i} />
           ))}
         </div>
       </div>

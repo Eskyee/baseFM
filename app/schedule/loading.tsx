@@ -1,4 +1,4 @@
-import { ScheduleSkeleton } from '@/components/ui/Skeleton';
+import { ScheduleSlotSkeleton } from '@/components/ui/Skeleton';
 
 export default function ScheduleLoading() {
   return (
@@ -7,7 +7,7 @@ export default function ScheduleLoading() {
         <div className="h-8 w-32 bg-[#1A1A1A] rounded-lg animate-pulse mb-6" />
         <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <ScheduleSkeleton key={i} />
+            <ScheduleSlotSkeleton key={i} />
           ))}
         </div>
       </div>
