@@ -22,6 +22,7 @@
     "hls.js": "^1.5.15",
     "lucide-react": "^0.572.0",
     "next": "^14.2.35",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",

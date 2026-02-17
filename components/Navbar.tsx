@@ -22,7 +22,8 @@ import {
   LayoutGrid,
   BookOpen,
   Ticket,
-  Cast
+  Cast,
+  QrCode
 } from 'lucide-react';
 
 export function Navbar() {
@@ -59,6 +60,7 @@ export function Navbar() {
   const connectedLinks = isConnected
     ? [
         { href: '/wallet', label: 'Wallet', Icon: Wallet },
+        { href: '/pos', label: 'POS', Icon: QrCode },
         { href: '/messages', label: 'Messages', Icon: Mail },
         { href: '/dashboard', label: 'Dashboard', Icon: LayoutGrid },
       ]
