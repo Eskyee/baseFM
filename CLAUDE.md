@@ -23,7 +23,9 @@ baseFM is an onchain radio platform on Base (chain ID 8453). DJs stream live mus
 | Notifications | Web Push (VAPID) + Slack | Optional |
 | Testing | Vitest + React Testing Library | `npm run test:run` |
 
-## Key Token - RAVE
+## Key Tokens
+
+### RAVE (Community Token)
 ```
 Address:  0xdf3c79a5759eeedb844e7481309a75037b8e86f5
 Chain:    Base (8453)
@@ -34,6 +36,16 @@ Name:     RaveCulture
 - **5,000 RAVE** = community access + DJ streaming
 - **1B RAVE** = premium tier (custom token gating)
 - Config: `lib/token/config.ts`
+
+### USDC (Payments)
+```
+Address:  0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+Chain:    Base (8453)
+Decimals: 6
+Symbol:   USDC
+```
+- Used for ticket purchases (direct to promoter wallets)
+- Used for tipping DJs
 
 ## Project Structure
 ```
@@ -60,7 +72,9 @@ app/                          # Next.js pages (App Router)
     page.tsx                  #   Product listing
     [handle]/page.tsx         #   Product detail
   events/                     # Event pages
-    strobe-soundsystem/       #   Current featured event
+    page.tsx                  #   Events listing (upcoming/past)
+    [slug]/page.tsx           #   Event detail + ticket purchase
+  guide/page.tsx              # Beginner user guide (9 sections)
   messages/page.tsx           # DMs (wallet-to-wallet)
   agency/page.tsx             # Booking & partnerships
   bookings/page.tsx           # Booking form
@@ -86,6 +100,7 @@ components/                   # Shared components
   ScheduleBlock.tsx           # Schedule time slot + DaySelector
   ShareApp.tsx                # Social share (inline/compact/full variants)
   TipButton.tsx               # Tip DJs (ETH, USDC, RAVE, cbBTC)
+  TicketPurchase.tsx          # Event ticket purchase with USDC
   CollectibleCard.tsx         # NFT mint card
   TokenGate.tsx               # Token-gated content wrapper
   FollowButton.tsx            # Follow DJ + push notification opt-in
@@ -119,6 +134,7 @@ lib/                          # Server & shared utilities
     members.ts                #   Community members
     schedule.ts               #   Schedule slots
     streams.ts                #   Stream management
+    tickets.ts                #   Ticket purchases (USDC payments)
   onchain/minter.ts           # Server-side token minting (ERC20/721/1155)
   schedule.ts                 # Schedule formatting utilities
   shopify/
@@ -141,7 +157,7 @@ public/
   logo.png                    # App logo
   icon-192.png, icon-32.png   # PWA icons
 
-supabase/                     # Database schemas (11 files)
+supabase/                     # Database schemas (12 files)
   schema-bookings.sql         # Booking inquiries
   schema-chat.sql             # Live chat messages (realtime enabled)
   schema-djs.sql              # DJ profiles
@@ -152,10 +168,18 @@ supabase/                     # Database schemas (11 files)
   schema-schedule.sql         # Weekly schedule slots
   schema-shop.sql             # Shopify orders + onchain entitlements
   schema-social.sql           # Connections, DMs, group chats
+  schema-tickets.sql          # Event tickets + purchases (USDC)
   schema-tips.sql             # Tip tracking
+
+__tests__/                    # Unit tests (55+ tests)
+  lib/
+    tip-config.test.ts        # Tip token configuration tests
+    tickets.test.ts           # Ticket system tests
+  utils/
+    test-utils.tsx            # Mock data, render helpers, Supabase mocks
 ```
 
-## API Routes (41 total)
+## API Routes (45+ total)
 ```
 # Streaming (core)
 GET/POST   /api/streams              # List/create streams
@@ -193,6 +217,15 @@ GET        /api/shop/products        # Shopify products
 GET        /api/shop/products/[handle]
 GET/POST/PATCH/DELETE /api/shop/cart  # Shopping cart
 GET/POST   /api/shop/claim           # Onchain perk claims
+
+# Events & Tickets
+GET        /api/events               # List events (upcoming/past)
+GET        /api/events/[slug]        # Event details
+POST       /api/events               # Submit event
+GET        /api/tickets              # Get tickets for event (?eventId=xxx)
+POST       /api/tickets              # Create ticket tier
+POST       /api/tickets/purchase     # Record purchase after USDC payment
+GET        /api/tickets/purchase     # Check ticket ownership (?wallet=xxx&eventId=xxx)
 
 # System
 GET        /api/token/check          # Check token balance
@@ -283,6 +316,19 @@ DJ stops         → /api/streams/[id]/stop
 - iOS-style bottom sheet UI in TipButton.tsx
 - Tips recorded in Supabase with tx hash
 
+### Ticket Purchases (like dice.fm but onchain)
+```
+User selects event → /events/[slug]
+Selects ticket tier → TicketPurchase component
+Pays with USDC → wagmi useWriteContract (ERC20 transfer)
+USDC goes direct to promoter wallet → no middleman
+Transaction confirmed → POST /api/tickets/purchase records it
+Ticket ownership → GET /api/tickets/purchase?wallet=xxx&eventId=xxx
+```
+- Direct wallet-to-wallet payments
+- No platform fees on ticket sales
+- Promoter receives full ticket price
+
 ## Git Workflow
 ```
 1. Claude builds on claude/* branch
@@ -306,6 +352,30 @@ npm run test:run     # Run tests once (Vitest)
 npm run test         # Run tests in watch mode
 ```
 
+## Testing Infrastructure
+- **Framework**: Vitest with jsdom environment
+- **Coverage**: V8 provider, reports in text/json/html
+- **Tests**: 55+ unit tests covering:
+  - Tip token configuration
+  - Ticket purchase calculations
+  - Token amount conversions
+  - Availability logic
+  - Transaction hash validation
+- **Setup**: `vitest.setup.tsx` mocks Next.js router, Image, wagmi hooks
+- **Helpers**: `__tests__/utils/test-utils.tsx` provides mock data and render utilities
+
+## CI/CD Pipeline
+`.github/workflows/ci.yml` runs on push to main and claude/* branches:
+1. **Lint Job** - ESLint checks
+2. **Test Job** - Vitest with coverage (parallel with lint)
+3. **Build Job** - Next.js production build (after lint+test pass)
+
+Features:
+- Parallel job execution for speed
+- Coverage reporting to Codecov
+- Concurrency control (cancels stale runs)
+- Node 20, npm caching
+
 ## Lessons Learned (from building sessions)
 1. **Sticky navbar breaks iOS PWA** - Must use `fixed` + spacer div
 2. **Coinbase Pay URLs need registered appId** - Use `coinbase.com/buy` instead
@@ -316,6 +386,12 @@ npm run test         # Run tests in watch mode
 7. **Owner tests everything on iPhone PWA** - Always prioritize mobile layout
 8. **Keep it simple** - No over-engineering, no unnecessary abstractions
 9. **Owner wants external shop** - Never internalize the Shopify store link
+10. **Vitest setup needs .tsx extension** - When mocking React components, use vitest.setup.tsx not .ts
+11. **USDC has 6 decimals** - $25 USDC = 25000000 (use parseUnits from viem)
+12. **Events need status: 'approved'** - Past events only show if approved in database
+13. **User guide should use simple English** - Teaching noobs, not developers
+14. **Keep comments for development** - Owner wants code comments preserved
+15. **Gradient buttons look better** - Use `bg-gradient-to-r` for premium styling
 
 ## Don'ts
 - Don't change Shop link to internal (owner explicitly said no)
@@ -326,3 +402,26 @@ npm run test         # Run tests in watch mode
 - Don't use Coinbase Pay API URLs (appId not registered)
 - Don't set Vercel custom domains to Preview environment
 - Don't change the GitHub default branch away from main
+
+## Project Documentation
+- **CLAUDE.md** - This file (AI context and project rules)
+- **SOUL.md** - Project journey, vision, timeline, achievements
+- **README.md** - Public-facing documentation with features, setup, API routes
+- **/guide** - User-facing beginner guide (9 sections including advanced features)
+
+## Key Pages Built
+| Page | Purpose | Key Features |
+|------|---------|--------------|
+| `/guide` | Beginner user guide | 9 sections, simple English, advanced features |
+| `/events` | Event listings | Upcoming/past toggle, promoter info |
+| `/events/[slug]` | Event detail | Ticket purchase with USDC, direct payments |
+| `/wallet` | Token management | Balances, swap, RAVE chart, buy crypto |
+| `/community` | Token-gated directory | 5000 RAVE requirement |
+
+## Future Expansion Notes
+- Underground rave culture history knowledge base (for community education)
+- DJ analytics dashboard
+- Show recordings as NFTs
+- Multi-stream support
+- Mobile app (React Native)
+- DAO governance
