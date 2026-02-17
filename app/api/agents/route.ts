@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAgent, getAllAgents, getAgentsByWallet } from '@/lib/db/agents';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/agents - List agents
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
