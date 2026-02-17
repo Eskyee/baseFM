@@ -32,6 +32,14 @@ interface SlackMessage {
   attachments?: unknown[];
 }
 
+// Simple text message to Slack
+export async function sendSlackMessage(
+  message: string,
+  channel: SlackChannel = 'general'
+): Promise<boolean> {
+  return sendSlackNotification({ text: message }, channel);
+}
+
 // Send notification to a Slack channel
 export async function sendSlackNotification(
   message: SlackMessage,
