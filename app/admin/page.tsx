@@ -152,7 +152,7 @@ export default function AdminPage() {
         )}
 
         {/* Quick Links */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
           <Link
             href="/admin/events"
             className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
@@ -163,6 +163,30 @@ export default function AdminPage() {
               </svg>
             </div>
             <h3 className="text-[#F5F5F5] font-medium text-sm">Events</h3>
+          </Link>
+
+          <Link
+            href="/admin/crew"
+            className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-3 group-hover:bg-cyan-500/30 transition-colors">
+              <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium text-sm">Crew</h3>
+          </Link>
+
+          <Link
+            href="/admin/accounting"
+            className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-3 group-hover:bg-green-500/30 transition-colors">
+              <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium text-sm">Accounting</h3>
           </Link>
 
           <Link
@@ -202,11 +226,23 @@ export default function AdminPage() {
           </Link>
 
           <Link
+            href="/promoter"
+            className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center mb-3 group-hover:bg-yellow-500/30 transition-colors">
+              <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium text-sm">Promoter Dashboard</h3>
+          </Link>
+
+          <Link
             href="/dashboard"
             className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
           >
-            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-3 group-hover:bg-green-500/30 transition-colors">
-              <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center mb-3 group-hover:bg-red-500/30 transition-colors">
+              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </div>

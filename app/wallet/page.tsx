@@ -147,7 +147,7 @@ export default function WalletPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base font-semibold text-[#F5F5F5]">Buy Crypto</h2>
-                <p className="text-xs text-[#888]">Buy ETH on Coinbase</p>
+                <p className="text-xs text-[#888]">Onramp to Base network</p>
               </div>
               <svg className="w-5 h-5 text-[#666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

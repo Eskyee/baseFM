@@ -95,9 +95,9 @@ export default function GuidePage() {
                   You need a crypto wallet to use all features. Don't worry - it's free and easy!
                 </p>
                 <div className="bg-[#0A0A0A] rounded-xl p-4">
-                  <p className="text-[#888] text-sm mb-3">We recommend Coinbase Wallet:</p>
+                  <p className="text-[#888] text-sm mb-3">We recommend Base Wallet:</p>
                   <ol className="text-[#CCC] text-sm space-y-2 list-decimal list-inside">
-                    <li>Download the Coinbase app on your phone</li>
+                    <li>Download the Base Wallet app on your phone</li>
                     <li>Create a wallet (it's free)</li>
                     <li>That's it! You're ready</li>
                   </ol>
@@ -115,7 +115,7 @@ export default function GuidePage() {
               <div>
                 <h3 className="text-[#F5F5F5] font-semibold mb-2">Connect Your Wallet</h3>
                 <p className="text-[#888] mb-4">
-                  Tap the wallet button in the top corner of baseFM. Sign in with your Coinbase Wallet.
+                  Tap the wallet button in the top corner of baseFM. Sign in with your Base Wallet.
                 </p>
                 <div className="flex items-center gap-2 text-green-400 text-sm">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -239,7 +239,7 @@ export default function GuidePage() {
               <div className="bg-[#0A0A0A] rounded-xl p-4 text-center">
                 <span className="text-xl text-orange-400">₿</span>
                 <p className="text-[#F5F5F5] font-medium mt-1">cbBTC</p>
-                <p className="text-[#666] text-xs">Coinbase Bitcoin</p>
+                <p className="text-[#666] text-xs">Wrapped Bitcoin</p>
               </div>
             </div>
 
@@ -556,7 +556,7 @@ export default function GuidePage() {
                 <div className="bg-[#0A0A0A] rounded-xl p-3 text-center">
                   <span className="text-xl mb-1 block">🛒</span>
                   <p className="text-[#F5F5F5] text-sm font-medium">Buy Crypto</p>
-                  <p className="text-[#666] text-xs">Via Coinbase</p>
+                  <p className="text-[#666] text-xs">Onramp to Base</p>
                 </div>
               </div>
             </div>

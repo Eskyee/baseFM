@@ -23,7 +23,8 @@ import {
   BookOpen,
   Ticket,
   Cast,
-  QrCode
+  QrCode,
+  Megaphone
 } from 'lucide-react';
 
 export function Navbar() {
@@ -61,6 +62,7 @@ export function Navbar() {
     ? [
         { href: '/wallet', label: 'Wallet', Icon: Wallet },
         { href: '/pos', label: 'POS', Icon: QrCode },
+        { href: '/promoter', label: 'Promoter', Icon: Megaphone },
         { href: '/messages', label: 'Messages', Icon: Mail },
         { href: '/dashboard', label: 'Dashboard', Icon: LayoutGrid },
       ]

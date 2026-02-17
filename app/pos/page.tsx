@@ -298,7 +298,7 @@ export default function POSPage() {
                 {/* Instructions */}
                 <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
                   <p className="text-purple-300 text-sm text-center">
-                    Customer scans QR with Coinbase Wallet to pay
+                    Customer scans QR with Base Wallet to pay
                   </p>
                 </div>
 
@@ -349,7 +349,7 @@ export default function POSPage() {
                 className="w-full bg-[#1A1A1A] border border-[#333] rounded-xl py-3 px-4 text-[#F5F5F5] text-sm font-mono focus:outline-none focus:border-purple-500 transition-colors resize-none"
               />
               <p className="text-[#666] text-xs">
-                Customer shows their wallet address QR from Coinbase Wallet
+                Customer shows their wallet address QR from Base Wallet
               </p>
             </div>
 
@@ -417,7 +417,7 @@ export default function POSPage() {
               <p className="text-[#F5F5F5] text-sm font-medium">How to verify tickets:</p>
               <ol className="text-[#888] text-xs space-y-1 list-decimal list-inside">
                 <li>Enter the event ID above</li>
-                <li>Ask customer to show wallet QR from Coinbase Wallet</li>
+                <li>Ask customer to show wallet QR from Base Wallet</li>
                 <li>Paste or type their wallet address</li>
                 <li>Tap Verify to check ticket ownership onchain</li>
               </ol>

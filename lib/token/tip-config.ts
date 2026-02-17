@@ -36,7 +36,7 @@ export const TIP_TOKENS: TipToken[] = [
   },
   {
     symbol: 'cbBTC',
-    name: 'Coinbase BTC',
+    name: 'Wrapped BTC',
     address: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
     decimals: 8,
     icon: '₿',

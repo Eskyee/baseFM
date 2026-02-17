@@ -29,7 +29,7 @@ Production-ready streaming platform for Base-native radio. Built by [Eskyee](htt
 - **Ticket Verification** - Wallet-based entry check
 
 ### Onchain
-- **Wallet Auth** - Coinbase Smart Wallet (no seed phrases!)
+- **Wallet Auth** - Base Wallet (no seed phrases!)
 - **Token-Gated Community** - 5000+ RAVE token holders
 - **Show NFTs** - Mint recordings as collectibles
 - **OnchainKit Integration** - Base names, avatars, identity
