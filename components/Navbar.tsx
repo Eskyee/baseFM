@@ -6,23 +6,24 @@ import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { WalletConnect } from './WalletConnect';
 import {
-  FiHome,
-  FiCalendar,
-  FiCloud,
-  FiTool,
-  FiImage,
-  FiArchive,
-  FiShoppingBag,
-  FiUsers,
-  FiMessageCircle,
-  FiBriefcase,
-  FiDisc,
-  FiMail,
-  FiGrid,
-  FiBook
-} from 'react-icons/fi';
-import { SiFarcaster } from 'react-icons/si';
-import { BsTicketPerforated, BsWallet2 } from 'react-icons/bs';
+  Home,
+  Calendar,
+  Cloud,
+  Wrench,
+  Image,
+  Archive,
+  ShoppingBag,
+  Users,
+  MessageCircle,
+  Briefcase,
+  Disc3,
+  Wallet,
+  Mail,
+  LayoutGrid,
+  BookOpen,
+  Ticket,
+  Cast
+} from 'lucide-react';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -33,33 +34,33 @@ export function Navbar() {
   // Order: Core > Content > Social > Featured > Commerce > Help
   const navLinks = [
     // Core navigation - what users need most
-    { href: '/', label: 'Home', Icon: FiHome },
-    { href: '/schedule', label: 'Schedule', Icon: FiCalendar },
-    { href: '/events', label: 'Events', Icon: BsTicketPerforated },
-    { href: '/djs', label: 'DJs', Icon: FiDisc },
+    { href: '/', label: 'Home', Icon: Home },
+    { href: '/schedule', label: 'Schedule', Icon: Calendar },
+    { href: '/events', label: 'Events', Icon: Ticket },
+    { href: '/djs', label: 'DJs', Icon: Disc3 },
     // Content - media & archives
-    { href: '/gallery', label: 'Gallery', Icon: FiImage },
-    { href: '/archive', label: 'Archive', Icon: FiArchive },
+    { href: '/gallery', label: 'Gallery', Icon: Image },
+    { href: '/archive', label: 'Archive', Icon: Archive },
     // Social - community & connections
-    { href: '/community', label: 'Community', Icon: FiUsers },
-    { href: '/farcaster', label: 'Farcaster', Icon: SiFarcaster },
-    { href: '/threads', label: 'Threads', Icon: FiMessageCircle, featured: true },
+    { href: '/community', label: 'Community', Icon: Users },
+    { href: '/farcaster', label: 'Farcaster', Icon: Cast },
+    { href: '/threads', label: 'Threads', Icon: MessageCircle, featured: true },
     // Featured tools
-    { href: '/aicloud', label: 'AI Cloud', Icon: FiCloud, featured: true },
-    { href: '/tools', label: 'Tools', Icon: FiTool },
+    { href: '/aicloud', label: 'AI Cloud', Icon: Cloud, featured: true },
+    { href: '/tools', label: 'Tools', Icon: Wrench },
     // Business & commerce
-    { href: '/agency', label: 'Agency', Icon: FiBriefcase },
-    { href: 'https://shop.basefm.space', label: 'Shop', Icon: FiShoppingBag, external: true },
+    { href: '/agency', label: 'Agency', Icon: Briefcase },
+    { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
     // Help
-    { href: '/guide', label: 'Guide', Icon: FiBook },
+    { href: '/guide', label: 'Guide', Icon: BookOpen },
   ];
 
   // Only show these links if wallet is connected
   const connectedLinks = isConnected
     ? [
-        { href: '/wallet', label: 'Wallet', Icon: BsWallet2 },
-        { href: '/messages', label: 'Messages', Icon: FiMail },
-        { href: '/dashboard', label: 'Dashboard', Icon: FiGrid },
+        { href: '/wallet', label: 'Wallet', Icon: Wallet },
+        { href: '/messages', label: 'Messages', Icon: Mail },
+        { href: '/dashboard', label: 'Dashboard', Icon: LayoutGrid },
       ]
     : [];
 
