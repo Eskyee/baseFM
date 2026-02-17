@@ -21,7 +21,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ agents });
+    // Cache public agent list for 60s, allow stale for 5min while revalidating
+    return NextResponse.json({ agents }, {
+      headers: {
+        'Cache-Control': wallet
+          ? 'private, max-age=10' // User-specific data: shorter cache
+          : 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('Error fetching agents:', error);
     return NextResponse.json(

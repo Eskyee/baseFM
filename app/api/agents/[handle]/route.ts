@@ -21,10 +21,15 @@ export async function GET(
       getSocialPlatforms(agent.id),
     ]);
 
+    // Cache agent profiles for 30s, allow stale for 2min while revalidating
     return NextResponse.json({
       agent,
       musicSources,
       socialPlatforms,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+      },
     });
   } catch (error) {
     console.error('Error fetching agent:', error);

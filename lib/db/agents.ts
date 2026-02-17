@@ -92,13 +92,7 @@ export async function getAllAgents(options?: {
 export async function createAgent(input: CreateAgentInput): Promise<{ agent: Agent; apiKey: string }> {
   const supabase = createServerClient();
 
-  // Check if handle is available
-  const existing = await getAgentByHandle(input.handle);
-  if (existing) {
-    throw new Error('Handle is already taken');
-  }
-
-  // Validate handle format
+  // Validate handle format (let DB unique constraint catch duplicates - saves a query)
   const handleRegex = /^[a-z][a-z0-9-]{2,29}$/;
   if (!handleRegex.test(input.handle.toLowerCase())) {
     throw new Error('Handle must be 3-30 characters, start with a letter, and contain only lowercase letters, numbers, and hyphens');
@@ -125,21 +119,14 @@ export async function createAgent(input: CreateAgentInput): Promise<{ agent: Age
     .select()
     .single();
 
+  // DB unique constraint catches duplicates
+  if (error?.code === '23505') throw new Error('Handle is already taken');
   if (error) throw new Error(error.message);
   return { agent: agentFromRow(data as AgentRow), apiKey: key };
 }
 
 export async function updateAgent(handle: string, ownerWalletAddress: string, input: UpdateAgentInput): Promise<Agent> {
   const supabase = createServerClient();
-
-  // Verify ownership
-  const existing = await getAgentByHandle(handle);
-  if (!existing) {
-    throw new Error('Agent not found');
-  }
-  if (existing.ownerWalletAddress.toLowerCase() !== ownerWalletAddress.toLowerCase()) {
-    throw new Error('Not authorized to update this agent');
-  }
 
   const updateData: Record<string, unknown> = {};
 
@@ -157,13 +144,16 @@ export async function updateAgent(handle: string, ownerWalletAddress: string, in
   if (input.autoFollowSimilar !== undefined) updateData.auto_follow_similar = input.autoFollowSimilar;
   if (input.collaborationOpen !== undefined) updateData.collaboration_open = input.collaborationOpen;
 
+  // Single query: update only if owner matches (no separate SELECT)
   const { data, error } = await supabase
     .from('agents')
     .update(updateData)
     .eq('handle', handle.toLowerCase())
+    .eq('owner_wallet_address', ownerWalletAddress.toLowerCase())
     .select()
     .single();
 
+  if (error?.code === 'PGRST116') throw new Error('Agent not found or not authorized');
   if (error) throw new Error(error.message);
   return agentFromRow(data as AgentRow);
 }
@@ -171,15 +161,7 @@ export async function updateAgent(handle: string, ownerWalletAddress: string, in
 export async function activateAgent(handle: string, ownerWalletAddress: string): Promise<Agent> {
   const supabase = createServerClient();
 
-  // Verify ownership
-  const existing = await getAgentByHandle(handle);
-  if (!existing) {
-    throw new Error('Agent not found');
-  }
-  if (existing.ownerWalletAddress.toLowerCase() !== ownerWalletAddress.toLowerCase()) {
-    throw new Error('Not authorized to activate this agent');
-  }
-
+  // Single query: update only if owner matches (no separate SELECT)
   const { data, error } = await supabase
     .from('agents')
     .update({
@@ -187,9 +169,11 @@ export async function activateAgent(handle: string, ownerWalletAddress: string):
       activated_at: new Date().toISOString(),
     })
     .eq('handle', handle.toLowerCase())
+    .eq('owner_wallet_address', ownerWalletAddress.toLowerCase())
     .select()
     .single();
 
+  if (error?.code === 'PGRST116') throw new Error('Agent not found or not authorized');
   if (error) throw new Error(error.message);
   return agentFromRow(data as AgentRow);
 }
@@ -197,21 +181,16 @@ export async function activateAgent(handle: string, ownerWalletAddress: string):
 export async function pauseAgent(handle: string, ownerWalletAddress: string): Promise<Agent> {
   const supabase = createServerClient();
 
-  const existing = await getAgentByHandle(handle);
-  if (!existing) {
-    throw new Error('Agent not found');
-  }
-  if (existing.ownerWalletAddress.toLowerCase() !== ownerWalletAddress.toLowerCase()) {
-    throw new Error('Not authorized to pause this agent');
-  }
-
+  // Single query: update only if owner matches (no separate SELECT)
   const { data, error } = await supabase
     .from('agents')
     .update({ status: 'paused' })
     .eq('handle', handle.toLowerCase())
+    .eq('owner_wallet_address', ownerWalletAddress.toLowerCase())
     .select()
     .single();
 
+  if (error?.code === 'PGRST116') throw new Error('Agent not found or not authorized');
   if (error) throw new Error(error.message);
   return agentFromRow(data as AgentRow);
 }
