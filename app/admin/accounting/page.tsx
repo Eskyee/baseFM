@@ -224,14 +224,56 @@ export default function AdminAccountingPage() {
           <div className="text-center py-12 text-[#888]">Loading accounting data...</div>
         ) : (
           <>
-            {/* Currency Notice */}
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-6 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-400 font-bold text-sm">$</span>
+            {/* Currency Notice & Conversion Guide */}
+            <div className="bg-[#1A1A1A] rounded-xl p-4 mb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-blue-400 font-bold">$</span>
+                  </div>
+                  <div>
+                    <p className="text-[#F5F5F5] font-medium">Default: USDC on Base</p>
+                    <p className="text-[#888] text-xs">1 USDC = 1 USD (stablecoin)</p>
+                  </div>
+                </div>
+
+                {/* Quick GBP Conversion Guide */}
+                <div className="flex items-center gap-4 p-3 bg-[#0A0A0A] rounded-lg">
+                  <div className="text-center">
+                    <p className="text-[#888] text-xs">USDC → GBP</p>
+                    <p className="text-[#F5F5F5] text-sm font-medium">~£0.79</p>
+                  </div>
+                  <div className="h-8 w-px bg-[#333]" />
+                  <div className="grid grid-cols-4 gap-3 text-center text-xs">
+                    <div>
+                      <p className="text-[#888]">$10</p>
+                      <p className="text-[#F5F5F5]">£7.90</p>
+                    </div>
+                    <div>
+                      <p className="text-[#888]">$25</p>
+                      <p className="text-[#F5F5F5]">£19.75</p>
+                    </div>
+                    <div>
+                      <p className="text-[#888]">$50</p>
+                      <p className="text-[#F5F5F5]">£39.50</p>
+                    </div>
+                    <div>
+                      <p className="text-[#888]">$100</p>
+                      <p className="text-[#F5F5F5]">£79</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p className="text-blue-300 text-sm">
-                Default accounting currency: <strong>USDC on Base</strong>
-              </p>
+
+              {/* Total Revenue in GBP */}
+              {(summary?.totalTicketRevenue || 0) > 0 && (
+                <div className="mt-4 pt-4 border-t border-[#333] flex items-center justify-between">
+                  <span className="text-[#888] text-sm">Total ticket revenue in GBP (approx)</span>
+                  <span className="text-[#F5F5F5] font-bold">
+                    £{((summary?.totalTicketRevenue || 0) * 0.79).toFixed(2)}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Summary Cards */}
