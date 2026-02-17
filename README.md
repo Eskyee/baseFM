@@ -1,31 +1,50 @@
 # baseFM - Onchain Radio Platform
 
-Production-ready streaming platform for Base-native radio. Built by [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
+Production-ready streaming platform for Base-native radio. Built by [Eskyee](https://github.com/Eskyee) / [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
+
+**Live:** [basefm.space](https://basefm.space) | **Shop:** [shop.basefm.space](https://shop.basefm.space) | **Guide:** [/guide](https://basefm.space/guide)
+
+[![CI](https://github.com/Eskyee/baseFM/actions/workflows/ci.yml/badge.svg)](https://github.com/Eskyee/baseFM/actions/workflows/ci.yml)
 
 ## Features
 
 ### Core Streaming
 - **Live DJ Streaming** - RTMP to HLS via Mux
-- **Show Archives** - Automatic recording and playback of past broadcasts
+- **Show Archives** - Automatic recording and playback
 - **Weekly Schedule** - Recurring DJ timeslots
-- **DJ Profiles** - Customizable profiles with social/creator links
+- **DJ Profiles** - Professional profiles with stats, followers, banners
+- **DJ of the Day** - Featured artist spotlight
 
 ### Engagement
 - **Live Chat** - Real-time chat during streams (Supabase Realtime)
-- **Tipping** - Send ETH directly to DJs on Base
-- **Follow DJs** - Get notified when your favorites go live
+- **Multi-Token Tipping** - ETH, USDC, RAVE, cbBTC direct to DJ wallets
+- **Follow System** - Follow DJs and track favorites
 - **Push Notifications** - Browser notifications for live shows
+- **Community Threads** - Discussions and posts
+
+### Events & Tickets (NEW)
+- **Event Listings** - Community events and parties
+- **Onchain Tickets** - Buy with USDC, pay promoters directly
+- **Promoter Profiles** - Collectives, venues, labels
+- **Ticket Verification** - Wallet-based entry check
 
 ### Onchain
-- **Wallet Auth** - Connect with Smart Wallet, Coinbase Wallet, or any EVM wallet
-- **Token-Gated Community** - 5000+ RAVE token holders directory
+- **Wallet Auth** - Coinbase Smart Wallet (no seed phrases!)
+- **Token-Gated Community** - 5000+ RAVE token holders
 - **Show NFTs** - Mint recordings as collectibles
-- **OnchainKit Integration** - Base names, avatars, and identity
+- **OnchainKit Integration** - Base names, avatars, identity
+- **Direct Payments** - Tips and tickets go straight to wallets
 
 ### Mobile
 - **PWA Support** - Install as app on iOS/Android
 - **Responsive Design** - Mobile-first UI
 - **Offline Support** - Service worker caching
+
+### Developer Experience
+- **CI/CD Pipeline** - GitHub Actions with lint, test, build
+- **Unit Tests** - 55+ tests with Vitest
+- **TypeScript** - Full type safety
+- **Documentation** - CLAUDE.md, SOUL.md, guides
 
 ## Tech Stack
 
@@ -108,14 +127,18 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 | Page | URL | Description |
 |------|-----|-------------|
-| Home | `/` | Live stream player |
+| Home | `/` | Live streams + featured content |
+| Guide | `/guide` | Beginner-friendly user guide |
 | Schedule | `/schedule` | Weekly DJ schedule |
 | Archive | `/archive` | Past broadcasts |
 | Collect | `/collect` | NFT collectibles |
 | Community | `/community` | Token-gated member directory |
 | DJs | `/djs` | DJ profiles listing |
-| DJ Profile | `/djs/[slug]` | Individual DJ page |
+| DJ Profile | `/djs/[slug]` | Individual DJ with stats |
+| Events | `/events` | Community events |
+| Event Detail | `/events/[slug]` | Event info + tickets |
 | Dashboard | `/dashboard` | DJ streaming controls |
+| Wallet | `/wallet` | Balances + swap |
 
 ## API Routes
 
@@ -141,6 +164,15 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### Community
 - `GET/POST /api/community` - Member directory
+
+### Events & Tickets
+- `GET /api/events` - List events (upcoming/past)
+- `GET /api/events/[slug]` - Event details
+- `POST /api/events` - Submit event
+- `GET /api/tickets?eventId=xxx` - Get tickets for event
+- `POST /api/tickets` - Create ticket tier
+- `POST /api/tickets/purchase` - Record purchase after USDC payment
+- `GET /api/tickets/purchase?wallet=xxx&eventId=xxx` - Check ticket ownership
 
 ## DJ Workflow
 

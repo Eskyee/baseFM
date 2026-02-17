@@ -393,7 +393,206 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 8: Need Help? */}
+        {/* SECTION 8: Advanced Features */}
+        {/* ============================================================= */}
+        <section className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+              <span className="text-2xl">🚀</span>
+            </div>
+            <h2 className="text-xl font-bold text-[#F5F5F5]">Advanced Features</h2>
+          </div>
+
+          <div className="space-y-4">
+            {/* RAVE Token */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🎵</span>
+                <h3 className="text-[#F5F5F5] font-semibold">RAVE Token</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                Our community token powers access and rewards on baseFM.
+              </p>
+              <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Symbol</span>
+                  <span className="text-purple-400 font-mono">RAVE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">DJ Access</span>
+                  <span className="text-[#F5F5F5]">5,000 RAVE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Premium Tier</span>
+                  <span className="text-[#F5F5F5]">1 Billion RAVE</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Network</span>
+                  <span className="text-blue-400">Base</span>
+                </div>
+              </div>
+              <Link
+                href="https://app.uniswap.org/#/swap?chain=base&outputCurrency=0xdf3c79a5759eeedb844e7481309a75037b8e86f5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full mt-4 py-2.5 bg-purple-600/20 text-purple-400 rounded-xl text-sm font-medium hover:bg-purple-600/30 transition-colors"
+              >
+                Get RAVE on Uniswap
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </Link>
+            </div>
+
+            {/* AI Agents */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🤖</span>
+                <h3 className="text-[#F5F5F5] font-semibold">AI Agents</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                baseFM uses AI agents to help moderate chat, recommend shows, and assist DJs.
+              </p>
+              <ul className="text-[#888] text-sm space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">Chat Moderation</strong> - Keeps chat friendly and spam-free</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">Show Recommendations</strong> - Suggests DJs based on your taste</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">DJ Assistant</strong> - Helps DJs manage their streams</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Streaming Guide for DJs */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">📡</span>
+                <h3 className="text-[#F5F5F5] font-semibold">DJ Streaming Guide</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                Ready to stream? Here's the technical setup:
+              </p>
+              <ol className="text-[#888] text-sm space-y-3 list-decimal list-inside">
+                <li>
+                  <strong className="text-[#F5F5F5]">Get streaming software</strong>
+                  <p className="text-[#666] text-xs ml-5 mt-1">OBS Studio (free), Larix Broadcaster (mobile), or any RTMP app</p>
+                </li>
+                <li>
+                  <strong className="text-[#F5F5F5]">Create a stream on baseFM</strong>
+                  <p className="text-[#666] text-xs ml-5 mt-1">Go to Dashboard → Create Stream → Get your RTMP URL and key</p>
+                </li>
+                <li>
+                  <strong className="text-[#F5F5F5]">Configure your software</strong>
+                  <p className="text-[#666] text-xs ml-5 mt-1">Paste the RTMP URL and stream key into your streaming settings</p>
+                </li>
+                <li>
+                  <strong className="text-[#F5F5F5]">Go live!</strong>
+                  <p className="text-[#666] text-xs ml-5 mt-1">Start streaming - baseFM detects it automatically</p>
+                </li>
+              </ol>
+              <div className="mt-4 p-3 bg-[#0A0A0A] rounded-xl">
+                <p className="text-[#666] text-xs">
+                  <strong className="text-[#888]">Recommended settings:</strong> Audio bitrate 128-320kbps, Sample rate 44.1kHz
+                </p>
+              </div>
+            </div>
+
+            {/* Bankr Integration */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🏦</span>
+                <h3 className="text-[#F5F5F5] font-semibold">Bankr & Farcaster</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                Connect with the broader onchain ecosystem.
+              </p>
+              <ul className="text-[#888] text-sm space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">Farcaster Frames</strong> - Share shows as interactive posts</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">Base Names</strong> - Your .base.eth identity shows up on baseFM</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-400 mt-1">●</span>
+                  <span><strong className="text-[#F5F5F5]">Onchain Identity</strong> - Your wallet reputation travels with you</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Wallet Features */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">💳</span>
+                <h3 className="text-[#F5F5F5] font-semibold">Wallet Page Features</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                Your /wallet page has everything you need:
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-[#0A0A0A] rounded-xl p-3 text-center">
+                  <span className="text-xl mb-1 block">📊</span>
+                  <p className="text-[#F5F5F5] text-sm font-medium">Balances</p>
+                  <p className="text-[#666] text-xs">ETH, USDC, RAVE</p>
+                </div>
+                <div className="bg-[#0A0A0A] rounded-xl p-3 text-center">
+                  <span className="text-xl mb-1 block">💱</span>
+                  <p className="text-[#F5F5F5] text-sm font-medium">Swap</p>
+                  <p className="text-[#666] text-xs">Trade tokens</p>
+                </div>
+                <div className="bg-[#0A0A0A] rounded-xl p-3 text-center">
+                  <span className="text-xl mb-1 block">📈</span>
+                  <p className="text-[#F5F5F5] text-sm font-medium">RAVE Chart</p>
+                  <p className="text-[#666] text-xs">Price tracking</p>
+                </div>
+                <div className="bg-[#0A0A0A] rounded-xl p-3 text-center">
+                  <span className="text-xl mb-1 block">🛒</span>
+                  <p className="text-[#F5F5F5] text-sm font-medium">Buy Crypto</p>
+                  <p className="text-[#666] text-xs">Via Coinbase</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Token Gating */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🔐</span>
+                <h3 className="text-[#F5F5F5] font-semibold">Token Gating</h3>
+              </div>
+              <p className="text-[#888] text-sm mb-3">
+                Some features require holding RAVE tokens:
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-[#0A0A0A] rounded-xl">
+                  <span className="text-[#888] text-sm">Community Access</span>
+                  <span className="text-purple-400 text-sm font-medium">5,000 RAVE</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-[#0A0A0A] rounded-xl">
+                  <span className="text-[#888] text-sm">DJ Streaming</span>
+                  <span className="text-purple-400 text-sm font-medium">5,000 RAVE</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-[#0A0A0A] rounded-xl">
+                  <span className="text-[#888] text-sm">Premium Features</span>
+                  <span className="text-purple-400 text-sm font-medium">1B RAVE</span>
+                </div>
+              </div>
+              <p className="text-[#666] text-xs mt-3">
+                Premium features include custom token gating for your streams, priority support, and featured placement.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================= */}
+        {/* SECTION 9: Need Help? */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-6 border border-purple-500/20 text-center">
