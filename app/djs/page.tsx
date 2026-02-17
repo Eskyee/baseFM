@@ -138,7 +138,7 @@ function DJCard({ dj }: { dj: DJ }) {
         <img
           src={dj.avatarUrl || DEFAULT_AVATAR}
           alt={dj.name}
-          className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+          className={`w-full h-full transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
             hasAvatar ? 'object-cover' : 'object-contain p-8'
           }`}
         />

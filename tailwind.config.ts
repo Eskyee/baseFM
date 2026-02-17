@@ -16,6 +16,15 @@ const config: Config = {
       screens: {
         'landscape': { 'raw': '(orientation: landscape) and (max-height: 500px)' },
       },
+      animation: {
+        'marquee': 'marquee 30s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
     },
   },
   plugins: [
