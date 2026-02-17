@@ -138,8 +138,11 @@ export default function SubmitEventPage() {
           <div className="flex gap-3 justify-center">
             <Link
               href="/events"
-              className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-100 transition-colors"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               View Events
             </Link>
             <button
@@ -162,8 +165,11 @@ export default function SubmitEventPage() {
                 setTicketPrice('');
                 setImageUrl('');
               }}
-              className="px-6 py-3 bg-[#1A1A1A] text-[#F5F5F5] rounded-full font-medium hover:bg-[#222] transition-colors"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] border border-[#333] text-[#F5F5F5] rounded-full font-semibold hover:bg-[#252525] hover:border-purple-500/50 transition-all active:scale-[0.98]"
             >
+              <svg className="w-5 h-5 text-[#888] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
               Submit Another
             </button>
           </div>
@@ -431,12 +437,27 @@ export default function SubmitEventPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 bg-white text-black rounded-full font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="group w-full py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-[length:200%_100%] rounded-2xl text-white font-bold text-lg shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:bg-right transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-3"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Event'}
+            {isSubmitting ? (
+              <>
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Submitting Event...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Submit Event for Review
+              </>
+            )}
           </button>
 
-          <p className="text-[#666] text-xs text-center">
+          <p className="text-center text-[#666] text-xs">
             By submitting, you agree that your event follows our community guidelines.
           </p>
         </form>

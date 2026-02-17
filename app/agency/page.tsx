@@ -134,10 +134,10 @@ export default function AgencyPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/bookings"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black rounded-full font-semibold text-lg hover:bg-[#E5E5E5] transition-all active:scale-[0.98]"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 rounded-full font-semibold text-lg text-white shadow-xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-[1.02] transition-all active:scale-[0.98]"
               >
                 Join The Network
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
@@ -145,9 +145,9 @@ export default function AgencyPage() {
                 href="https://warpcast.com/raveculture"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#2C2C2E] rounded-full text-[#F5F5F5] font-semibold text-lg hover:bg-[#3C3C3E] transition-colors"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#1A1A1A] border border-[#333] rounded-full text-[#F5F5F5] font-semibold text-lg hover:bg-[#252525] hover:border-purple-500/50 transition-all"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-5 h-5 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.24 4.315l-6.24 15.63-2.385-6.15L3.465 11.4l14.775-7.085zm.255-.63L3.21 10.77a.75.75 0 00-.135 1.29l6.855 2.67 2.67 6.855a.75.75 0 001.29-.135l7.085-14.775a.75.75 0 00-.93-.99z"/>
                 </svg>
                 Follow on Farcaster
@@ -313,10 +313,10 @@ export default function AgencyPage() {
             </div>
             <Link
               href="/"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-semibold hover:bg-[#E5E5E5] transition-colors"
+              className="group flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
             >
               Explore baseFM
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
@@ -337,15 +337,15 @@ export default function AgencyPage() {
           {/* Booking Form */}
           <Link
             href="/bookings"
-            className="bg-white text-black rounded-2xl p-6 text-center hover:bg-[#E5E5E5] transition-all group"
+            className="bg-gradient-to-br from-purple-600 to-blue-600 text-white rounded-2xl p-6 text-center shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] transition-all group"
           >
-            <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
             <h3 className="font-bold mb-1">Join Network</h3>
-            <p className="text-black/60 text-sm">Artists & Crews</p>
+            <p className="text-white/70 text-sm">Artists & Crews</p>
           </Link>
 
           {/* Email */}
