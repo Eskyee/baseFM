@@ -49,14 +49,14 @@ export async function GET(request: NextRequest) {
       const djs = t.djs as Record<string, unknown> | null;
 
       return {
-        id: t.id,
-        fromWallet: t.from_wallet,
-        toWallet: t.to_wallet,
-        toDjName: djs?.name || 'Unknown DJ',
-        token: t.token,
+        id: t.id as string,
+        fromWallet: t.from_wallet as string,
+        toWallet: t.to_wallet as string,
+        toDjName: (djs?.name as string) || 'Unknown DJ',
+        token: t.token as string,
         amount: parseFloat(t.amount as string),
-        txHash: t.tx_hash,
-        createdAt: t.created_at,
+        txHash: t.tx_hash as string,
+        createdAt: t.created_at as string,
       };
     });
 
