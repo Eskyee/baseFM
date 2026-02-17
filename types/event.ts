@@ -139,3 +139,102 @@ export function accessTokenFromRow(row: AccessTokenRow): AccessToken {
     consumed: row.consumed,
   };
 }
+
+// =============================================================================
+// PROMOTER TYPES
+// =============================================================================
+
+export type PromoterType = 'promoter' | 'collective' | 'venue' | 'label' | 'artist';
+
+export type Promoter = {
+  id: string;
+  walletAddress?: string;
+  slug: string;
+  name: string;
+  bio?: string;
+  logoUrl?: string;
+  coverImageUrl?: string;
+  email?: string;
+  websiteUrl?: string;
+  twitterUrl?: string;
+  instagramUrl?: string;
+  farcasterUrl?: string;
+  city?: string;
+  country?: string;
+  type: PromoterType;
+  genres: string[];
+  isVerified: boolean;
+  isFeatured: boolean;
+  isBanned: boolean;
+  totalEvents: number;
+  createdAt: string;
+};
+
+export type PromoterRow = {
+  id: string;
+  wallet_address: string | null;
+  slug: string;
+  name: string;
+  bio: string | null;
+  logo_url: string | null;
+  cover_image_url: string | null;
+  email: string | null;
+  website_url: string | null;
+  twitter_url: string | null;
+  instagram_url: string | null;
+  farcaster_url: string | null;
+  city: string | null;
+  country: string | null;
+  type: string;
+  genres: string[] | null;
+  is_verified: boolean;
+  is_featured: boolean;
+  is_banned: boolean;
+  total_events: number;
+  created_at: string;
+};
+
+export type CreatePromoterInput = {
+  walletAddress?: string;
+  name: string;
+  bio?: string;
+  logoUrl?: string;
+  coverImageUrl?: string;
+  email?: string;
+  websiteUrl?: string;
+  twitterUrl?: string;
+  instagramUrl?: string;
+  farcasterUrl?: string;
+  city?: string;
+  country?: string;
+  type?: PromoterType;
+  genres?: string[];
+};
+
+export type UpdatePromoterInput = Partial<CreatePromoterInput>;
+
+export function promoterFromRow(row: PromoterRow): Promoter {
+  return {
+    id: row.id,
+    walletAddress: row.wallet_address ?? undefined,
+    slug: row.slug,
+    name: row.name,
+    bio: row.bio ?? undefined,
+    logoUrl: row.logo_url ?? undefined,
+    coverImageUrl: row.cover_image_url ?? undefined,
+    email: row.email ?? undefined,
+    websiteUrl: row.website_url ?? undefined,
+    twitterUrl: row.twitter_url ?? undefined,
+    instagramUrl: row.instagram_url ?? undefined,
+    farcasterUrl: row.farcaster_url ?? undefined,
+    city: row.city ?? undefined,
+    country: row.country ?? undefined,
+    type: row.type as PromoterType,
+    genres: row.genres ?? [],
+    isVerified: row.is_verified,
+    isFeatured: row.is_featured,
+    isBanned: row.is_banned,
+    totalEvents: row.total_events,
+    createdAt: row.created_at,
+  };
+}
