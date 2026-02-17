@@ -87,10 +87,10 @@ export default function HomePage() {
             <p className="text-[#888] text-sm">Onchain radio on Base</p>
           </div>
           <Link
-            href="/schedule"
+            href="/events"
             className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium hover:bg-[#222] transition-colors active:scale-[0.97]"
           >
-            Schedule
+            Events
           </Link>
         </header>
 
