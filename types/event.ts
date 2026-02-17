@@ -1,286 +1,141 @@
-export interface Event {
+// Event & Access types for RaveCulture event system
+
+export type EventStatus = 'draft' | 'active' | 'ended';
+export type NFTType = 'ERC721' | 'ERC1155';
+export type EventType = 'physical' | 'livestream';
+
+export type Event = {
   id: string;
-  slug: string;
-  title: string;
-  subtitle?: string;
+  name: string;
   description?: string;
+  location?: string;
+  eventType: EventType;
+  creator?: string;
+  startTime: number;
+  endTime: number;
+  maxSupply: number;
+  minted: number;
+  nftContract?: `0x${string}`;
+  nftType: NFTType;
+  artistAddress?: `0x${string}`;
+  revenueSplitId?: string;
+  status: EventStatus;
+  streamUrl?: string;
+};
 
-  // Date & Time
-  date: string;
-  startTime?: string;
-  endTime?: string;
-  displayDate: string;
-
-  // Location
-  venue: string;
-  address?: string;
-  city?: string;
-  country?: string;
-
-  // Media
-  imageUrl?: string;
-  coverImageUrl?: string;
-
-  // Details
-  headliners: string[];
-  tags: string[];
-  genres: string[];
-  ticketUrl?: string;
-  ticketPrice?: string;
-
-  // Relationships
-  promoterId?: string;
-  promoter?: Promoter;
-  createdByWallet?: string;
-
-  // Status
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  isFeatured: boolean;
-
-  // Computed
-  isPast: boolean;
-
-  // Timestamps
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface EventRow {
+/** Public-safe event (no admin fields like nftContract, artistAddress) */
+export type PublicEvent = {
   id: string;
-  slug: string;
-  title: string;
-  subtitle: string | null;
+  name: string;
+  description?: string;
+  location?: string;
+  eventType: EventType;
+  creator?: string;
+  startTime: number;
+  endTime: number;
+  status: EventStatus;
+  spotsLeft: number;
+  streamUrl?: string;
+};
+
+export type AccessToken = {
+  eventId: string;
+  wallet: `0x${string}`;
+  tokenId?: string;
+  issuedAt: number;
+  expiresAt?: number;
+  consumed: boolean;
+};
+
+// Supabase row types (snake_case)
+export type EventRow = {
+  id: string;
+  name: string;
   description: string | null;
-  date: string;
-  start_time: string | null;
-  end_time: string | null;
-  display_date: string;
-  venue: string;
-  address: string | null;
-  city: string | null;
-  country: string | null;
-  image_url: string | null;
-  cover_image_url: string | null;
-  headliners: string[];
-  tags: string[];
-  genres: string[];
-  ticket_url: string | null;
-  ticket_price: string | null;
-  promoter_id: string | null;
-  created_by_wallet: string | null;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  is_featured: boolean;
+  location: string | null;
+  event_type: string | null;
+  creator: string | null;
+  start_time: number;
+  end_time: number;
+  max_supply: number;
+  minted: number;
+  nft_contract: string | null;
+  nft_type: string;
+  artist_address: string | null;
+  revenue_split_id: string | null;
+  status: string;
+  stream_url: string | null;
   created_at: string;
-  updated_at: string;
-}
+};
 
-export function eventFromRow(row: EventRow, promoter?: Promoter): Event {
-  const eventDate = new Date(row.date);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+export type AccessTokenRow = {
+  id: string;
+  event_id: string;
+  wallet: string;
+  token_id: string | null;
+  issued_at: number;
+  expires_at: number | null;
+  consumed: boolean;
+  consumed_at: string | null;
+  created_at: string;
+};
 
+export type MintLogRow = {
+  id: string;
+  wallet: string;
+  event_id: string;
+  tx_hash: string;
+  timestamp: number;
+  status: string;
+  error_message: string | null;
+};
+
+// Row → Domain converters
+export function eventFromRow(row: EventRow): Event {
   return {
     id: row.id,
-    slug: row.slug,
-    title: row.title,
-    subtitle: row.subtitle || undefined,
-    description: row.description || undefined,
-    date: row.date,
-    startTime: row.start_time || undefined,
-    endTime: row.end_time || undefined,
-    displayDate: row.display_date,
-    venue: row.venue,
-    address: row.address || undefined,
-    city: row.city || undefined,
-    country: row.country || undefined,
-    imageUrl: row.image_url || undefined,
-    coverImageUrl: row.cover_image_url || undefined,
-    headliners: row.headliners || [],
-    tags: row.tags || [],
-    genres: row.genres || [],
-    ticketUrl: row.ticket_url || undefined,
-    ticketPrice: row.ticket_price || undefined,
-    promoterId: row.promoter_id || undefined,
-    promoter,
-    createdByWallet: row.created_by_wallet || undefined,
-    status: row.status,
-    isFeatured: row.is_featured,
-    isPast: eventDate < today,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-export interface CreateEventInput {
-  title: string;
-  subtitle?: string;
-  description?: string;
-  date: string;
-  startTime?: string;
-  endTime?: string;
-  displayDate: string;
-  venue: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  imageUrl?: string;
-  coverImageUrl?: string;
-  headliners?: string[];
-  tags?: string[];
-  genres?: string[];
-  ticketUrl?: string;
-  ticketPrice?: string;
-  promoterId?: string;
-  createdByWallet?: string;
-}
-
-export interface UpdateEventInput {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  date?: string;
-  startTime?: string;
-  endTime?: string;
-  displayDate?: string;
-  venue?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  imageUrl?: string;
-  coverImageUrl?: string;
-  headliners?: string[];
-  tags?: string[];
-  genres?: string[];
-  ticketUrl?: string;
-  ticketPrice?: string;
-  promoterId?: string;
-  status?: 'pending' | 'approved' | 'rejected' | 'cancelled';
-  isFeatured?: boolean;
-}
-
-// Promoter types
-export type PromoterType = 'promoter' | 'collective' | 'venue' | 'label' | 'organization';
-
-export interface Promoter {
-  id: string;
-  walletAddress?: string;
-  slug: string;
-  name: string;
-  bio?: string;
-
-  // Media
-  logoUrl?: string;
-  coverImageUrl?: string;
-
-  // Contact & Links
-  email?: string;
-  websiteUrl?: string;
-  twitterUrl?: string;
-  instagramUrl?: string;
-  farcasterUrl?: string;
-
-  // Location
-  city?: string;
-  country?: string;
-
-  // Type
-  type: PromoterType;
-  genres: string[];
-
-  // Status
-  isVerified: boolean;
-  isFeatured: boolean;
-  isBanned: boolean;
-
-  // Stats
-  totalEvents: number;
-
-  // Timestamps
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PromoterRow {
-  id: string;
-  wallet_address: string | null;
-  slug: string;
-  name: string;
-  bio: string | null;
-  logo_url: string | null;
-  cover_image_url: string | null;
-  email: string | null;
-  website_url: string | null;
-  twitter_url: string | null;
-  instagram_url: string | null;
-  farcaster_url: string | null;
-  city: string | null;
-  country: string | null;
-  type: PromoterType;
-  genres: string[];
-  is_verified: boolean;
-  is_featured: boolean;
-  is_banned: boolean;
-  total_events: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export function promoterFromRow(row: PromoterRow): Promoter {
-  return {
-    id: row.id,
-    walletAddress: row.wallet_address || undefined,
-    slug: row.slug,
     name: row.name,
-    bio: row.bio || undefined,
-    logoUrl: row.logo_url || undefined,
-    coverImageUrl: row.cover_image_url || undefined,
-    email: row.email || undefined,
-    websiteUrl: row.website_url || undefined,
-    twitterUrl: row.twitter_url || undefined,
-    instagramUrl: row.instagram_url || undefined,
-    farcasterUrl: row.farcaster_url || undefined,
-    city: row.city || undefined,
-    country: row.country || undefined,
-    type: row.type,
-    genres: row.genres || [],
-    isVerified: row.is_verified,
-    isFeatured: row.is_featured,
-    isBanned: row.is_banned,
-    totalEvents: row.total_events,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    description: row.description ?? undefined,
+    location: row.location ?? undefined,
+    eventType: (row.event_type as EventType) ?? 'physical',
+    creator: row.creator ?? undefined,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    maxSupply: row.max_supply,
+    minted: row.minted,
+    nftContract: row.nft_contract as `0x${string}` | undefined,
+    nftType: row.nft_type as NFTType,
+    artistAddress: row.artist_address as `0x${string}` | undefined,
+    revenueSplitId: row.revenue_split_id ?? undefined,
+    status: row.status as EventStatus,
+    streamUrl: row.stream_url ?? undefined,
   };
 }
 
-export interface CreatePromoterInput {
-  walletAddress?: string;
-  name: string;
-  bio?: string;
-  logoUrl?: string;
-  coverImageUrl?: string;
-  email?: string;
-  websiteUrl?: string;
-  twitterUrl?: string;
-  instagramUrl?: string;
-  farcasterUrl?: string;
-  city?: string;
-  country?: string;
-  type?: PromoterType;
-  genres?: string[];
+/** Convert Event → PublicEvent (strips admin/onchain fields) */
+export function toPublicEvent(event: Event): PublicEvent {
+  return {
+    id: event.id,
+    name: event.name,
+    description: event.description,
+    location: event.location,
+    eventType: event.eventType,
+    creator: event.creator,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    status: event.status,
+    spotsLeft: Math.max(0, event.maxSupply - event.minted),
+    streamUrl: event.eventType === 'livestream' ? event.streamUrl : undefined,
+  };
 }
 
-export interface UpdatePromoterInput {
-  name?: string;
-  bio?: string;
-  logoUrl?: string;
-  coverImageUrl?: string;
-  email?: string;
-  websiteUrl?: string;
-  twitterUrl?: string;
-  instagramUrl?: string;
-  farcasterUrl?: string;
-  city?: string;
-  country?: string;
-  type?: PromoterType;
-  genres?: string[];
+export function accessTokenFromRow(row: AccessTokenRow): AccessToken {
+  return {
+    eventId: row.event_id,
+    wallet: row.wallet as `0x${string}`,
+    tokenId: row.token_id ?? undefined,
+    issuedAt: row.issued_at,
+    expiresAt: row.expires_at ?? undefined,
+    consumed: row.consumed,
+  };
 }

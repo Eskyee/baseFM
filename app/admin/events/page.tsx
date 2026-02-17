@@ -1,153 +1,222 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
-import { Event } from '@/types/event';
+import type { Event } from '@/types/event';
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-500',
-  approved: 'bg-green-500',
-  rejected: 'bg-red-500',
-  cancelled: 'bg-gray-500',
+// ============================================================
+// Admin Events Page
+// Wallet-gated — only ADMIN_WALLETS can access
+//
+// UX Copy:
+//   ✅ Access, Pass, Entry, Confirmed
+//   ❌ NFT, Token, Mint, Blockchain, Gas, Transaction
+// ============================================================
+
+type EventFormData = {
+  name: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  maxSupply: number;
+  nftType: 'ERC721' | 'ERC1155';
+  nftContract: string;
+  artistAddress: string;
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending',
-  approved: 'Approved',
-  rejected: 'Rejected',
-  cancelled: 'Cancelled',
+const DEFAULT_FORM: EventFormData = {
+  name: '',
+  startDate: '',
+  startTime: '',
+  endDate: '',
+  endTime: '',
+  maxSupply: 100,
+  nftType: 'ERC1155',
+  nftContract: '',
+  artistAddress: '',
 };
+
+function StatusBadge({ status }: { status: string }) {
+  const colors: Record<string, string> = {
+    draft: 'bg-[#333] text-[#888]',
+    active: 'bg-green-500/20 text-green-400',
+    ended: 'bg-red-500/20 text-red-400',
+  };
+  return (
+    <span className={`px-2 py-0.5 text-xs font-medium rounded ${colors[status] ?? colors.draft}`}>
+      {status}
+    </span>
+  );
+}
+
+function formatDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function AdminEventsPage() {
   const { address, isConnected } = useAccount();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [updating, setUpdating] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState<EventFormData>(DEFAULT_FORM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
+
+  const checkAdmin = useCallback(async () => {
+    if (!address) return;
+    try {
+      const res = await fetch(`/api/admin/check?wallet=${address}`);
+      if (res.ok) {
+        const data = await res.json();
+        setIsAdmin(data.isAdmin);
+      }
+    } catch {
+      setIsAdmin(false);
+    }
+  }, [address]);
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      const res = await fetch('/api/events/admin-list');
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data.events ?? []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const res = await fetch('/api/admin/events');
-        if (res.ok) {
-          const data = await res.json();
-          setEvents(data.events || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch events:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    if (isConnected) {
+    if (isConnected && address) {
+      checkAdmin();
       fetchEvents();
     }
-  }, [isConnected]);
+  }, [isConnected, address, checkAdmin, fetchEvents]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setResult(null);
+
+    try {
+      const startTimestamp = Math.floor(
+        new Date(`${form.startDate}T${form.startTime}`).getTime() / 1000
+      );
+      const endTimestamp = Math.floor(
+        new Date(`${form.endDate}T${form.endTime}`).getTime() / 1000
+      );
+
+      if (endTimestamp <= startTimestamp) {
+        setResult({ error: 'End time must be after start time' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const res = await fetch('/api/events/admin-list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: address,
+          name: form.name.trim(),
+          startTime: startTimestamp,
+          endTime: endTimestamp,
+          maxSupply: form.maxSupply,
+          nftType: form.nftType,
+          nftContract: form.nftContract.trim() || undefined,
+          artistAddress: form.artistAddress.trim() || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setResult({ error: data.error || 'Failed to create event' });
+        return;
+      }
+
+      setResult({ success: true, message: 'Event created' });
+      setForm(DEFAULT_FORM);
+      setShowForm(false);
+      fetchEvents();
+    } catch (err) {
+      setResult({ error: 'Something went wrong. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStatusChange = async (eventId: string, newStatus: string) => {
+    try {
+      const res = await fetch('/api/events/admin-list', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: address,
+          eventId,
+          status: newStatus,
+        }),
+      });
+
+      if (res.ok) {
+        fetchEvents();
+        setResult({ success: true, message: `Event ${newStatus}` });
+      } else {
+        const data = await res.json();
+        setResult({ error: data.error || 'Failed to update event' });
+      }
+    } catch {
+      setResult({ error: 'Failed to update event' });
+    }
+  };
+
+  // ---- Not connected ----
   if (!isConnected) {
     return (
       <div className="min-h-screen pb-20 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+            </svg>
+          </div>
           <h1 className="text-2xl font-bold text-[#F5F5F5] mb-3">Event Management</h1>
-          <p className="text-[#888] mb-8">Connect your admin wallet</p>
+          <p className="text-[#888] mb-8">Connect your admin wallet to manage events</p>
           <WalletConnect />
         </div>
       </div>
     );
   }
 
-  const handleAction = async (eventId: string, action: string, value?: boolean) => {
-    setUpdating(eventId);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/admin/events', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: address,
-          eventId,
-          action,
-          value,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to update');
-      }
-
-      // Update local state
-      setEvents(events.map(e =>
-        e.id === eventId ? data.event : e
-      ));
-
-      const actionLabels: Record<string, string> = {
-        approve: 'approved',
-        reject: 'rejected',
-        cancel: 'cancelled',
-        pending: 'set to pending',
-        setFeatured: value ? 'featured' : 'unfeatured',
-      };
-      setSuccess(`Event ${actionLabels[action] || 'updated'}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update');
-    } finally {
-      setUpdating(null);
-    }
-  };
-
-  const handleDelete = async (event: Event) => {
-    if (!confirm(`Are you sure you want to delete "${event.title}"?`)) {
-      return;
-    }
-
-    setUpdating(event.id);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/admin/events', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: address,
-          eventId: event.id,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to delete');
-      }
-
-      setEvents(events.filter(e => e.id !== event.id));
-      setSuccess(`"${event.title}" deleted`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete');
-    } finally {
-      setUpdating(null);
-    }
-  };
-
-  const filteredEvents = events.filter(e => {
-    if (filter === 'all') return true;
-    return e.status === filter;
-  });
-
-  const pendingCount = events.filter(e => e.status === 'pending').length;
+  // ---- Not admin ----
+  if (!isAdmin && !isLoading) {
+    return (
+      <div className="min-h-screen pb-20 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <h1 className="text-2xl font-bold text-[#F5F5F5] mb-3">Access Denied</h1>
+          <p className="text-[#888] mb-4">This wallet is not authorized for admin access.</p>
+          <Link href="/" className="text-purple-400 hover:text-purple-300">
+            Go Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Back Link */}
         <Link
           href="/admin"
@@ -159,203 +228,203 @@ export default function AdminEventsPage() {
           Back to Admin
         </Link>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#F5F5F5]">Event Management</h1>
-            <p className="text-[#888] text-sm mt-1">
-              Review and manage event submissions
-              {pendingCount > 0 && (
-                <span className="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">
-                  {pendingCount} pending
-                </span>
-              )}
-            </p>
+            <h1 className="text-2xl font-bold text-[#F5F5F5] mb-1">Events</h1>
+            <p className="text-[#888] text-sm">{events.length} events</p>
           </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+          >
+            {showForm ? 'Cancel' : '+ New Event'}
+          </button>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex gap-2 mb-6">
-          {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === f
-                  ? 'bg-white text-black'
-                  : 'bg-[#1A1A1A] text-[#888] hover:text-[#F5F5F5]'
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-              {f === 'pending' && pendingCount > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 bg-yellow-500 text-black text-[10px] rounded-full">
-                  {pendingCount}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Messages */}
-        {error && (
-          <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
+        {/* Results */}
+        {result?.success && (
+          <div className="bg-green-900/20 border border-green-500 text-green-400 px-4 py-3 rounded-lg mb-6 text-sm">
+            {result.message}
           </div>
         )}
-        {success && (
-          <div className="bg-green-900/20 border border-green-500 text-green-400 px-4 py-3 rounded-lg mb-6 text-sm">
-            {success}
+        {result?.error && (
+          <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm">
+            {result.error}
+          </div>
+        )}
+
+        {/* Create Event Form */}
+        {showForm && (
+          <div className="bg-[#1A1A1A] rounded-xl p-6 mb-6">
+            <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Create Event</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm text-[#888] mb-1">Event Name</label>
+                <input
+                  type="text"
+                  required
+                  maxLength={100}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  placeholder="Berlin Warehouse Session"
+                />
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={form.startDate}
+                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">Start Time</label>
+                  <input
+                    type="time"
+                    required
+                    value={form.startTime}
+                    onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">End Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={form.endDate}
+                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">End Time</label>
+                  <input
+                    type="time"
+                    required
+                    value={form.endTime}
+                    onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Supply & Type */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">Max Passes</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    max={10000}
+                    value={form.maxSupply}
+                    onChange={(e) => setForm({ ...form, maxSupply: parseInt(e.target.value) || 100 })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#888] mb-1">Pass Type</label>
+                  <select
+                    value={form.nftType}
+                    onChange={(e) => setForm({ ...form, nftType: e.target.value as 'ERC721' | 'ERC1155' })}
+                    className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="ERC1155">Standard (Multi-pass)</option>
+                    <option value="ERC721">Unique (Single-pass)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Optional: Contract & Artist */}
+              <div>
+                <label className="block text-sm text-[#888] mb-1">Contract Address (optional)</label>
+                <input
+                  type="text"
+                  value={form.nftContract}
+                  onChange={(e) => setForm({ ...form, nftContract: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none font-mono"
+                  placeholder="0x..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#888] mb-1">Artist Wallet (optional)</label>
+                <input
+                  type="text"
+                  value={form.artistAddress}
+                  onChange={(e) => setForm({ ...form, artistAddress: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[#333] rounded-lg px-3 py-2 text-[#F5F5F5] text-sm focus:border-purple-500 focus:outline-none font-mono"
+                  placeholder="0x..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
+              >
+                {isSubmitting ? 'Creating...' : 'Create Event'}
+              </button>
+            </form>
           </div>
         )}
 
         {/* Events List */}
-        {isLoading ? (
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-[#1A1A1A] rounded-lg" />
-            ))}
-          </div>
-        ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-16 bg-[#1A1A1A] rounded-lg">
-            <p className="text-[#888]">
-              {filter === 'all' ? 'No events submitted yet' : `No ${filter} events`}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredEvents.map((event) => (
-              <div
-                key={event.id}
-                className={`bg-[#1A1A1A] rounded-lg p-5 ${
-                  event.status === 'rejected' || event.status === 'cancelled' ? 'opacity-60' : ''
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  {/* Event Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[event.status]}`} />
-                      <span className="text-[#888] text-xs">{STATUS_LABELS[event.status]}</span>
-                      {event.isFeatured && (
-                        <span className="px-2 py-0.5 bg-purple-500 text-white text-[10px] font-medium rounded">
-                          Featured
-                        </span>
+        <div className="bg-[#1A1A1A] rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">All Events</h2>
+
+          {isLoading ? (
+            <div className="text-center py-8 text-[#888]">Loading events...</div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-8 text-[#888]">No events yet. Create your first one above.</div>
+          ) : (
+            <div className="space-y-3">
+              {events.map((event) => (
+                <div key={event.id} className="p-4 bg-[#0A0A0A] rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-[#F5F5F5] font-medium">{event.name}</h3>
+                      <StatusBadge status={event.status} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {event.status === 'draft' && (
+                        <button
+                          onClick={() => handleStatusChange(event.id, 'active')}
+                          className="px-3 py-1.5 text-xs font-medium rounded bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                        >
+                          Activate
+                        </button>
                       )}
-                      {event.isPast && (
-                        <span className="px-2 py-0.5 bg-[#333] text-[#888] text-[10px] font-medium rounded">
-                          Past
-                        </span>
+                      {event.status === 'active' && (
+                        <button
+                          onClick={() => handleStatusChange(event.id, 'ended')}
+                          className="px-3 py-1.5 text-xs font-medium rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                        >
+                          End
+                        </button>
                       )}
                     </div>
-
-                    <h3 className="text-[#F5F5F5] font-bold text-lg truncate">{event.title}</h3>
-                    {event.subtitle && (
-                      <p className="text-[#888] text-sm truncate">{event.subtitle}</p>
-                    )}
-
-                    <div className="flex items-center gap-4 mt-2 text-sm text-[#666]">
-                      <span>{event.displayDate}</span>
-                      <span>{event.venue}</span>
-                      {event.promoter && (
-                        <span className="text-purple-400">by {event.promoter.name}</span>
-                      )}
-                    </div>
-
-                    {event.headliners.length > 0 && (
-                      <p className="text-[#666] text-xs mt-2 truncate">
-                        {event.headliners.join(' • ')}
-                      </p>
-                    )}
-
-                    <p className="text-[#555] text-xs mt-2">
-                      Submitted {new Date(event.createdAt).toLocaleDateString()}
-                    </p>
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex flex-col gap-2 flex-shrink-0">
-                    {event.status === 'pending' && (
-                      <>
-                        <button
-                          onClick={() => handleAction(event.id, 'approve')}
-                          disabled={updating === event.id}
-                          className="px-4 py-2 bg-green-500/20 text-green-400 rounded text-sm font-medium hover:bg-green-500/30 transition-colors disabled:opacity-50"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleAction(event.id, 'reject')}
-                          disabled={updating === event.id}
-                          className="px-4 py-2 bg-red-500/20 text-red-400 rounded text-sm font-medium hover:bg-red-500/30 transition-colors disabled:opacity-50"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-
-                    {event.status === 'approved' && (
-                      <>
-                        <button
-                          onClick={() => handleAction(event.id, 'setFeatured', !event.isFeatured)}
-                          disabled={updating === event.id}
-                          className={`px-4 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 ${
-                            event.isFeatured
-                              ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
-                              : 'bg-[#333] text-[#888] hover:bg-[#444]'
-                          }`}
-                        >
-                          {event.isFeatured ? 'Unfeature' : 'Feature'}
-                        </button>
-                        <button
-                          onClick={() => handleAction(event.id, 'cancel')}
-                          disabled={updating === event.id}
-                          className="px-4 py-2 bg-[#333] text-[#888] rounded text-sm font-medium hover:bg-[#444] transition-colors disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    )}
-
-                    {(event.status === 'rejected' || event.status === 'cancelled') && (
-                      <button
-                        onClick={() => handleAction(event.id, 'pending')}
-                        disabled={updating === event.id}
-                        className="px-4 py-2 bg-[#333] text-[#888] rounded text-sm font-medium hover:bg-[#444] transition-colors disabled:opacity-50"
-                      >
-                        Restore
-                      </button>
-                    )}
-
-                    <Link
-                      href={`/events/${event.slug}`}
-                      className="px-4 py-2 bg-[#333] text-[#888] rounded text-sm font-medium hover:bg-[#444] transition-colors text-center"
-                    >
-                      View
-                    </Link>
-
-                    <button
-                      onClick={() => handleDelete(event)}
-                      disabled={updating === event.id}
-                      className="px-4 py-2 bg-red-900/20 text-red-400 rounded text-sm font-medium hover:bg-red-900/30 transition-colors disabled:opacity-50"
-                    >
-                      Delete
-                    </button>
+                  <div className="flex items-center gap-4 text-xs text-[#666]">
+                    <span>{formatDate(event.startTime)} — {formatDate(event.endTime)}</span>
+                    <span>{event.minted} / {event.maxSupply} passes issued</span>
+                    <span className="text-[#555]">{event.nftType === 'ERC1155' ? 'Multi-pass' : 'Unique pass'}</span>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Info */}
-        <div className="mt-8 p-4 bg-[#1A1A1A] rounded-lg">
-          <h3 className="text-[#F5F5F5] font-medium mb-2">Event Status Types</h3>
-          <ul className="text-[#888] text-sm space-y-1">
-            <li><span className="text-yellow-400">Pending</span> — Awaiting admin review</li>
-            <li><span className="text-green-400">Approved</span> — Visible on the events page</li>
-            <li><span className="text-red-400">Rejected</span> — Not approved for listing</li>
-            <li><span className="text-gray-400">Cancelled</span> — Event was cancelled</li>
-            <li><span className="text-purple-400">Featured</span> — Shows on homepage</li>
-          </ul>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

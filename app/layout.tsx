@@ -76,7 +76,7 @@ export default function RootLayout({
             <AppShell>{children}</AppShell>
           </SplashScreen>
         </OnchainProvider>
-        <Analytics />
+        <SpeedInsights />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
+import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import Link from 'next/link';
