@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ScheduleSlot, DAY_NAMES, DAY_NAMES_SHORT } from '@/types/schedule';
@@ -8,9 +9,43 @@ import { ScheduleSlot, DAY_NAMES, DAY_NAMES_SHORT } from '@/types/schedule';
 const DEFAULT_AVATAR = '/logo.png';
 
 export default function SchedulePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const dayParam = searchParams.get('day');
+
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+
+  // Parse day from URL or default to current day
+  const getInitialDay = () => {
+    if (dayParam !== null) {
+      const parsed = parseInt(dayParam, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 6) {
+        return parsed;
+      }
+    }
+    return new Date().getDay();
+  };
+
+  const [selectedDay, setSelectedDay] = useState(getInitialDay);
+
+  const handleDayChange = (day: number) => {
+    setSelectedDay(day);
+    if (day === new Date().getDay()) {
+      router.push('/schedule', { scroll: false });
+    } else {
+      router.push(`/schedule?day=${day}`, { scroll: false });
+    }
+  };
+
+  useEffect(() => {
+    if (dayParam !== null) {
+      const parsed = parseInt(dayParam, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 6) {
+        setSelectedDay(parsed);
+      }
+    }
+  }, [dayParam]);
 
   useEffect(() => {
     async function fetchSchedule() {
@@ -80,7 +115,7 @@ export default function SchedulePage() {
             return (
               <button
                 key={day}
-                onClick={() => setSelectedDay(index)}
+                onClick={() => handleDayChange(index)}
                 className={`flex-shrink-0 min-w-[44px] py-2.5 rounded-xl text-xs font-medium transition-all active:scale-95 ${
                   isSelected
                     ? 'bg-[#3B82F6] text-white'

@@ -1,15 +1,39 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DJ } from '@/types/dj';
 
 const DEFAULT_AVATAR = '/logo.png';
 
+type Filter = 'all' | 'residents';
+
 export default function DJsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const filterParam = searchParams.get('filter') as Filter | null;
+
   const [djs, setDJs] = useState<DJ[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'residents'>('all');
+  const [filter, setFilter] = useState<Filter>(filterParam === 'residents' ? 'residents' : 'all');
+
+  const handleFilterChange = (newFilter: Filter) => {
+    setFilter(newFilter);
+    if (newFilter === 'all') {
+      router.push('/djs', { scroll: false });
+    } else {
+      router.push(`/djs?filter=${newFilter}`, { scroll: false });
+    }
+  };
+
+  useEffect(() => {
+    if (filterParam === 'residents') {
+      setFilter('residents');
+    } else {
+      setFilter('all');
+    }
+  }, [filterParam]);
 
   useEffect(() => {
     async function fetchDJs() {
@@ -46,7 +70,7 @@ export default function DJsPage() {
           {/* Filter */}
           <div className="flex gap-2">
             <button
-              onClick={() => setFilter('all')}
+              onClick={() => handleFilterChange('all')}
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
                 filter === 'all'
                   ? 'bg-white text-black'
@@ -56,7 +80,7 @@ export default function DJsPage() {
               All
             </button>
             <button
-              onClick={() => setFilter('residents')}
+              onClick={() => handleFilterChange('residents')}
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
                 filter === 'residents'
                   ? 'bg-white text-black'

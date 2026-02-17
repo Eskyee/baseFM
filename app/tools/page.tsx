@@ -1,13 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const CLANKER_DOCS_URL = 'https://docs.clanker.world';
 const DEPLOY_URL = 'https://www.clanker.world/clanker';
 
+type Tab = 'tokens' | 'agents' | 'bankr';
+
 export default function ToolsPage() {
-  const [activeTab, setActiveTab] = useState<'tokens' | 'agents' | 'bankr'>('tokens');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabParam = searchParams.get('tab') as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(tabParam || 'tokens');
+
+  useEffect(() => {
+    if (tabParam && ['tokens', 'agents', 'bankr'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    router.push(`/tools?tab=${tab}`, { scroll: false });
+  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -25,7 +42,7 @@ export default function ToolsPage() {
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-8 overflow-x-auto hide-scrollbar">
           <button
-            onClick={() => setActiveTab('tokens')}
+            onClick={() => handleTabChange('tokens')}
             className={`px-4 py-2 rounded-lg text-sm font-mono font-medium transition-all whitespace-nowrap ${
               activeTab === 'tokens'
                 ? 'bg-[#0052FF] text-white'
@@ -35,7 +52,7 @@ export default function ToolsPage() {
             Token Deploy
           </button>
           <button
-            onClick={() => setActiveTab('agents')}
+            onClick={() => handleTabChange('agents')}
             className={`px-4 py-2 rounded-lg text-sm font-mono font-medium transition-all whitespace-nowrap ${
               activeTab === 'agents'
                 ? 'bg-[#0052FF] text-white'
@@ -45,7 +62,7 @@ export default function ToolsPage() {
             AI Agents
           </button>
           <button
-            onClick={() => setActiveTab('bankr')}
+            onClick={() => handleTabChange('bankr')}
             className={`px-4 py-2 rounded-lg text-sm font-mono font-medium transition-all whitespace-nowrap ${
               activeTab === 'bankr'
                 ? 'bg-[#0052FF] text-white'

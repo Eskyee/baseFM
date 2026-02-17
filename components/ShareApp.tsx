@@ -11,20 +11,47 @@ const APP_DESCRIPTION = 'The onchain radio platform on Base. Listen to live DJ s
 interface ShareAppProps {
   variant?: 'inline' | 'compact' | 'full';
   className?: string;
+  /** Custom URL to share (defaults to current page or APP_URL) */
+  url?: string;
+  /** Custom text for sharing (defaults to APP_DESCRIPTION) */
+  text?: string;
+  /** Custom title for native share (defaults to APP_NAME) */
+  title?: string;
+  /** Use current page URL instead of APP_URL */
+  useCurrentUrl?: boolean;
 }
 
-export function ShareApp({ variant = 'inline', className = '' }: ShareAppProps) {
+export function ShareApp({
+  variant = 'inline',
+  className = '',
+  url,
+  text,
+  title,
+  useCurrentUrl = false,
+}: ShareAppProps) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${APP_DESCRIPTION}`;
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(APP_URL)}`;
-  const farcasterUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(`${shareText}\n\n${APP_URL}`)}`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${APP_URL}`)}`;
-  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(APP_URL)}&text=${encodeURIComponent(shareText)}`;
+  // Determine the URL to share
+  const getShareUrl = () => {
+    if (url) return url;
+    if (useCurrentUrl && typeof window !== 'undefined') {
+      return window.location.href;
+    }
+    return APP_URL;
+  };
+
+  const shareUrl = typeof window !== 'undefined' ? getShareUrl() : APP_URL;
+  const shareText = text || APP_DESCRIPTION;
+  const shareTitle = title || APP_NAME;
+
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  const farcasterUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(APP_URL);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -36,9 +63,9 @@ export function ShareApp({ variant = 'inline', className = '' }: ShareAppProps) 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: APP_NAME,
-          text: APP_DESCRIPTION,
-          url: APP_URL,
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
         });
       } catch (err) {
         console.log('Share cancelled');
