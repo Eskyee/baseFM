@@ -10,6 +10,7 @@ const TYPE_LABELS: Record<PromoterType, string> = {
   collective: 'Collective',
   venue: 'Venue',
   label: 'Label',
+  artist: 'Artist',
   organization: 'Organization',
 };
 

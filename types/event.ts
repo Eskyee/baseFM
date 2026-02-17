@@ -7,12 +7,20 @@ export type EventType = 'physical' | 'livestream';
 export type Event = {
   id: string;
   name: string;
+  title?: string;
+  subtitle?: string;
+  slug?: string;
   description?: string;
   location?: string;
+  venue?: string;
+  address?: string;
+  city?: string;
+  country?: string;
   eventType: EventType;
   creator?: string;
   startTime: number;
   endTime: number;
+  displayDate?: string;
   maxSupply: number;
   minted: number;
   nftContract?: `0x${string}`;
@@ -21,6 +29,16 @@ export type Event = {
   revenueSplitId?: string;
   status: EventStatus;
   streamUrl?: string;
+  coverImageUrl?: string;
+  imageUrl?: string;
+  tags?: string[];
+  headliners?: string[];
+  ticketUrl?: string;
+  ticketPrice?: number;
+  isPast?: boolean;
+  genres?: string[];
+  promoter?: Promoter;
+  promoterId?: string;
 };
 
 /** Public-safe event (no admin fields like nftContract, artistAddress) */
@@ -91,16 +109,24 @@ export type MintLogRow = {
 };
 
 // Row → Domain converters
-export function eventFromRow(row: EventRow): Event {
+export function eventFromRow(row: EventRow, promoter?: Promoter): Event {
   return {
     id: row.id,
     name: row.name,
+    title: (row as EventRowExtended).title ?? row.name,
+    subtitle: (row as EventRowExtended).subtitle ?? undefined,
+    slug: (row as EventRowExtended).slug ?? undefined,
     description: row.description ?? undefined,
     location: row.location ?? undefined,
+    venue: (row as EventRowExtended).venue ?? undefined,
+    address: (row as EventRowExtended).address ?? undefined,
+    city: (row as EventRowExtended).city ?? undefined,
+    country: (row as EventRowExtended).country ?? undefined,
     eventType: (row.event_type as EventType) ?? 'physical',
     creator: row.creator ?? undefined,
     startTime: row.start_time,
     endTime: row.end_time,
+    displayDate: (row as EventRowExtended).display_date ?? undefined,
     maxSupply: row.max_supply,
     minted: row.minted,
     nftContract: row.nft_contract as `0x${string}` | undefined,
@@ -109,8 +135,38 @@ export function eventFromRow(row: EventRow): Event {
     revenueSplitId: row.revenue_split_id ?? undefined,
     status: row.status as EventStatus,
     streamUrl: row.stream_url ?? undefined,
+    coverImageUrl: (row as EventRowExtended).cover_image_url ?? undefined,
+    imageUrl: (row as EventRowExtended).image_url ?? undefined,
+    tags: (row as EventRowExtended).tags ?? undefined,
+    headliners: (row as EventRowExtended).headliners ?? undefined,
+    ticketUrl: (row as EventRowExtended).ticket_url ?? undefined,
+    ticketPrice: (row as EventRowExtended).ticket_price ?? undefined,
+    isPast: row.end_time ? row.end_time < Date.now() / 1000 : undefined,
+    genres: (row as EventRowExtended).genres ?? undefined,
+    promoter,
+    promoterId: (row as EventRowExtended).promoter_id ?? undefined,
   };
 }
+
+// Extended row type for additional fields
+type EventRowExtended = EventRow & {
+  title?: string;
+  subtitle?: string;
+  slug?: string;
+  venue?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  display_date?: string;
+  cover_image_url?: string;
+  image_url?: string;
+  tags?: string[];
+  headliners?: string[];
+  ticket_url?: string;
+  ticket_price?: number;
+  genres?: string[];
+  promoter_id?: string;
+};
 
 /** Convert Event → PublicEvent (strips admin/onchain fields) */
 export function toPublicEvent(event: Event): PublicEvent {
@@ -144,7 +200,7 @@ export function accessTokenFromRow(row: AccessTokenRow): AccessToken {
 // PROMOTER TYPES
 // =============================================================================
 
-export type PromoterType = 'promoter' | 'collective' | 'venue' | 'label' | 'artist';
+export type PromoterType = 'promoter' | 'collective' | 'venue' | 'label' | 'artist' | 'organization';
 
 export type Promoter = {
   id: string;
@@ -212,6 +268,43 @@ export type CreatePromoterInput = {
 };
 
 export type UpdatePromoterInput = Partial<CreatePromoterInput>;
+
+// =============================================================================
+// EVENT INPUT TYPES
+// =============================================================================
+
+export type CreateEventInput = {
+  title: string;
+  subtitle?: string;
+  description?: string;
+  location?: string;
+  venue?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  eventType?: EventType;
+  date?: string;
+  startTime?: number;
+  endTime?: number;
+  displayDate?: string;
+  maxSupply?: number;
+  nftType?: NFTType;
+  streamUrl?: string;
+  coverImageUrl?: string;
+  imageUrl?: string;
+  tags?: string[];
+  headliners?: string[];
+  ticketUrl?: string;
+  ticketPrice?: number;
+  genres?: string[];
+  promoterId?: string;
+  createdByWallet?: string;
+};
+
+export type UpdateEventInput = Partial<CreateEventInput> & {
+  status?: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  isFeatured?: boolean;
+};
 
 export function promoterFromRow(row: PromoterRow): Promoter {
   return {

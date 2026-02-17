@@ -34,7 +34,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
     }
 
-    const events = (data as EventRow[]).map(eventFromRow);
+    const events = (data as EventRow[]).map((row) => eventFromRow(row));
     return NextResponse.json({ events });
   } catch (err) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

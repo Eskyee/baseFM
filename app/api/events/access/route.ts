@@ -254,13 +254,17 @@ export async function POST(req: NextRequest) {
 
     // ---- Log the mint ----
     if (txHash) {
-      await db.from('mint_logs').insert({
-        wallet: wallet.toLowerCase(),
-        event_id: eventId,
-        tx_hash: txHash,
-        timestamp: now,
-        status: 'success',
-      }).catch(() => {});
+      try {
+        await db.from('mint_logs').insert({
+          wallet: wallet.toLowerCase(),
+          event_id: eventId,
+          tx_hash: txHash,
+          timestamp: now,
+          status: 'success',
+        });
+      } catch {
+        // Silently ignore mint log errors
+      }
     }
 
     // UX-safe response — no crypto language

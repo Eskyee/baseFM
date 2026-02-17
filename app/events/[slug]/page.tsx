@@ -78,7 +78,7 @@ export default function EventDetailPage({
         {event.coverImageUrl || event.imageUrl ? (
           <Image
             src={event.coverImageUrl || event.imageUrl!}
-            alt={event.title}
+            alt={event.title ?? event.name}
             fill
             className="object-cover"
           />
@@ -188,7 +188,7 @@ export default function EventDetailPage({
         {/* Onchain Ticket Purchase */}
         {!event.isPast && event.id && (
           <div className="mb-8">
-            <TicketPurchase eventId={event.id} eventTitle={event.title} />
+            <TicketPurchase eventId={event.id} eventTitle={event.title ?? event.name} />
           </div>
         )}
 

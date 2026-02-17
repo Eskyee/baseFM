@@ -5,6 +5,7 @@ import { OnchainProvider } from '@/components/providers/OnchainProvider';
 import { AppShell } from '@/components/AppShell';
 import { SplashScreen } from '@/components/SplashScreen';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
