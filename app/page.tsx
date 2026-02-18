@@ -108,10 +108,14 @@ export default function HomePage() {
                 id={featuredStream.id}
                 title={featuredStream.title}
                 djName={featuredStream.djName}
+                djWalletAddress={featuredStream.djWalletAddress}
                 artwork={featuredStream.coverImageUrl}
                 genre={featuredStream.genre}
                 isLive={featuredStream.status === 'LIVE'}
                 isTokenGated={featuredStream.isGated}
+                muxPlaybackId={featuredStream.muxPlaybackId}
+                hlsUrl={featuredStream.hlsPlaybackUrl}
+                useGlobalPlayer
                 variant="featured"
               />
             </section>
@@ -129,10 +133,14 @@ export default function HomePage() {
                       id={stream.id}
                       title={stream.title}
                       djName={stream.djName}
+                      djWalletAddress={stream.djWalletAddress}
                       artwork={stream.coverImageUrl}
                       genre={stream.genre}
                       isLive
                       isTokenGated={stream.isGated}
+                      muxPlaybackId={stream.muxPlaybackId}
+                      hlsUrl={stream.hlsPlaybackUrl}
+                      useGlobalPlayer
                       variant="compact"
                     />
                   ))}

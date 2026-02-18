@@ -4,7 +4,8 @@ import './globals.css';
 import { OnchainProvider } from '@/components/providers/OnchainProvider';
 import { AppShell } from '@/components/AppShell';
 import { SplashScreen } from '@/components/SplashScreen';
-import { Analytics } from '@vercel/analytics/next';
+import { PlayerProvider } from '@/contexts/PlayerContext';
+import { GlobalPlayer } from '@/components/GlobalPlayer';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -73,9 +74,12 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-[#0A0A0A] min-h-screen`}>
         <OnchainProvider>
-          <SplashScreen>
-            <AppShell>{children}</AppShell>
-          </SplashScreen>
+          <PlayerProvider>
+            <SplashScreen>
+              <AppShell>{children}</AppShell>
+              <GlobalPlayer />
+            </SplashScreen>
+          </PlayerProvider>
         </OnchainProvider>
         <SpeedInsights />
         <script

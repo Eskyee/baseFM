@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePlayer, CurrentStream } from '@/contexts/PlayerContext';
 
 // Default fallback image - baseFM logo
 const DEFAULT_ARTWORK = '/logo.png';
@@ -9,6 +10,7 @@ interface LiveShowCardProps {
   id: string;
   title: string;
   djName: string;
+  djWalletAddress?: string;
   artwork?: string;
   genre?: string;
   isLive?: boolean;
@@ -16,12 +18,17 @@ interface LiveShowCardProps {
   startTime?: string;
   variant?: 'featured' | 'compact' | 'carousel';
   onClick?: () => void;
+  // Stream data for global player
+  muxPlaybackId?: string;
+  hlsUrl?: string;
+  useGlobalPlayer?: boolean;
 }
 
 export function LiveShowCard({
   id,
   title,
   djName,
+  djWalletAddress,
   artwork,
   genre,
   isLive = false,
@@ -29,10 +36,38 @@ export function LiveShowCard({
   startTime,
   variant = 'compact',
   onClick,
+  muxPlaybackId,
+  hlsUrl,
+  useGlobalPlayer = false,
 }: LiveShowCardProps) {
+  const { playStream } = usePlayer();
+
   // Use provided artwork or fall back to logo
   const imageUrl = artwork || DEFAULT_ARTWORK;
   const hasCustomArtwork = !!artwork;
+
+  const handlePlay = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+
+    if (useGlobalPlayer && isLive) {
+      const streamData: CurrentStream = {
+        id,
+        title,
+        djName,
+        djWalletAddress,
+        artwork,
+        genre,
+        isLive,
+        isTokenGated,
+        muxPlaybackId,
+        hlsUrl,
+      };
+      playStream(streamData);
+    }
+  };
 
   const content = (
     <>
@@ -122,6 +157,15 @@ export function LiveShowCard({
   const wrapperClasses = `group block transition-subtle ${
     variant === 'featured' ? '' : variant === 'carousel' ? 'flex-shrink-0' : ''
   }`;
+
+  // Use global player for live streams
+  if (useGlobalPlayer && isLive) {
+    return (
+      <button onClick={handlePlay} className={`${wrapperClasses} text-left w-full`}>
+        {content}
+      </button>
+    );
+  }
 
   if (onClick) {
     return (
