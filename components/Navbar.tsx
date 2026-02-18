@@ -45,10 +45,12 @@ export function Navbar() {
     { href: '/archive', label: 'Archive', Icon: Archive },
     // Social - community & connections
     { href: '/community', label: 'Community', Icon: Users },
+    { href: '/collectives', label: 'Collectives', Icon: Users },
     { href: '/farcaster', label: 'Farcaster', Icon: Cast },
     { href: '/threads', label: 'Threads', Icon: MessageCircle, featured: true },
     // Featured tools
     { href: '/aicloud', label: 'AI Cloud', Icon: Cloud, featured: true },
+    { href: '/aicloud/feed', label: 'Ravefeed', Icon: Cast, featured: true },
     { href: '/tools', label: 'Tools', Icon: Wrench },
     // Business & commerce
     { href: '/agency', label: 'Agency', Icon: Briefcase },

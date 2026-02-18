@@ -12,7 +12,7 @@ export async function getThreads(options?: {
 
   let query = supabase
     .from('threads')
-    .select('*, members!threads_author_wallet_fkey(display_name, avatar_url, base_name, ens_name, is_verified)', { count: 'exact' })
+    .select('*', { count: 'exact' })
     .eq('is_deleted', false)
     .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false });
@@ -54,15 +54,30 @@ export async function getThreads(options?: {
     }
   }
 
-  const threads = data.map((row: ThreadRow & { members?: { display_name?: string; avatar_url?: string; base_name?: string; ens_name?: string; is_verified?: boolean } }) => {
+  // Fetch member data for authors
+  const authorWallets = [...new Set(data.map((t: ThreadRow) => t.author_wallet.toLowerCase()))];
+  const { data: members } = await supabase
+    .from('members')
+    .select('wallet_address, display_name, avatar_url, base_name, ens_name, is_verified')
+    .in('wallet_address', authorWallets);
+
+  const memberMap = new Map(
+    (members || []).map((m: { wallet_address: string; display_name?: string; avatar_url?: string; base_name?: string; ens_name?: string; is_verified?: boolean }) => [
+      m.wallet_address.toLowerCase(),
+      m,
+    ])
+  );
+
+  const threads = data.map((row: ThreadRow) => {
     const thread = threadFromRow(row);
-    if (row.members) {
+    const member = memberMap.get(row.author_wallet.toLowerCase());
+    if (member) {
       thread.author = {
-        displayName: row.members.display_name || undefined,
-        avatarUrl: row.members.avatar_url || undefined,
-        baseName: row.members.base_name || undefined,
-        ensName: row.members.ens_name || undefined,
-        isVerified: row.members.is_verified || false,
+        displayName: member.display_name || undefined,
+        avatarUrl: member.avatar_url || undefined,
+        baseName: member.base_name || undefined,
+        ensName: member.ens_name || undefined,
+        isVerified: member.is_verified || false,
       };
     }
     thread.isLikedByMe = likedThreadIds.has(thread.id);
@@ -77,7 +92,7 @@ export async function getThreadById(id: string, viewerWallet?: string): Promise<
 
   const { data, error } = await supabase
     .from('threads')
-    .select('*, members!threads_author_wallet_fkey(display_name, avatar_url, base_name, ens_name, is_verified)')
+    .select('*')
     .eq('id', id)
     .eq('is_deleted', false)
     .single();
@@ -86,14 +101,20 @@ export async function getThreadById(id: string, viewerWallet?: string): Promise<
 
   const thread = threadFromRow(data as ThreadRow);
 
-  // Get author info
-  if (data.members) {
+  // Get author info from members table
+  const { data: member } = await supabase
+    .from('members')
+    .select('display_name, avatar_url, base_name, ens_name, is_verified')
+    .eq('wallet_address', data.author_wallet.toLowerCase())
+    .single();
+
+  if (member) {
     thread.author = {
-      displayName: data.members.display_name || undefined,
-      avatarUrl: data.members.avatar_url || undefined,
-      baseName: data.members.base_name || undefined,
-      ensName: data.members.ens_name || undefined,
-      isVerified: data.members.is_verified || false,
+      displayName: member.display_name || undefined,
+      avatarUrl: member.avatar_url || undefined,
+      baseName: member.base_name || undefined,
+      ensName: member.ens_name || undefined,
+      isVerified: member.is_verified || false,
     };
   }
 

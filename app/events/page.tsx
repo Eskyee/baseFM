@@ -71,12 +71,20 @@ export default function EventsPage() {
             <h1 className="text-[#F5F5F5] text-xl font-bold">Events</h1>
             <p className="text-[#888] text-sm">Discover what&apos;s happening</p>
           </div>
-          <Link
-            href="/"
-            className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium transition-colors active:scale-[0.97]"
-          >
-            Home
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/events/submit"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full text-sm font-medium transition-all hover:opacity-90 active:scale-[0.97]"
+            >
+              + Submit Event
+            </Link>
+            <Link
+              href="/"
+              className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium transition-colors active:scale-[0.97]"
+            >
+              Home
+            </Link>
+          </div>
         </header>
 
         {/* Upcoming Events */}

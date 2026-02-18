@@ -24,6 +24,7 @@ export default function ThreadsPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [postError, setPostError] = useState<string | null>(null);
 
   // Check token balance
   const { data: balanceData } = useReadContract({
@@ -70,22 +71,37 @@ export default function ThreadsPage() {
   const handleCreateThread = async (content: string) => {
     if (!address) return;
 
-    const res = await fetch('/api/threads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        authorWallet: address,
-        content,
-      }),
-    });
+    try {
+      const res = await fetch('/api/threads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          authorWallet: address,
+          content,
+        }),
+      });
 
-    if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error || 'Failed to create thread');
-    }
 
-    // Refresh threads
-    await fetchThreads();
+      if (!res.ok) {
+        // Show user-friendly error
+        if (res.status === 403 && data.details) {
+          setPostError(`Token required: ${data.details}`);
+        } else {
+          setPostError(data.error || 'Failed to create thread');
+        }
+        throw new Error(data.error || 'Failed to create thread');
+      }
+
+      // Clear any error on success
+      setPostError(null);
+
+      // Refresh threads
+      await fetchThreads();
+    } catch (err) {
+      console.error('Failed to post thread:', err);
+      throw err;
+    }
   };
 
   const handleLike = async (threadId: string) => {
@@ -170,6 +186,21 @@ export default function ThreadsPage() {
               onSubmit={handleCreateThread}
               placeholder="Share with the community..."
             />
+            {postError && (
+              <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <div className="flex items-center justify-between">
+                  <p className="text-red-400 text-xs">{postError}</p>
+                  <button
+                    onClick={() => setPostError(null)}
+                    className="text-red-400 hover:text-red-300 p-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : null}
 
