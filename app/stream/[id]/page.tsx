@@ -1,11 +1,11 @@
 'use client';
 
 import { useStream } from '@/hooks/useStream';
-import { AudioPlayer } from '@/components/AudioPlayer';
 import { TokenGate } from '@/components/TokenGate';
 import { TipButton } from '@/components/TipButton';
 import Link from 'next/link';
 import Image from 'next/image';
+import MuxPlayer from '@mux/mux-player-react';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
@@ -17,17 +17,14 @@ export default function StreamPage({ params }: { params: { id: string } }) {
           {/* Back button skeleton */}
           <div className="h-10 w-10 bg-[#1A1A1A] rounded-full mb-6 skeleton" />
 
-          {/* Artwork skeleton */}
-          <div className="aspect-square max-w-sm mx-auto bg-[#1A1A1A] rounded-3xl mb-8 skeleton" />
+          {/* Player skeleton */}
+          <div className="aspect-video bg-[#1A1A1A] rounded-2xl mb-6 skeleton" />
 
           {/* Title skeleton */}
           <div className="text-center space-y-3 mb-8">
             <div className="h-8 bg-[#1A1A1A] rounded-lg w-3/4 mx-auto skeleton" />
             <div className="h-5 bg-[#1A1A1A] rounded w-1/2 mx-auto skeleton" />
           </div>
-
-          {/* Player skeleton */}
-          <div className="h-20 bg-[#1A1A1A] rounded-2xl skeleton" />
         </div>
       </div>
     );
@@ -108,7 +105,34 @@ export default function StreamPage({ params }: { params: { id: string } }) {
       );
     }
 
-    if (!stream.hlsPlaybackUrl) {
+    // Use Mux Player if we have a playback ID
+    if (stream.muxPlaybackId) {
+      return (
+        <div className="rounded-2xl overflow-hidden bg-black shadow-2xl shadow-purple-500/10">
+          <MuxPlayer
+            playbackId={stream.muxPlaybackId}
+            streamType="live"
+            autoPlay="muted"
+            muted
+            accentColor="#8B5CF6"
+            primaryColor="#FFFFFF"
+            secondaryColor="#1A1A1A"
+            metadata={{
+              video_title: stream.title,
+              viewer_user_id: 'anonymous',
+            }}
+            style={{
+              aspectRatio: '16/9',
+              width: '100%',
+              borderRadius: '1rem',
+            }}
+          />
+        </div>
+      );
+    }
+
+    // Fallback if no playback ID available
+    if (!stream.hlsPlaybackUrl && !stream.muxPlaybackId) {
       return (
         <div className="bg-[#1A1A1A] rounded-2xl p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
@@ -121,22 +145,36 @@ export default function StreamPage({ params }: { params: { id: string } }) {
       );
     }
 
+    // Fallback to HLS URL with Mux player
     return (
-      <AudioPlayer
-        streamUrl={stream.hlsPlaybackUrl}
-        title={stream.title}
-        djName={stream.djName}
-        coverImageUrl={stream.coverImageUrl}
-        autoPlay={true}
-      />
+      <div className="rounded-2xl overflow-hidden bg-black shadow-2xl shadow-purple-500/10">
+        <MuxPlayer
+          src={stream.hlsPlaybackUrl}
+          streamType="live"
+          autoPlay="muted"
+          muted
+          accentColor="#8B5CF6"
+          primaryColor="#FFFFFF"
+          secondaryColor="#1A1A1A"
+          metadata={{
+            video_title: stream.title,
+            viewer_user_id: 'anonymous',
+          }}
+          style={{
+            aspectRatio: '16/9',
+            width: '100%',
+            borderRadius: '1rem',
+          }}
+        />
+      </div>
     );
   };
 
   const playerContent = renderPlayer();
 
   return (
-    <div className="min-h-screen pb-24 safe-area-all">
-      <div className="max-w-2xl mx-auto px-4 py-4 sm:py-6">
+    <div className="min-h-screen pb-24 safe-area-all bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A] to-purple-950/20">
+      <div className="max-w-3xl mx-auto px-4 py-4 sm:py-6">
         {/* iOS-style header with back button */}
         <div className="flex items-center justify-between mb-6">
           <Link
@@ -161,53 +199,8 @@ export default function StreamPage({ params }: { params: { id: string } }) {
           <div className="w-10" />
         </div>
 
-        {/* Album art style artwork - centered, prominent */}
-        <div className="mb-8">
-          <div className="aspect-square max-w-xs sm:max-w-sm mx-auto relative rounded-3xl overflow-hidden bg-[#1A1A1A] shadow-2xl shadow-black/50">
-            {stream.coverImageUrl ? (
-              <Image
-                src={stream.coverImageUrl}
-                alt={stream.title}
-                fill
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]">
-                <svg className="w-24 h-24 text-[#333]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                </svg>
-              </div>
-            )}
-
-            {/* Badges overlay */}
-            {stream.isGated && (
-              <div className="absolute top-4 right-4">
-                <span className="px-3 py-1.5 bg-[#F59E0B]/90 backdrop-blur-sm text-black text-xs font-bold uppercase rounded-full">
-                  Token Gated
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Stream info - Apple Music style centered text */}
-        <div className="text-center mb-8 px-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
-            {stream.title}
-          </h1>
-          <p className="text-[#3B82F6] font-medium text-lg">
-            {stream.djName}
-          </p>
-          {stream.genre && (
-            <p className="text-[#888] text-sm mt-2 uppercase tracking-wider">
-              {stream.genre}
-            </p>
-          )}
-        </div>
-
-        {/* Player Section */}
-        <div className="mb-8">
+        {/* Player Section - Full width, prominent */}
+        <div className="mb-6">
           {stream.isGated && stream.requiredTokenAddress ? (
             <TokenGate
               tokenAddress={stream.requiredTokenAddress}
@@ -218,6 +211,48 @@ export default function StreamPage({ params }: { params: { id: string } }) {
           ) : (
             playerContent
           )}
+        </div>
+
+        {/* Stream info below player */}
+        <div className="flex items-start gap-4 mb-6">
+          {/* Cover art thumbnail */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#1A1A1A] flex-shrink-0 shadow-lg">
+            {stream.coverImageUrl ? (
+              <Image
+                src={stream.coverImageUrl}
+                alt={stream.title}
+                width={80}
+                height={80}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/50 to-blue-900/50">
+                <svg className="w-8 h-8 text-[#444]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Stream details */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              {stream.isGated && (
+                <span className="px-2 py-0.5 bg-[#F59E0B]/20 text-[#F59E0B] text-[10px] font-bold uppercase rounded">
+                  Token Gated
+                </span>
+              )}
+              {stream.genre && (
+                <span className="text-[#888] text-xs uppercase tracking-wider">{stream.genre}</span>
+              )}
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-1 leading-tight line-clamp-2">
+              {stream.title}
+            </h1>
+            <p className="text-purple-400 font-medium">
+              {stream.djName}
+            </p>
+          </div>
         </div>
 
         {/* Actions - Tip button prominent for live streams */}
@@ -231,7 +266,7 @@ export default function StreamPage({ params }: { params: { id: string } }) {
           </div>
         )}
 
-        {/* Stream Details - collapsed by default on mobile */}
+        {/* Stream Details */}
         {(stream.description || (stream.tags && stream.tags.length > 0)) && (
           <div className="bg-[#1A1A1A]/50 backdrop-blur-sm rounded-2xl p-5 sm:p-6">
             <h2 className="text-sm font-semibold text-[#888] uppercase tracking-wider mb-4">
