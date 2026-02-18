@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllEvents, createEvent, getUpcomingEvents, getPastEvents } from '@/lib/db/events';
+import { createEventTicket } from '@/lib/db/tickets';
 
 // GET all events
 export async function GET(request: NextRequest) {
@@ -58,6 +59,10 @@ export async function POST(request: NextRequest) {
       ticketPrice,
       promoterId,
       createdByWallet,
+      // Ticket sales
+      enableTicketSales,
+      paymentWallet,
+      ticketTiers,
     } = body;
 
     if (!title || !date || !venue || !displayDate) {
@@ -65,6 +70,22 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: title, date, venue, displayDate' },
         { status: 400 }
       );
+    }
+
+    // Validate ticket sales fields if enabled
+    if (enableTicketSales) {
+      if (!paymentWallet) {
+        return NextResponse.json(
+          { error: 'Payment wallet required for ticket sales' },
+          { status: 400 }
+        );
+      }
+      if (!ticketTiers || ticketTiers.length === 0) {
+        return NextResponse.json(
+          { error: 'At least one ticket tier required for ticket sales' },
+          { status: 400 }
+        );
+      }
     }
 
     const event = await createEvent({
@@ -88,9 +109,32 @@ export async function POST(request: NextRequest) {
       ticketPrice,
       promoterId,
       createdByWallet,
+      enableTicketSales,
+      promoterWallet: paymentWallet,
+      ticketTiers,
     });
 
-    return NextResponse.json({ event }, { status: 201 });
+    // Create ticket tiers if ticket sales enabled
+    const createdTickets = [];
+    if (enableTicketSales && ticketTiers && ticketTiers.length > 0) {
+      for (const tier of ticketTiers) {
+        const ticket = await createEventTicket({
+          eventId: event.id,
+          name: tier.name,
+          description: tier.description,
+          priceUsdc: tier.priceUsdc,
+          totalQuantity: tier.quantity || undefined,
+        });
+        if (ticket) {
+          createdTickets.push(ticket);
+        }
+      }
+    }
+
+    return NextResponse.json({
+      event,
+      tickets: createdTickets.length > 0 ? createdTickets : undefined,
+    }, { status: 201 });
   } catch (error) {
     console.error('Events POST error:', error);
     return NextResponse.json({ error: 'Failed to create event' }, { status: 500 });

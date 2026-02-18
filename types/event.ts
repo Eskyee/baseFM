@@ -299,6 +299,15 @@ export type CreateEventInput = {
   genres?: string[];
   promoterId?: string;
   createdByWallet?: string;
+  // Onchain ticket sales
+  enableTicketSales?: boolean;
+  promoterWallet?: string;
+  ticketTiers?: Array<{
+    name: string;
+    priceUsdc: number;
+    quantity?: number;
+    description?: string;
+  }>;
 };
 
 export type UpdateEventInput = Partial<CreateEventInput> & {
