@@ -329,10 +329,10 @@ export default function AICloudPage() {
 
                 <div className="space-y-4">
                   <Link
-                    href="/dashboard"
-                    className="block w-full py-4 bg-purple-500 text-white rounded-xl font-mono font-bold text-lg hover:bg-purple-600 transition-colors"
+                    href="/aicloud/dashboard"
+                    className="block w-full py-4 bg-purple-500 text-white rounded-xl font-mono font-bold text-lg hover:bg-purple-600 transition-colors text-center"
                   >
-                    Set Up My Agent
+                    Go to My Agent Dashboard
                   </Link>
                   <p className="text-[#666] text-sm font-mono">
                     Connect your SoundCloud, link your socials, and start growing
