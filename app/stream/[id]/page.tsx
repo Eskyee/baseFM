@@ -3,12 +3,14 @@
 import { useStream } from '@/hooks/useStream';
 import { TokenGate } from '@/components/TokenGate';
 import { TipButton } from '@/components/TipButton';
+import { usePlayer } from '@/components/AppShell';
 import Link from 'next/link';
 import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
+  const { currentShow, setCurrentShow } = usePlayer();
 
   if (isLoading) {
     return (
@@ -60,6 +62,31 @@ export default function StreamPage({ params }: { params: { id: string } }) {
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
   const hasEnded = stream.status === 'ENDED';
+
+  // Check if this stream is currently playing in persistent player
+  const isInPersistentPlayer = currentShow?.streamId === stream.id;
+
+  // Enable persistent playback - audio continues while browsing
+  const enablePersistentPlayback = () => {
+    const hlsUrl = stream.muxPlaybackId
+      ? `https://stream.mux.com/${stream.muxPlaybackId}.m3u8`
+      : stream.hlsPlaybackUrl;
+
+    setCurrentShow({
+      title: stream.title,
+      djName: stream.djName,
+      artwork: stream.coverImageUrl,
+      isLive: isLive,
+      isTokenGated: stream.isGated,
+      hlsUrl: hlsUrl || undefined,
+      streamId: stream.id,
+    });
+  };
+
+  // Stop persistent playback
+  const stopPersistentPlayback = () => {
+    setCurrentShow(null);
+  };
 
   const renderPlayer = () => {
     if (hasEnded) {
@@ -255,14 +282,43 @@ export default function StreamPage({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Actions - Tip button prominent for live streams */}
-        {isLive && stream.djWalletAddress && (
-          <div className="flex justify-center mb-8">
-            <TipButton
-              djWalletAddress={stream.djWalletAddress}
-              djName={stream.djName}
-              streamId={stream.id}
-            />
+        {/* Actions - Tip button and persistent player toggle */}
+        {isLive && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+            {/* Listen While Browsing button */}
+            <button
+              onClick={isInPersistentPlayer ? stopPersistentPlayback : enablePersistentPlayback}
+              className={`flex items-center gap-2 px-5 py-3 rounded-full font-medium text-sm transition-all active:scale-[0.97] ${
+                isInPersistentPlayer
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-[#1A1A1A] text-[#F5F5F5] hover:bg-[#252525]'
+              }`}
+            >
+              {isInPersistentPlayer ? (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                  Playing in Background
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                  Listen While Browsing
+                </>
+              )}
+            </button>
+
+            {/* Tip button */}
+            {stream.djWalletAddress && (
+              <TipButton
+                djWalletAddress={stream.djWalletAddress}
+                djName={stream.djName}
+                streamId={stream.id}
+              />
+            )}
           </div>
         )}
 
