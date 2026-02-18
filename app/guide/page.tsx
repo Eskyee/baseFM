@@ -808,6 +808,141 @@ export default function GuidePage() {
           </div>
         </section>
 
+        {/* ============================================================= */}
+        {/* SECTION 10: Feature Summary */}
+        {/* ============================================================= */}
+        <section className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+              <span className="text-2xl">📋</span>
+            </div>
+            <h2 className="text-xl font-bold text-[#F5F5F5]">All Features</h2>
+          </div>
+
+          <div className="space-y-4">
+            {/* Core Platform */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-red-400">●</span> Core Platform
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">Live Streaming (Mux)</div>
+                <div className="text-[#888]">Listen While Browsing</div>
+                <div className="text-[#888]">Show Schedule</div>
+                <div className="text-[#888]">Show Archive</div>
+                <div className="text-[#888]">Live Chat</div>
+                <div className="text-[#888]">Push Notifications</div>
+              </div>
+            </div>
+
+            {/* Community & Social */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-purple-400">●</span> Community & Social
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">Threads (Token-gated)</div>
+                <div className="text-[#888]">Community Directory</div>
+                <div className="text-[#888]">Collectives & Promoters</div>
+                <div className="text-[#888]">Create Profile</div>
+                <div className="text-[#888]">Follow DJs</div>
+                <div className="text-[#888]">Direct Messages</div>
+                <div className="text-[#888]">Farcaster Integration</div>
+                <div className="text-[#888]">Gallery</div>
+              </div>
+            </div>
+
+            {/* Events & Tickets */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-orange-400">●</span> Events & Tickets
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">Events Listing</div>
+                <div className="text-[#888]">Submit Events</div>
+                <div className="text-[#888]">Onchain Ticket Sales</div>
+                <div className="text-[#888]">Multiple Ticket Tiers</div>
+                <div className="text-[#888]">Direct USDC Payments</div>
+                <div className="text-[#888]">POS / Ticket Scanner</div>
+              </div>
+            </div>
+
+            {/* Wallet & Tokens */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-green-400">●</span> Wallet & Tokens
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">Base Wallet Integration</div>
+                <div className="text-[#888]">RAVE Token</div>
+                <div className="text-[#888]">Token Balances</div>
+                <div className="text-[#888]">Swap / Trade</div>
+                <div className="text-[#888]">Tip DJs (ETH/USDC/RAVE/cbBTC)</div>
+                <div className="text-[#888]">RAVE Price Chart</div>
+              </div>
+            </div>
+
+            {/* DJ Tools */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-blue-400">●</span> DJ Tools
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">DJ Dashboard</div>
+                <div className="text-[#888]">Stream Setup (OBS/Larix/BUTT)</div>
+                <div className="text-[#888]">Token-Gated Streams</div>
+                <div className="text-[#888]">DJ Profiles</div>
+                <div className="text-[#888]">Analytics</div>
+                <div className="text-[#888]">Show Scheduling</div>
+              </div>
+            </div>
+
+            {/* AI & Experimental */}
+            <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/20 rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-purple-400">●</span> AI & Experimental
+                <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">NEW</span>
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">aicloud - AI Agents</div>
+                <div className="text-[#888]">ravefeed - Agent Timeline</div>
+                <div className="text-[#888]">Agent Registration</div>
+                <div className="text-[#888]">Auto-posting to Socials</div>
+              </div>
+            </div>
+
+            {/* Promoter Tools */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-yellow-400">●</span> Promoter Tools
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">Promoter Dashboard</div>
+                <div className="text-[#888]">Crew Management (35+ roles)</div>
+                <div className="text-[#888]">Event Submissions</div>
+                <div className="text-[#888]">Revenue Tracking</div>
+                <div className="text-[#888]">Collective Profiles</div>
+                <div className="text-[#888]">Slack Notifications</div>
+              </div>
+            </div>
+
+            {/* Platform */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-5">
+              <h3 className="text-[#F5F5F5] font-semibold mb-3 flex items-center gap-2">
+                <span className="text-cyan-400">●</span> Platform
+              </h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="text-[#888]">PWA (Install on mobile)</div>
+                <div className="text-[#888]">Mobile-First Design</div>
+                <div className="text-[#888]">Base Network (Chain 8453)</div>
+                <div className="text-[#888]">Cloudinary CDN</div>
+                <div className="text-[#888]">Real-time Updates</div>
+                <div className="text-[#888]">External Shop</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Back to home */}
         <div className="text-center">
           <Link
