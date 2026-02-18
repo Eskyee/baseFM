@@ -124,7 +124,7 @@ export function AudioPlayer({
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg p-4 w-full max-w-md">
+    <div className="bg-gray-900 rounded-lg p-4 w-full max-w-md mx-auto">
       {/* Cover Image */}
       {coverImageUrl && (
         <div className="mb-4">
