@@ -1022,6 +1022,27 @@ export default function GuidePage() {
           </div>
         </section>
 
+        {/* Developer Notice */}
+        <div className="mb-8 p-5 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-2xl">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">👩‍💻</span>
+            </div>
+            <div>
+              <h3 className="text-[#F5F5F5] font-semibold mb-2">New Developers Welcome!</h3>
+              <p className="text-[#888] text-sm leading-relaxed mb-3">
+                Want to build on Base? We&apos;re starting monthly meetups at a workshop cafe in Oxford.
+                Come learn, collaborate, and build with fellow Base builders over coffee.
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">Base Builders</span>
+                <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">Oxford</span>
+                <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] rounded-full">Monthly</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Back to home */}
         <div className="text-center">
           <Link
