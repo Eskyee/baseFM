@@ -941,6 +941,85 @@ export default function GuidePage() {
               </div>
             </div>
           </div>
+
+          {/* Tech Specs - For the super nerds */}
+          <div className="mt-8 pt-6 border-t border-[#333]">
+            <button
+              onClick={() => {
+                const el = document.getElementById('tech-specs');
+                if (el) el.classList.toggle('hidden');
+              }}
+              className="flex items-center gap-2 text-sm text-[#666] hover:text-[#888] transition-colors"
+            >
+              <span>🤓</span>
+              <span>Tech Specs (for the nerds)</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div id="tech-specs" className="hidden mt-4 space-y-3 text-xs font-mono">
+              <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
+                <div className="text-purple-400 font-semibold mb-2">// Stack</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="text-[#666]">Framework</span>
+                  <span className="text-[#888]">Next.js 14 (App Router)</span>
+                  <span className="text-[#666]">Language</span>
+                  <span className="text-[#888]">TypeScript</span>
+                  <span className="text-[#666]">Styling</span>
+                  <span className="text-[#888]">Tailwind CSS</span>
+                  <span className="text-[#666]">Database</span>
+                  <span className="text-[#888]">Supabase (Postgres)</span>
+                  <span className="text-[#666]">Streaming</span>
+                  <span className="text-[#888]">Mux (RTMP→HLS)</span>
+                  <span className="text-[#666]">Images</span>
+                  <span className="text-[#888]">Cloudinary CDN</span>
+                  <span className="text-[#666]">Hosting</span>
+                  <span className="text-[#888]">Vercel Edge</span>
+                </div>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
+                <div className="text-green-400 font-semibold mb-2">// Onchain</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="text-[#666]">Network</span>
+                  <span className="text-[#888]">Base (Chain ID: 8453)</span>
+                  <span className="text-[#666]">Wallet</span>
+                  <span className="text-[#888]">Coinbase Smart Wallet</span>
+                  <span className="text-[#666]">Web3</span>
+                  <span className="text-[#888]">wagmi v2 + viem</span>
+                  <span className="text-[#666]">Identity</span>
+                  <span className="text-[#888]">OnchainKit</span>
+                  <span className="text-[#666]">RAVE Token</span>
+                  <span className="text-[#888] break-all">0xdf3c...86f5</span>
+                  <span className="text-[#666]">USDC</span>
+                  <span className="text-[#888] break-all">0x8335...2913</span>
+                </div>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
+                <div className="text-cyan-400 font-semibold mb-2">// Stats</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="text-[#666]">API Routes</span>
+                  <span className="text-[#888]">50+</span>
+                  <span className="text-[#666]">Components</span>
+                  <span className="text-[#888]">40+</span>
+                  <span className="text-[#666]">Database Tables</span>
+                  <span className="text-[#888]">13</span>
+                  <span className="text-[#666]">Test Coverage</span>
+                  <span className="text-[#888]">55+ unit tests</span>
+                  <span className="text-[#666]">Crew Roles</span>
+                  <span className="text-[#888]">35+</span>
+                  <span className="text-[#666]">PWA Cache</span>
+                  <span className="text-[#888]">v4</span>
+                </div>
+              </div>
+
+              <div className="text-center text-[#444] mt-4">
+                Built with ❤️ on Base
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Back to home */}
