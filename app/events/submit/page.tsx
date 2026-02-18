@@ -34,6 +34,39 @@ export default function SubmitEventPage() {
   const [ticketPrice, setTicketPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
+  // Ticket sales state
+  const [enableTicketSales, setEnableTicketSales] = useState(false);
+  const [ticketTiers, setTicketTiers] = useState<Array<{
+    name: string;
+    price: string;
+    quantity: string;
+    description: string;
+  }>>([{ name: 'General Admission', price: '', quantity: '', description: '' }]);
+  const [paymentWallet, setPaymentWallet] = useState('');
+
+  // Auto-fill payment wallet with connected address
+  useEffect(() => {
+    if (address && !paymentWallet) {
+      setPaymentWallet(address);
+    }
+  }, [address, paymentWallet]);
+
+  const addTicketTier = () => {
+    setTicketTiers([...ticketTiers, { name: '', price: '', quantity: '', description: '' }]);
+  };
+
+  const removeTicketTier = (index: number) => {
+    if (ticketTiers.length > 1) {
+      setTicketTiers(ticketTiers.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateTicketTier = (index: number, field: string, value: string) => {
+    const updated = [...ticketTiers];
+    updated[index] = { ...updated[index], [field]: value };
+    setTicketTiers(updated);
+  };
+
   // Load promoter profile for connected wallet
   useEffect(() => {
     async function loadPromoter() {
@@ -93,6 +126,15 @@ export default function SubmitEventPage() {
           imageUrl: imageUrl || undefined,
           promoterId: promoter?.id,
           createdByWallet: address,
+          // Ticket sales data
+          enableTicketSales,
+          paymentWallet: enableTicketSales ? paymentWallet : undefined,
+          ticketTiers: enableTicketSales ? ticketTiers.filter(t => t.name && t.price).map(t => ({
+            name: t.name,
+            priceUsdc: parseFloat(t.price) || 0,
+            quantity: parseInt(t.quantity) || 0,
+            description: t.description || undefined,
+          })) : undefined,
         }),
       });
 
@@ -164,6 +206,9 @@ export default function SubmitEventPage() {
                 setTicketUrl('');
                 setTicketPrice('');
                 setImageUrl('');
+                setEnableTicketSales(false);
+                setTicketTiers([{ name: 'General Admission', price: '', quantity: '', description: '' }]);
+                setPaymentWallet(address || '');
               }}
               className="group inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] border border-[#333] text-[#F5F5F5] rounded-full font-semibold hover:bg-[#252525] hover:border-purple-500/50 transition-all active:scale-[0.98]"
             >
@@ -399,23 +444,25 @@ export default function SubmitEventPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-[#888] mb-2">Ticket URL</label>
+                <label className="block text-sm text-[#888] mb-2">Ticket URL (external)</label>
                 <input
                   type="url"
                   value={ticketUrl}
                   onChange={(e) => setTicketUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
+                  disabled={enableTicketSales}
+                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 disabled:opacity-50"
                 />
               </div>
               <div>
-                <label className="block text-sm text-[#888] mb-2">Ticket Price</label>
+                <label className="block text-sm text-[#888] mb-2">Ticket Price (display)</label>
                 <input
                   type="text"
                   value={ticketPrice}
                   onChange={(e) => setTicketPrice(e.target.value)}
                   placeholder="e.g., Free, $20, 10-25"
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
+                  disabled={enableTicketSales}
+                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -431,6 +478,141 @@ export default function SubmitEventPage() {
               />
               <p className="text-[#666] text-xs mt-1">Direct link to your event flyer/image</p>
             </div>
+          </div>
+
+          {/* Onchain Ticket Sales */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-[#F5F5F5]">Onchain Ticket Sales</h2>
+                <p className="text-xs text-[#888]">Sell tickets directly via USDC - no middleman fees</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEnableTicketSales(!enableTicketSales)}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  enableTicketSales ? 'bg-purple-600' : 'bg-[#333]'
+                }`}
+              >
+                <span
+                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    enableTicketSales ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {enableTicketSales && (
+              <div className="space-y-4 p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl">
+                {/* Payment Wallet */}
+                <div>
+                  <label className="block text-sm text-[#888] mb-2">
+                    Payment Wallet (receives USDC) *
+                  </label>
+                  <input
+                    type="text"
+                    value={paymentWallet}
+                    onChange={(e) => setPaymentWallet(e.target.value)}
+                    placeholder="0x..."
+                    className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 font-mono text-sm"
+                  />
+                  <p className="text-[#666] text-xs mt-1">
+                    Ticket payments go directly to this wallet
+                  </p>
+                </div>
+
+                {/* Ticket Tiers */}
+                <div>
+                  <label className="block text-sm text-[#888] mb-3">Ticket Tiers</label>
+                  <div className="space-y-3">
+                    {ticketTiers.map((tier, index) => (
+                      <div
+                        key={index}
+                        className="p-4 bg-[#1A1A1A] rounded-lg border border-[#333] space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-purple-400 font-medium">
+                            Tier {index + 1}
+                          </span>
+                          {ticketTiers.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeTicketTier(index)}
+                              className="text-red-400 hover:text-red-300 text-xs"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <input
+                              type="text"
+                              value={tier.name}
+                              onChange={(e) => updateTicketTier(index, 'name', e.target.value)}
+                              placeholder="Tier name (e.g., Early Bird)"
+                              className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666] text-sm">
+                                  $
+                                </span>
+                                <input
+                                  type="number"
+                                  value={tier.price}
+                                  onChange={(e) => updateTicketTier(index, 'price', e.target.value)}
+                                  placeholder="Price"
+                                  min="0"
+                                  step="0.01"
+                                  className="w-full pl-7 pr-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                                />
+                              </div>
+                            </div>
+                            <div className="w-24">
+                              <input
+                                type="number"
+                                value={tier.quantity}
+                                onChange={(e) => updateTicketTier(index, 'quantity', e.target.value)}
+                                placeholder="Qty"
+                                min="0"
+                                className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <input
+                          type="text"
+                          value={tier.description}
+                          onChange={(e) => updateTicketTier(index, 'description', e.target.value)}
+                          placeholder="Description (optional)"
+                          className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addTicketTier}
+                    className="mt-3 w-full py-2 border border-dashed border-purple-500/50 rounded-lg text-purple-400 text-sm hover:bg-purple-500/10 transition-colors"
+                  >
+                    + Add Another Tier
+                  </button>
+                </div>
+
+                <div className="p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
+                  <p className="text-blue-300 text-xs">
+                    <strong>How it works:</strong> Attendees pay with USDC on Base.
+                    Payments go directly to your wallet - no platform fees.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Submit */}
