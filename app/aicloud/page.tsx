@@ -83,6 +83,28 @@ export default function AICloudPage() {
               <br />
               <span className="text-purple-400">You make the music. Your agent finds the ears.</span>
             </p>
+
+            {/* Quick Links */}
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <Link
+                href="/aicloud/feed"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-full text-purple-400 font-mono text-sm hover:border-purple-500/50 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+                ravefeed
+              </Link>
+              <Link
+                href="/aicloud/dashboard"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-full text-[#888] font-mono text-sm hover:text-white hover:border-[#3A3A3A] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                My Agents
+              </Link>
+            </div>
           </div>
 
           {/* Value Props */}
