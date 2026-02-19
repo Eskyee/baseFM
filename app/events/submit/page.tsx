@@ -482,104 +482,139 @@ export default function SubmitEventPage() {
 
           {/* Onchain Ticket Sales */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-[#F5F5F5]">Onchain Ticket Sales</h2>
-                <p className="text-xs text-[#888]">Sell tickets directly via USDC - no middleman fees</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEnableTicketSales(!enableTicketSales)}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
-                  enableTicketSales ? 'bg-purple-600' : 'bg-[#333]'
-                }`}
-              >
-                <span
-                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    enableTicketSales ? 'translate-x-7' : 'translate-x-1'
+            <div
+              className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                enableTicketSales
+                  ? 'bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-500/50'
+                  : 'bg-[#1A1A1A] border-[#333] hover:border-[#444]'
+              }`}
+              onClick={() => setEnableTicketSales(!enableTicketSales)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                    enableTicketSales ? 'bg-purple-500/30' : 'bg-[#333]'
+                  }`}>
+                    <svg className={`w-5 h-5 transition-colors ${enableTicketSales ? 'text-purple-400' : 'text-[#888]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-[#F5F5F5] font-semibold">Onchain Ticket Sales</h2>
+                    <p className="text-xs text-[#888]">Sell tickets directly via USDC - no fees</p>
+                  </div>
+                </div>
+                {/* iOS-style toggle */}
+                <div
+                  className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
+                    enableTicketSales
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg shadow-purple-500/30'
+                      : 'bg-[#333]'
                   }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ease-out ${
+                      enableTicketSales ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                  />
+                </div>
+              </div>
             </div>
 
             {enableTicketSales && (
-              <div className="space-y-4 p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl">
+              <div className="space-y-5 p-5 bg-gradient-to-br from-purple-900/10 to-blue-900/10 border border-purple-500/20 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
                 {/* Payment Wallet */}
                 <div>
-                  <label className="block text-sm text-[#888] mb-2">
-                    Payment Wallet (receives USDC) *
+                  <label className="flex items-center gap-2 text-sm font-medium text-[#F5F5F5] mb-2">
+                    <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Payment Wallet
                   </label>
                   <input
                     type="text"
                     value={paymentWallet}
                     onChange={(e) => setPaymentWallet(e.target.value)}
                     placeholder="0x..."
-                    className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 font-mono text-sm"
+                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#333] rounded-xl text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 font-mono text-sm transition-all"
                   />
-                  <p className="text-[#666] text-xs mt-1">
-                    Ticket payments go directly to this wallet
+                  <p className="text-[#888] text-xs mt-2 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    USDC payments go directly to this wallet
                   </p>
                 </div>
 
                 {/* Ticket Tiers */}
                 <div>
-                  <label className="block text-sm text-[#888] mb-3">Ticket Tiers</label>
+                  <label className="flex items-center gap-2 text-sm font-medium text-[#F5F5F5] mb-3">
+                    <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    Ticket Tiers
+                  </label>
                   <div className="space-y-3">
                     {ticketTiers.map((tier, index) => (
                       <div
                         key={index}
-                        className="p-4 bg-[#1A1A1A] rounded-lg border border-[#333] space-y-3"
+                        className="p-4 bg-[#0A0A0A] rounded-xl border border-[#333] hover:border-purple-500/30 transition-colors space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-purple-400 font-medium">
-                            Tier {index + 1}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold flex items-center justify-center">
+                              {index + 1}
+                            </span>
+                            <span className="text-xs text-[#888]">
+                              {tier.name || 'New Tier'}
+                            </span>
+                          </div>
                           {ticketTiers.length > 1 && (
                             <button
                               type="button"
                               onClick={() => removeTicketTier(index)}
-                              className="text-red-400 hover:text-red-300 text-xs"
+                              className="p-1.5 rounded-lg text-[#666] hover:text-red-400 hover:bg-red-500/10 transition-colors"
                             >
-                              Remove
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                             </button>
                           )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <input
                               type="text"
                               value={tier.name}
                               onChange={(e) => updateTicketTier(index, 'name', e.target.value)}
-                              placeholder="Tier name (e.g., Early Bird)"
-                              className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                              placeholder="e.g., Early Bird"
+                              className="w-full px-3 py-2.5 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#555] focus:outline-none focus:border-purple-500 text-sm transition-colors"
                             />
                           </div>
                           <div className="flex gap-2">
-                            <div className="flex-1">
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666] text-sm">
-                                  $
-                                </span>
-                                <input
-                                  type="number"
-                                  value={tier.price}
-                                  onChange={(e) => updateTicketTier(index, 'price', e.target.value)}
-                                  placeholder="Price"
-                                  min="0"
-                                  step="0.01"
-                                  className="w-full pl-7 pr-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
-                                />
-                              </div>
+                            <div className="flex-1 relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-green-400 text-sm font-medium">
+                                $
+                              </span>
+                              <input
+                                type="number"
+                                value={tier.price}
+                                onChange={(e) => updateTicketTier(index, 'price', e.target.value)}
+                                placeholder="0.00"
+                                min="0"
+                                step="0.01"
+                                className="w-full pl-7 pr-3 py-2.5 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#555] focus:outline-none focus:border-purple-500 text-sm transition-colors"
+                              />
                             </div>
-                            <div className="w-24">
+                            <div className="w-20">
                               <input
                                 type="number"
                                 value={tier.quantity}
                                 onChange={(e) => updateTicketTier(index, 'quantity', e.target.value)}
                                 placeholder="Qty"
                                 min="0"
-                                className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                                className="w-full px-3 py-2.5 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#555] focus:outline-none focus:border-purple-500 text-sm text-center transition-colors"
                               />
                             </div>
                           </div>
@@ -590,7 +625,7 @@ export default function SubmitEventPage() {
                           value={tier.description}
                           onChange={(e) => updateTicketTier(index, 'description', e.target.value)}
                           placeholder="Description (optional)"
-                          className="w-full px-3 py-2 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 text-sm"
+                          className="w-full px-3 py-2.5 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#555] focus:outline-none focus:border-purple-500 text-sm transition-colors"
                         />
                       </div>
                     ))}
@@ -599,17 +634,27 @@ export default function SubmitEventPage() {
                   <button
                     type="button"
                     onClick={addTicketTier}
-                    className="mt-3 w-full py-2 border border-dashed border-purple-500/50 rounded-lg text-purple-400 text-sm hover:bg-purple-500/10 transition-colors"
+                    className="mt-3 w-full py-3 border-2 border-dashed border-purple-500/30 rounded-xl text-purple-400 text-sm font-medium hover:bg-purple-500/10 hover:border-purple-500/50 transition-all flex items-center justify-center gap-2"
                   >
-                    + Add Another Tier
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Another Tier
                   </button>
                 </div>
 
-                <div className="p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
-                  <p className="text-blue-300 text-xs">
-                    <strong>How it works:</strong> Attendees pay with USDC on Base.
-                    Payments go directly to your wallet - no platform fees.
-                  </p>
+                <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-500/20 rounded-xl">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-blue-300 text-sm font-medium mb-1">How it works</p>
+                    <p className="text-[#888] text-xs leading-relaxed">
+                      Attendees pay with USDC on Base. Payments go directly to your wallet - zero platform fees.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

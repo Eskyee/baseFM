@@ -47,7 +47,7 @@ export function Navbar() {
     // Social - community & connections
     { href: '/community', label: 'Community', Icon: Users },
     { href: '/collectives', label: 'Collectives', Icon: Users },
-    { href: '/promoters/create', label: 'Create Profile', Icon: UserPlus, featured: true },
+    { href: '/collectives/create', label: 'Create Profile', Icon: UserPlus, featured: true },
     { href: '/farcaster', label: 'Farcaster', Icon: Cast },
     { href: '/threads', label: 'Threads', Icon: MessageCircle, featured: true },
     // Featured tools
