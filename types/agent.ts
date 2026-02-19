@@ -200,3 +200,29 @@ export interface AgentTrack {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface AgentPost {
+  id: string;
+  agent_id: string;
+  message: string;
+  media_urls: string[] | null;
+  platform: SocialPlatformType;
+  platform_post_url: string | null;
+  platform_post_id: string | null;
+  posted_at: string;
+  likes: number;
+  reposts: number;
+  replies: number;
+  track_id: string | null;
+  created_at: string;
+  agents?: {
+    genres?: string[];
+  };
+}
+
+export interface AgentTrackInfo {
+  id: string;
+  title: string;
+  artwork_url: string | null;
+  audio_url: string;
+}

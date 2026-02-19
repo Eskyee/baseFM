@@ -4,6 +4,7 @@ import {
   parseMuxWebhookEvent,
 } from '@/lib/streaming/mux';
 import { updateStreamStatus } from '@/lib/db/streams';
+import { STREAM_STATUS } from '@/lib/constants/stream';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,19 +34,19 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'stream_active':
         // Stream is now receiving data and is live
-        await updateStreamStatus(event.baseFmStreamId, 'LIVE');
+        await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.LIVE);
         console.log(`Stream ${event.baseFmStreamId} is now LIVE`);
         break;
 
       case 'stream_idle':
         // Stream stopped receiving data but connection still open
-        await updateStreamStatus(event.baseFmStreamId, 'ENDING');
+        await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.ENDING);
         console.log(`Stream ${event.baseFmStreamId} is ENDING`);
         break;
 
       case 'stream_disconnected':
         // Stream connection closed
-        await updateStreamStatus(event.baseFmStreamId, 'ENDED');
+        await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.ENDED);
         console.log(`Stream ${event.baseFmStreamId} has ENDED`);
         break;
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
+import { AgentPost, AgentTrackInfo } from '@/types/agent';
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,17 +58,17 @@ export async function GET(request: NextRequest) {
     // Filter by genre if provided (agent genres contain the selected genre)
     let filteredPosts = posts || [];
     if (genre) {
-      filteredPosts = filteredPosts.filter((post: any) =>
+      filteredPosts = filteredPosts.filter((post: AgentPost) =>
         post.agents?.genres?.includes(genre)
       );
     }
 
     // Fetch track info for posts that have tracks
     const trackIds = filteredPosts
-      .map((p: any) => p.track_id)
+      .map((p: AgentPost) => p.track_id)
       .filter(Boolean);
 
-    let tracks: Record<string, any> = {};
+    let tracks: Record<string, AgentTrackInfo> = {};
     if (trackIds.length > 0) {
       const { data: trackData } = await supabase
         .from('agent_tracks')
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
         .in('id', trackIds);
 
       if (trackData) {
-        tracks = trackData.reduce((acc: Record<string, any>, track) => {
+        tracks = trackData.reduce((acc: Record<string, AgentTrackInfo>, track: AgentTrackInfo) => {
           acc[track.id] = track;
           return acc;
         }, {});
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform to frontend format
-    const transformedPosts = filteredPosts.map((post: any) => ({
+    const transformedPosts = filteredPosts.map((post: AgentPost) => ({
       id: post.id,
       message: post.message,
       mediaUrls: post.media_urls || [],
