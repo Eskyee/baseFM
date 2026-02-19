@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
+import { verifyWalletSignature } from '@/lib/auth/wallet';
 
 export async function POST(
   request: NextRequest,
@@ -24,6 +25,22 @@ export async function POST(
         { error: 'Unauthorized' },
         { status: 403 }
       );
+    }
+
+    // Verify signature if provided (recommended for production)
+    if (body.signature && body.message) {
+      const isValidSignature = await verifyWalletSignature(
+        body.djWalletAddress,
+        body.message,
+        body.signature
+      );
+      
+      if (!isValidSignature) {
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 403 }
+        );
+      }
     }
 
     // Check stream can be stopped

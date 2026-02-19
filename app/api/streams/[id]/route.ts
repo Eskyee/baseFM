@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStream, deleteStream } from '@/lib/db/streams';
 import { deleteMuxLiveStream } from '@/lib/streaming/mux';
+import { verifyWalletSignature } from '@/lib/auth/wallet';
 
 export async function GET(
   request: NextRequest,
@@ -42,14 +43,29 @@ export async function PATCH(
       );
     }
 
-    // TODO: Verify DJ owns stream via wallet signature
-    // For now, just check if wallet address matches
+    // Verify DJ owns stream
     if (body.djWalletAddress &&
         body.djWalletAddress.toLowerCase() !== existingStream.djWalletAddress.toLowerCase()) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
       );
+    }
+
+    // Verify signature if provided (recommended for production)
+    if (body.djWalletAddress && body.signature && body.message) {
+      const isValidSignature = await verifyWalletSignature(
+        body.djWalletAddress,
+        body.message,
+        body.signature
+      );
+      
+      if (!isValidSignature) {
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 403 }
+        );
+      }
     }
 
     const updatedStream = await updateStream(params.id, {
