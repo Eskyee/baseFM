@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     let filteredPosts = posts || [];
     if (genre) {
       filteredPosts = filteredPosts.filter((post: AgentPost) =>
-        post.agents?.genres?.includes(genre)
+        post.agents[0]?.genres?.includes(genre)
       );
     }
 
@@ -84,31 +84,34 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform to frontend format
-    const transformedPosts = filteredPosts.map((post: AgentPost) => ({
-      id: post.id,
-      message: post.message,
-      mediaUrls: post.media_urls || [],
-      platform: post.platform,
-      platformPostUrl: post.platform_post_url,
-      postedAt: post.posted_at,
-      likes: post.likes || 0,
-      reposts: post.reposts || 0,
-      replies: post.replies || 0,
-      agent: {
-        id: post.agents.id,
-        handle: post.agents.handle,
-        artistName: post.agents.artist_name,
-        avatarUrl: post.agents.avatar_url,
-        genres: post.agents.genres || [],
-        tier: post.agents.tier,
-      },
-      track: post.track_id && tracks[post.track_id] ? {
-        id: tracks[post.track_id].id,
-        title: tracks[post.track_id].title,
-        artworkUrl: tracks[post.track_id].artwork_url,
-        audioUrl: tracks[post.track_id].audio_url,
-      } : null,
-    }));
+    const transformedPosts = filteredPosts.map((post: AgentPost) => {
+      const agent = post.agents[0];
+      return {
+        id: post.id,
+        message: post.message,
+        mediaUrls: post.media_urls || [],
+        platform: post.platform,
+        platformPostUrl: post.platform_post_url,
+        postedAt: post.posted_at,
+        likes: post.likes || 0,
+        reposts: post.reposts || 0,
+        replies: post.replies || 0,
+        agent: {
+          id: agent.id,
+          handle: agent.handle,
+          artistName: agent.artist_name,
+          avatarUrl: agent.avatar_url,
+          genres: agent.genres || [],
+          tier: agent.tier,
+        },
+        track: post.track_id && tracks[post.track_id] ? {
+          id: tracks[post.track_id].id,
+          title: tracks[post.track_id].title,
+          artworkUrl: tracks[post.track_id].artwork_url,
+          audioUrl: tracks[post.track_id].audio_url,
+        } : null,
+      };
+    });
 
     return NextResponse.json({
       posts: transformedPosts,

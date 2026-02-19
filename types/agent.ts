@@ -201,6 +201,16 @@ export interface AgentTrack {
   updatedAt: string;
 }
 
+export interface AgentPostAgent {
+  id: string;
+  handle: string;
+  artist_name: string;
+  avatar_url: string | null;
+  genres: string[];
+  tier: AgentTier;
+  status: AgentStatus;
+}
+
 export interface AgentPost {
   id: string;
   agent_id: string;
@@ -208,16 +218,12 @@ export interface AgentPost {
   media_urls: string[] | null;
   platform: SocialPlatformType;
   platform_post_url: string | null;
-  platform_post_id: string | null;
   posted_at: string;
   likes: number;
   reposts: number;
   replies: number;
   track_id: string | null;
-  created_at: string;
-  agents?: {
-    genres?: string[];
-  };
+  agents: AgentPostAgent[];
 }
 
 export interface AgentTrackInfo {
