@@ -14,6 +14,7 @@ import {
   Archive,
   ShoppingBag,
   Users,
+  UsersRound,
   MessageCircle,
   Briefcase,
   Disc3,
@@ -23,6 +24,7 @@ import {
   BookOpen,
   Ticket,
   Cast,
+  Rss,
   QrCode,
   Megaphone
 } from 'lucide-react';
@@ -45,12 +47,12 @@ export function Navbar() {
     { href: '/archive', label: 'Archive', Icon: Archive },
     // Social - community & connections
     { href: '/community', label: 'Community', Icon: Users },
-    { href: '/collectives', label: 'Collectives', Icon: Users },
+    { href: '/collectives', label: 'Collectives', Icon: UsersRound },
     { href: '/farcaster', label: 'Farcaster', Icon: Cast },
     { href: '/threads', label: 'Threads', Icon: MessageCircle, featured: true },
     // Featured tools
     { href: '/aicloud', label: 'AI Cloud', Icon: Cloud, featured: true },
-    { href: '/aicloud/feed', label: 'Ravefeed', Icon: Cast, featured: true },
+    { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss, featured: true },
     { href: '/tools', label: 'Tools', Icon: Wrench },
     // Business & commerce
     { href: '/agency', label: 'Agency', Icon: Briefcase },
@@ -114,7 +116,7 @@ export function Navbar() {
                 }`;
 
                 const tooltip = (
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#1A1A1A] text-[#F5F5F5] text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 border border-[#333]">
+                  <span className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-[#1A1A1A] text-[#F5F5F5] text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 delay-150 whitespace-nowrap pointer-events-none z-50 border border-[#333] shadow-lg">
                     {link.label}
                   </span>
                 );
