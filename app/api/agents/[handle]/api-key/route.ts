@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAgentByHandle, regenerateApiKey, logAgentActivity } from '@/lib/db/agents';
+import { verifyWalletSignature } from '@/lib/auth/wallet';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const { walletAddress } = body;
+    const { walletAddress, signature, message } = body;
 
     if (!walletAddress) {
       return NextResponse.json(
@@ -29,6 +30,22 @@ export async function POST(
 
     if (agent.ownerWalletAddress.toLowerCase() !== walletAddress.toLowerCase()) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+    }
+
+    // Verify signature if provided (recommended for production)
+    if (signature && message) {
+      const isValidSignature = await verifyWalletSignature(
+        walletAddress,
+        message,
+        signature
+      );
+      
+      if (!isValidSignature) {
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 403 }
+        );
+      }
     }
 
     // Regenerate the API key

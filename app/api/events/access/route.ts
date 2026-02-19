@@ -194,6 +194,7 @@ export async function POST(req: NextRequest) {
         const privateKey = process.env.BANKR_PRIVATE_KEY;
 
         if (apiKey && privateKey) {
+          // NOTE: @bankr/sdk is alpha — using 'any' for dynamic import type safety
           let BankrClient: any;
           try {
             const bankrModule = await import('@bankr/sdk');

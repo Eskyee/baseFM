@@ -31,6 +31,14 @@ export function createAuthMessage(nonce: string): string {
 }
 
 export function generateNonce(): string {
-  return Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
+  // Use crypto.randomUUID() for cryptographically secure nonces
+  // Falls back to crypto.getRandomValues if UUID not available
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback for environments without randomUUID
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }

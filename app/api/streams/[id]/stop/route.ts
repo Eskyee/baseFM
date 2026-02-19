@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
+import { verifyWalletSignature } from '@/lib/auth/wallet';
+import { STREAM_STATUS, STOPPABLE_STATUSES } from '@/lib/constants/stream';
 
 export async function POST(
   request: NextRequest,
@@ -26,8 +28,24 @@ export async function POST(
       );
     }
 
+    // Verify signature if provided (recommended for production)
+    if (body.signature && body.message) {
+      const isValidSignature = await verifyWalletSignature(
+        body.djWalletAddress,
+        body.message,
+        body.signature
+      );
+      
+      if (!isValidSignature) {
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 403 }
+        );
+      }
+    }
+
     // Check stream can be stopped
-    if (!['PREPARING', 'LIVE'].includes(stream.status)) {
+    if (!STOPPABLE_STATUSES.includes(stream.status as any)) {
       return NextResponse.json(
         { error: `Cannot stop stream with status: ${stream.status}` },
         { status: 400 }
@@ -35,7 +53,7 @@ export async function POST(
     }
 
     // Update status to ENDED
-    const updatedStream = await updateStreamStatus(params.id, 'ENDED');
+    const updatedStream = await updateStreamStatus(params.id, STREAM_STATUS.ENDED);
 
     return NextResponse.json({ stream: updatedStream });
   } catch (error) {

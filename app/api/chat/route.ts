@@ -4,14 +4,25 @@ import { chatMessageFromRow, ChatMessageRow } from '@/types/chat';
 
 // Rate limiting: max messages per wallet per minute
 const RATE_LIMIT = 10;
+const RATE_LIMIT_WINDOW = 60000; // 60 seconds
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+// Periodically clean up expired entries to prevent memory leak
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetTime) {
+      rateLimitMap.delete(key);
+    }
+  }
+}, 60000); // Clean up every minute
 
 function checkRateLimit(walletAddress: string): boolean {
   const now = Date.now();
   const entry = rateLimitMap.get(walletAddress);
 
   if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(walletAddress, { count: 1, resetTime: now + 60000 });
+    rateLimitMap.set(walletAddress, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     return true;
   }
 
@@ -72,6 +83,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message too long (max 500 chars)' }, { status: 400 });
     }
 
+    // Basic XSS protection: strip HTML tags and sanitize
+    const sanitizedMessage = message
+      .trim()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    
+    const sanitizedName = senderName 
+      ? senderName.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 50)
+      : null;
+
     // Rate limiting
     if (!checkRateLimit(walletAddress)) {
       return NextResponse.json({ error: 'Too many messages. Please wait.' }, { status: 429 });
@@ -85,8 +106,8 @@ export async function POST(request: NextRequest) {
       .insert({
         stream_id: streamId,
         wallet_address: walletAddress,
-        message: message.trim(),
-        sender_name: senderName || null,
+        message: sanitizedMessage,
+        sender_name: sanitizedName,
         sender_avatar: senderAvatar || null,
         is_dj: isDj || false,
         is_mod: false,

@@ -98,12 +98,21 @@ export async function POST(req: NextRequest) {
 
     // ---- Execute via Bankr SDK ----
     // NOTE: @bankr/sdk is alpha — import dynamically to handle missing package gracefully
+    // Using 'any' type because this is an optional, dynamically imported third-party SDK
     let BankrClient: any;
     try {
       const bankrModule = await import('@bankr/sdk');
       BankrClient = bankrModule.BankrClient ?? bankrModule.default;
     } catch {
       console.error('Bankr SDK not installed or failed to load');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
+    if (!BankrClient) {
+      console.error('BankrClient not available in imported module');
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
         { status: 503 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
 import { getMuxLiveStreamStatus } from '@/lib/streaming/mux';
+import { STREAM_STATUS, MUX_STATUS } from '@/lib/constants/stream';
 
 export async function POST(
   request: NextRequest,
@@ -23,13 +24,13 @@ export async function POST(
 
     // Map Mux status to our status
     let newStatus = stream.status;
-    if (muxStatus === 'active') {
-      newStatus = 'LIVE';
-    } else if (muxStatus === 'idle' && stream.status === 'LIVE') {
-      newStatus = 'ENDING';
-    } else if (muxStatus === 'idle' && stream.status === 'PREPARING') {
+    if (muxStatus === MUX_STATUS.ACTIVE) {
+      newStatus = STREAM_STATUS.LIVE;
+    } else if (muxStatus === MUX_STATUS.IDLE && stream.status === STREAM_STATUS.LIVE) {
+      newStatus = STREAM_STATUS.ENDING;
+    } else if (muxStatus === MUX_STATUS.IDLE && stream.status === STREAM_STATUS.PREPARING) {
       // Still preparing, waiting for video feed
-      newStatus = 'PREPARING';
+      newStatus = STREAM_STATUS.PREPARING;
     }
 
     // Update if changed

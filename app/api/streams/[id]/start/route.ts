@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
+import { STREAM_STATUS } from '@/lib/constants/stream';
 
 export async function POST(
   request: NextRequest,
@@ -27,7 +28,7 @@ export async function POST(
     }
 
     // Check stream can be started
-    if (stream.status !== 'CREATED') {
+    if (stream.status !== STREAM_STATUS.CREATED) {
       return NextResponse.json(
         { error: `Cannot start stream with status: ${stream.status}` },
         { status: 400 }
@@ -35,13 +36,13 @@ export async function POST(
     }
 
     // Update status to PREPARING
-    await updateStreamStatus(params.id, 'PREPARING');
+    await updateStreamStatus(params.id, STREAM_STATUS.PREPARING);
 
     // Return RTMP credentials for DJ to use in OBS/streaming software
     return NextResponse.json({
       stream: {
         ...stream,
-        status: 'PREPARING',
+        status: STREAM_STATUS.PREPARING,
       },
       rtmpCredentials: {
         url: stream.rtmpUrl,

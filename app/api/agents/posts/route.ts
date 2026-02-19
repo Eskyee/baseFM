@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
+import { AgentPost, AgentTrackInfo } from '@/types/agent';
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,17 +58,17 @@ export async function GET(request: NextRequest) {
     // Filter by genre if provided (agent genres contain the selected genre)
     let filteredPosts = posts || [];
     if (genre) {
-      filteredPosts = filteredPosts.filter((post: any) =>
-        post.agents?.genres?.includes(genre)
+      filteredPosts = filteredPosts.filter((post: AgentPost) =>
+        post.agents[0]?.genres?.includes(genre)
       );
     }
 
     // Fetch track info for posts that have tracks
     const trackIds = filteredPosts
-      .map((p: any) => p.track_id)
+      .map((p: AgentPost) => p.track_id)
       .filter(Boolean);
 
-    let tracks: Record<string, any> = {};
+    let tracks: Record<string, AgentTrackInfo> = {};
     if (trackIds.length > 0) {
       const { data: trackData } = await supabase
         .from('agent_tracks')
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
         .in('id', trackIds);
 
       if (trackData) {
-        tracks = trackData.reduce((acc: Record<string, any>, track) => {
+        tracks = trackData.reduce((acc: Record<string, AgentTrackInfo>, track: AgentTrackInfo) => {
           acc[track.id] = track;
           return acc;
         }, {});
@@ -83,31 +84,34 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform to frontend format
-    const transformedPosts = filteredPosts.map((post: any) => ({
-      id: post.id,
-      message: post.message,
-      mediaUrls: post.media_urls || [],
-      platform: post.platform,
-      platformPostUrl: post.platform_post_url,
-      postedAt: post.posted_at,
-      likes: post.likes || 0,
-      reposts: post.reposts || 0,
-      replies: post.replies || 0,
-      agent: {
-        id: post.agents.id,
-        handle: post.agents.handle,
-        artistName: post.agents.artist_name,
-        avatarUrl: post.agents.avatar_url,
-        genres: post.agents.genres || [],
-        tier: post.agents.tier,
-      },
-      track: post.track_id && tracks[post.track_id] ? {
-        id: tracks[post.track_id].id,
-        title: tracks[post.track_id].title,
-        artworkUrl: tracks[post.track_id].artwork_url,
-        audioUrl: tracks[post.track_id].audio_url,
-      } : null,
-    }));
+    const transformedPosts = filteredPosts.map((post: AgentPost) => {
+      const agent = post.agents[0];
+      return {
+        id: post.id,
+        message: post.message,
+        mediaUrls: post.media_urls || [],
+        platform: post.platform,
+        platformPostUrl: post.platform_post_url,
+        postedAt: post.posted_at,
+        likes: post.likes || 0,
+        reposts: post.reposts || 0,
+        replies: post.replies || 0,
+        agent: {
+          id: agent.id,
+          handle: agent.handle,
+          artistName: agent.artist_name,
+          avatarUrl: agent.avatar_url,
+          genres: agent.genres || [],
+          tier: agent.tier,
+        },
+        track: post.track_id && tracks[post.track_id] ? {
+          id: tracks[post.track_id].id,
+          title: tracks[post.track_id].title,
+          artworkUrl: tracks[post.track_id].artwork_url,
+          audioUrl: tracks[post.track_id].audio_url,
+        } : null,
+      };
+    });
 
     return NextResponse.json({
       posts: transformedPosts,
