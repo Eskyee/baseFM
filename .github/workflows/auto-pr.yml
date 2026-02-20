@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'claude/**'
+      - 'copilot/**'
 
 permissions:
   contents: read
