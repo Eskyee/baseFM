@@ -3,6 +3,8 @@ import { createServerClient } from '@/lib/supabase/client';
 import { eventFromRow, toPublicEvent } from '@/types/event';
 import type { EventRow } from '@/types/event';
 
+export const dynamic = 'force-dynamic';
+
 // ============================================================
 // Public Events API — no auth required
 // GET — Return public events (active + upcoming)
