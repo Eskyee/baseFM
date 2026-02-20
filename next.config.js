@@ -15,6 +15,15 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@coinbase/onchainkit', 'wagmi', 'viem'],
   },
 
+  // Webpack config to handle React Native dependencies from WalletConnect
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@react-native-async-storage/async-storage': false,
+    };
+    return config;
+  },
+
   images: {
     // Use modern formats
     formats: ['image/avif', 'image/webp'],
