@@ -76,7 +76,16 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A] safe-area-top overflow-hidden">
+      {/* Background layer that extends behind safe area */}
+      <div
+        className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]"
+        style={{ height: 'calc(3.5rem + env(safe-area-inset-top, 0px))' }}
+        aria-hidden="true"
+      />
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A]"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div
           className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8"
           style={{
@@ -182,7 +191,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       <nav
-        className={`fixed z-50 bg-[#0A0A0A]/95 backdrop-blur-lg border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
+        className={`fixed z-50 bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{
