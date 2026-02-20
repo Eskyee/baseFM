@@ -30,10 +30,41 @@
   --radius-lg: 12px;
 }
 
+html {
+  background-color: var(--bg);
+  /* Prevent overscroll bounce that shows content behind navbar */
+  overscroll-behavior: none;
+}
+
 body {
   color: var(--text);
   background-color: var(--bg);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Prevent pull-to-refresh and overscroll in PWA */
+  overscroll-behavior-y: none;
+}
+
+/* PWA standalone mode - extra protection for notched devices */
+@media all and (display-mode: standalone) {
+  html, body {
+    /* Prevent any overscroll that could show content behind safe area */
+    overscroll-behavior: none;
+    /* Ensure background extends behind safe area */
+    background-color: var(--bg);
+  }
+
+  /* Fixed background behind the notch/dynamic island area */
+  html::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background-color: var(--bg);
+    z-index: 9999;
+    pointer-events: none;
+  }
 }
 
 /* Typography */
