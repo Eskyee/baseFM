@@ -162,7 +162,7 @@ export function ThreadCard({
           {thread.mediaUrls && thread.mediaUrls.length > 0 && (
             <div className={`mt-3 grid gap-2 ${thread.mediaUrls.length === 1 ? '' : 'grid-cols-2'}`}>
               {thread.mediaUrls.slice(0, 4).map((url, i) => (
-                <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                <div key={i} className="relative aspect-square w-full rounded-xl overflow-hidden">
                   <Image
                     src={url}
                     alt=""
