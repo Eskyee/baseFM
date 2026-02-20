@@ -86,6 +86,7 @@ export function TicketPurchase({ eventId, eventTitle }: TicketPurchaseProps) {
     if (isConfirmed && txHash && selectedTicket) {
       recordPurchase();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConfirmed, txHash]);
 
   // Handle write errors

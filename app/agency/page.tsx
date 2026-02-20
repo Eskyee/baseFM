@@ -109,7 +109,7 @@ export default function AgencyPage() {
               Plugged In · DIY Network
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#F5F5F5] mb-6 leading-tight">
-              We Don't Wait For<br />
+              We Don&apos;t Wait For<br />
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
                 Permission
               </span>
@@ -274,7 +274,7 @@ export default function AgencyPage() {
               Standing On Shoulders
             </h2>
             <p className="text-[#888]">
-              We didn't invent this. We're continuing what the pioneers started.
+              We didn&apos;t invent this. We&apos;re continuing what the pioneers started.
             </p>
           </div>
 
@@ -290,8 +290,8 @@ export default function AgencyPage() {
           </div>
 
           <p className="text-center text-[#444] text-xs mt-8 max-w-lg mx-auto">
-            "The history of rave is the history of people creating spaces outside the system.
-            We're not nostalgic — we're building the next chapter."
+            &quot;The history of rave is the history of people creating spaces outside the system.
+            We&apos;re not nostalgic — we&apos;re building the next chapter.&quot;
           </p>
         </div>
       </section>
@@ -329,7 +329,7 @@ export default function AgencyPage() {
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F5F5] mb-4">Plug In</h2>
           <p className="text-[#888] max-w-2xl mx-auto">
-            Whether you're an artist, promoter, or just someone who believes in the culture — let's connect.
+            Whether you&apos;re an artist, promoter, or just someone who believes in the culture — let&apos;s connect.
           </p>
         </div>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
 import { base } from 'wagmi/chains';
 import { Thread } from '@/types/thread';
@@ -161,12 +162,14 @@ export function ThreadCard({
           {thread.mediaUrls && thread.mediaUrls.length > 0 && (
             <div className={`mt-3 grid gap-2 ${thread.mediaUrls.length === 1 ? '' : 'grid-cols-2'}`}>
               {thread.mediaUrls.slice(0, 4).map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  className="rounded-xl w-full aspect-square object-cover"
-                />
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                  <Image
+                    src={url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               ))}
             </div>
           )}

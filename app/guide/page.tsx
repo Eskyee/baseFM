@@ -92,14 +92,14 @@ export default function GuidePage() {
               <div>
                 <h3 className="text-[#F5F5F5] font-semibold mb-2">Get a Wallet</h3>
                 <p className="text-[#888] mb-4">
-                  You need a crypto wallet to use all features. Don't worry - it's free and easy!
+                  You need a crypto wallet to use all features. Don&apos;t worry - it&apos;s free and easy!
                 </p>
                 <div className="bg-[#0A0A0A] rounded-xl p-4">
                   <p className="text-[#888] text-sm mb-3">We recommend Base Wallet:</p>
                   <ol className="text-[#CCC] text-sm space-y-2 list-decimal list-inside">
                     <li>Download the Base Wallet app on your phone</li>
-                    <li>Create a wallet (it's free)</li>
-                    <li>That's it! You're ready</li>
+                    <li>Create a wallet (it&apos;s free)</li>
+                    <li>That&apos;s it! You&apos;re ready</li>
                   </ol>
                 </div>
               </div>
@@ -170,7 +170,7 @@ export default function GuidePage() {
                 Finding Live Shows
               </h3>
               <p className="text-[#888] mb-3">
-                When a DJ is live, you'll see them on the homepage with a red "LIVE" badge. Just tap to listen!
+                When a DJ is live, you&apos;ll see them on the homepage with a red &quot;LIVE&quot; badge. Just tap to listen!
               </p>
               <div className="bg-[#0A0A0A] rounded-xl p-4">
                 <p className="text-[#666] text-sm">
@@ -234,7 +234,7 @@ export default function GuidePage() {
 
           <div className="bg-[#1A1A1A] rounded-2xl p-6">
             <p className="text-[#888] mb-6">
-              Love what you're hearing? Send a tip directly to the DJ's wallet. They get 100% of it - no middleman!
+              Love what you&apos;re hearing? Send a tip directly to the DJ&apos;s wallet. They get 100% of it - no middleman!
             </p>
 
             {/* Tip options */}
@@ -263,7 +263,7 @@ export default function GuidePage() {
 
             <div className="bg-[#0A0A0A] rounded-xl p-4">
               <p className="text-[#888] text-sm">
-                <strong className="text-[#F5F5F5]">How to tip:</strong> On any DJ's profile or live stream, tap the "Tip" button, choose an amount, and confirm in your wallet. Done!
+                <strong className="text-[#F5F5F5]">How to tip:</strong> On any DJ&apos;s profile or live stream, tap the &quot;Tip&quot; button, choose an amount, and confirm in your wallet. Done!
               </p>
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function GuidePage() {
               <h4 className="text-[#F5F5F5] font-semibold mb-2">How it works:</h4>
               <ol className="text-[#888] text-sm space-y-2 list-decimal list-inside">
                 <li>Find an event you like</li>
-                <li>Tap "Get Tickets"</li>
+                <li>Tap &quot;Get Tickets&quot;</li>
                 <li>Pay with USDC from your wallet</li>
                 <li>Your ticket is saved to your wallet!</li>
               </ol>
@@ -571,8 +571,8 @@ export default function GuidePage() {
                 <ol className="text-[#888] text-sm space-y-2 list-decimal list-inside">
                   <li>Make sure you have <span className="text-purple-400">5,000 RAVE</span> in your wallet</li>
                   <li>Go to <Link href="/dashboard" className="text-blue-400 underline">DJ Dashboard</Link></li>
-                  <li>Click "Create Stream" and fill in your show details</li>
-                  <li>Click "Setup Mux" to generate your RTMP credentials</li>
+                  <li>Click &quot;Create Stream&quot; and fill in your show details</li>
+                  <li>Click &quot;Setup Mux&quot; to generate your RTMP credentials</li>
                   <li>Copy your <strong className="text-[#F5F5F5]">RTMP URL</strong> and <strong className="text-[#F5F5F5]">Stream Key</strong></li>
                 </ol>
               </div>
@@ -591,12 +591,12 @@ export default function GuidePage() {
                   <ol className="text-[#888] text-sm space-y-1.5 list-decimal list-inside">
                     <li>Download from <span className="text-blue-400">obsproject.com</span></li>
                     <li>Go to Settings → Stream</li>
-                    <li>Service: Select "Custom..."</li>
+                    <li>Service: Select &quot;Custom...&quot;</li>
                     <li>Server: Paste your RTMP URL</li>
                     <li>Stream Key: Paste your stream key</li>
                     <li>Go to Settings → Output → set Audio Bitrate to 320kbps</li>
                     <li>Add your audio source (microphone, soundcard, etc.)</li>
-                    <li>Click "Start Streaming"</li>
+                    <li>Click &quot;Start Streaming&quot;</li>
                   </ol>
                 </div>
 
@@ -611,7 +611,7 @@ export default function GuidePage() {
                     <li>Download Larix Broadcaster from App Store / Play Store</li>
                     <li>Tap the gear icon → Connections</li>
                     <li>Tap + to add new connection</li>
-                    <li>Name: "baseFM"</li>
+                    <li>Name: &quot;baseFM&quot;</li>
                     <li>URL: Paste your full RTMP URL with stream key</li>
                     <li>Format: rtmp://...your-url.../your-stream-key</li>
                     <li>Save and tap the red record button to go live</li>
@@ -624,7 +624,7 @@ export default function GuidePage() {
                     <span className="text-lg">🎚️</span>
                     <h5 className="text-[#F5F5F5] font-medium">BUTT (Audio-only, lightweight)</h5>
                   </div>
-                  <p className="text-[#666] text-xs mb-3">Simple audio streamer - "Broadcast Using This Tool"</p>
+                  <p className="text-[#666] text-xs mb-3">Simple audio streamer - &quot;Broadcast Using This Tool&quot;</p>
                   <ol className="text-[#888] text-sm space-y-1.5 list-decimal list-inside">
                     <li>Download from <span className="text-blue-400">danielnoethen.de/butt</span></li>
                     <li>Settings → Main → Server: Add</li>
@@ -673,7 +673,7 @@ export default function GuidePage() {
                   <li>Start streaming from your software</li>
                   <li>baseFM automatically detects when you go live</li>
                   <li>Your show appears on the homepage with a LIVE badge</li>
-                  <li>When done, stop streaming and click "End Stream" in dashboard</li>
+                  <li>When done, stop streaming and click &quot;End Stream&quot; in dashboard</li>
                 </ol>
               </div>
 
@@ -960,7 +960,7 @@ export default function GuidePage() {
 
             <div id="tech-specs" className="hidden mt-4 space-y-3 text-xs font-mono">
               <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
-                <div className="text-purple-400 font-semibold mb-2">// Stack</div>
+                <div className="text-purple-400 font-semibold mb-2">{`// Stack`}</div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                   <span className="text-[#666]">Framework</span>
                   <span className="text-[#888]">Next.js 14 (App Router)</span>
@@ -980,7 +980,7 @@ export default function GuidePage() {
               </div>
 
               <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
-                <div className="text-green-400 font-semibold mb-2">// Onchain</div>
+                <div className="text-green-400 font-semibold mb-2">{`// Onchain`}</div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                   <span className="text-[#666]">Network</span>
                   <span className="text-[#888]">Base (Chain ID: 8453)</span>
@@ -998,7 +998,7 @@ export default function GuidePage() {
               </div>
 
               <div className="bg-[#0A0A0A] rounded-xl p-4 space-y-2">
-                <div className="text-cyan-400 font-semibold mb-2">// Stats</div>
+                <div className="text-cyan-400 font-semibold mb-2">{`// Stats`}</div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                   <span className="text-[#666]">API Routes</span>
                   <span className="text-[#888]">50+</span>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Stream } from '@/types/stream';
 
 // Default fallback image - baseFM logo
@@ -40,10 +41,11 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
     <div className="bg-[#1C1C1E] rounded-2xl overflow-hidden hover:bg-[#2C2C2E] transition-all active:scale-[0.98]">
       {/* Cover Image */}
       <div className="relative aspect-video bg-[#0A0A0A]">
-        <img
+        <Image
           src={coverImage}
           alt={stream.title}
-          className={`w-full h-full ${
+          fill
+          className={`${
             hasCustomImage ? 'object-cover' : 'object-contain p-8'
           }`}
         />

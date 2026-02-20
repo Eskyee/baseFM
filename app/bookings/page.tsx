@@ -118,7 +118,7 @@ function BookingForm() {
               Book Our Services
             </h1>
             <p className="text-[#888] text-sm sm:text-base max-w-lg mx-auto">
-              Tell us about your event and we'll put together a custom quote.
+              Tell us about your event and we&apos;ll put together a custom quote.
             </p>
           </div>
         </div>
@@ -311,7 +311,7 @@ function BookingFormFallback() {
               Book Our Services
             </h1>
             <p className="text-[#888] text-sm sm:text-base max-w-lg mx-auto">
-              Tell us about your event and we'll put together a custom quote.
+              Tell us about your event and we&apos;ll put together a custom quote.
             </p>
           </div>
         </div>

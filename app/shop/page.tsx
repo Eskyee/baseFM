@@ -99,7 +99,7 @@ export default async function ShopPage() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Coming Soon</h2>
             <p className="text-[#888] max-w-md mx-auto mb-8">
-              We're preparing some exclusive merch with onchain perks.
+              We&apos;re preparing some exclusive merch with onchain perks.
               Connect your wallet to get notified when we launch.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
