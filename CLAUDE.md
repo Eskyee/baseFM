@@ -349,17 +349,83 @@ Ticket ownership → GET /api/tickets/purchase?wallet=xxx&eventId=xxx
 
 ## Git Workflow
 ```
-1. Claude builds on claude/* branch
+1. AI (Claude/Copilot) works on a feature branch: copilot/<task-name> or claude/<task-name>
 2. Push triggers auto-PR workflow (.github/workflows/auto-pr.yml)
-3. CI runs: TypeScript → Lint → Tests → Build (.github/workflows/ci.yml)
-4. Vercel auto-deploys preview URL
-5. Owner reviews on iPhone, checks preview
+3. CI runs: Lint → Tests → Build (.github/workflows/ci.yml)
+4. Vercel auto-deploys a unique preview URL for that PR
+5. Owner reviews on iPhone using the Vercel preview URL
 6. Owner squash-merges PR to main on GitHub
 7. Vercel deploys main to production (basefm.space)
 ```
 - **Never push directly to main**
-- **Default branch is main** (not a claude/ branch)
+- **Default branch is main** (not an AI branch)
 - PR template at `.github/pull_request_template.md`
+- AI branches are short-lived — delete them after the PR is merged
+
+## Branch Management
+
+### Active Branches
+| Branch | Purpose | Notes |
+|--------|---------|-------|
+| `main` | Production | Protected, auto-deploys to basefm.space |
+| `staging` | Staging / pre-prod testing | Optional; can be used before merging to main |
+
+### AI Working Branches (short-lived)
+AI agents (Claude/Copilot) create branches named `copilot/<task>` or `claude/<task>`.
+Each branch should:
+1. Have a corresponding PR targeting `main`
+2. Get a Vercel preview URL automatically
+3. Be deleted after the PR is merged or closed
+
+### Dead Branches (safe to delete)
+The following branches have served their purpose and can be removed:
+
+**Old AI branches (merged or abandoned):**
+- `atlas/rebuild-v2`
+- `claude/review-completion-status-QbcVX`
+- `copilot/add-new-features`
+- `copilot/add-new-features-again`
+- `copilot/fix-code-errors`
+- `copilot/fix-eslint-rule-error`
+- `copilot/improve-github-actions-workflow`
+- `copilot/review-code-base`
+- `copilot/tidy-up-repo`
+
+**Dependabot branches (review and merge or close):**
+- `dependabot/npm_and_yarn/axios-1.13.5`
+- `dependabot/npm_and_yarn/hono-4.12.0`
+- `dependabot/npm_and_yarn/multi-93fa3e69bb`
+
+**Auto-created Vercel branches (safe to delete):**
+- `vercel/install-vercel-web-analytics-f-y5yy5n`
+- `vercel/vercel-speed-insights-to-nextj-ml7qc2`
+
+### How to Delete Dead Branches
+```bash
+# Delete a remote branch via GitHub UI:
+# Go to github.com/Eskyee/baseFM/branches → delete stale branches
+
+# Or via CLI (requires GitHub auth):
+git push origin --delete <branch-name>
+```
+
+### Vercel Preview Flow
+```
+copilot/feature or claude/feature
+        ↓ (push)
+  GitHub auto-PR created
+        ↓
+  CI runs (lint + test + build)
+        ↓
+  Vercel deploys preview URL
+  e.g. basefm-git-copilot-feature-eskyee.vercel.app
+        ↓
+  Owner reviews on iPhone
+        ↓
+  Squash-merge to main
+        ↓
+  Vercel deploys to basefm.space
+```
 
 ## Commands
 ```bash
@@ -383,14 +449,17 @@ npm run test         # Run tests in watch mode
 - **Helpers**: `__tests__/utils/test-utils.tsx` provides mock data and render utilities
 
 ## CI/CD Pipeline
-`.github/workflows/ci.yml` runs on push to main and claude/* branches:
+`.github/workflows/ci.yml` runs on push to `main`, `claude/**`, and `copilot/**` branches:
 1. **Lint Job** - ESLint checks
 2. **Test Job** - Vitest with coverage (parallel with lint)
 3. **Build Job** - Next.js production build (after lint+test pass)
 
+`.github/workflows/auto-pr.yml` runs on push to `claude/**` and `copilot/**` branches:
+- Auto-creates a PR targeting `main` if one doesn't exist
+- Comments on existing PR when new commits are pushed
+
 Features:
 - Parallel job execution for speed
-- Coverage reporting to Codecov
 - Concurrency control (cancels stale runs)
 - Node 20, npm caching
 
@@ -415,6 +484,7 @@ Features:
 18. **Crew roles are categorized** - Group 35+ roles into Management, FOH, Safety, Technical, etc.
 19. **Page transitions improve UX** - 150ms fade with translate-y for smooth navigation
 20. **Loading skeletons per page** - Custom skeletons for schedule, events, gallery, DJs, wallet
+21. **Delete AI branches after merge** - copilot/* and claude/* branches are short-lived; delete them once the PR is merged to keep the repo tidy
 
 ## Don'ts
 - Don't change Shop link to internal (owner explicitly said no)
@@ -425,6 +495,7 @@ Features:
 - Don't use Coinbase Pay API URLs (appId not registered)
 - Don't set Vercel custom domains to Preview environment
 - Don't change the GitHub default branch away from main
+- Don't leave old AI branches around after a PR is merged - delete them
 
 ## Project Documentation
 - **CLAUDE.md** - This file (AI context and project rules)
