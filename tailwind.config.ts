@@ -9,6 +9,22 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          'Inter',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Oxygen',
+          'Ubuntu',
+          'Cantarell',
+          'Fira Sans',
+          'Droid Sans',
+          'Helvetica Neue',
+          'sans-serif',
+        ],
+      },
       colors: {
         'base-blue': '#0052FF',
         'base-dark': '#0A0B0D',
