@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -26,57 +26,101 @@ import {
   Cast,
   Rss,
   QrCode,
-  Megaphone
+  Megaphone,
+  ChevronDown,
+  Sparkles,
+  Music,
+  Store,
+  Zap
 } from 'lucide-react';
 
 export function Navbar() {
   const pathname = usePathname();
   const { isConnected } = useAccount();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Nav links organized by category for better UX
-  // Order: Core > Content > Social > Featured > Commerce > Help
-  const navLinks = [
-    // Core navigation - what users need most
-    { href: '/', label: 'Home', Icon: Home },
-    { href: '/schedule', label: 'Schedule', Icon: Calendar },
-    { href: '/events', label: 'Events', Icon: Ticket },
-    { href: '/djs', label: 'DJs', Icon: Disc3 },
-    // Content - media & archives
-    { href: '/gallery', label: 'Gallery', Icon: Image },
-    { href: '/archive', label: 'Archive', Icon: Archive },
-    // Social - community & connections
-    { href: '/community', label: 'Community', Icon: Users },
-    { href: '/collectives', label: 'Collectives', Icon: UsersRound },
-    { href: '/farcaster', label: 'Farcaster', Icon: Cast },
-    { href: '/threads', label: 'Threads', Icon: MessageCircle, featured: true },
-    // Featured tools
-    { href: '/aicloud', label: 'AI Cloud', Icon: Cloud, featured: true },
-    { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss, featured: true },
-    { href: '/tools', label: 'Tools', Icon: Wrench },
-    // Business & commerce
-    { href: '/agency', label: 'Agency', Icon: Briefcase },
-    { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
-    // Help
-    { href: '/guide', label: 'Guide', Icon: BookOpen },
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Organized menu structure
+  const menuGroups = [
+    {
+      id: 'discover',
+      label: 'Discover',
+      Icon: Sparkles,
+      featured: false,
+      links: [
+        { href: '/schedule', label: 'Schedule', Icon: Calendar },
+        { href: '/events', label: 'Events', Icon: Ticket },
+        { href: '/djs', label: 'DJs', Icon: Disc3 },
+        { href: '/gallery', label: 'Gallery', Icon: Image },
+        { href: '/archive', label: 'Archive', Icon: Archive },
+      ]
+    },
+    {
+      id: 'community',
+      label: 'Community',
+      Icon: Users,
+      featured: false,
+      links: [
+        { href: '/community', label: 'Community', Icon: Users },
+        { href: '/collectives', label: 'Collectives', Icon: UsersRound },
+        { href: '/threads', label: 'Threads', Icon: MessageCircle },
+        { href: '/farcaster', label: 'Farcaster', Icon: Cast },
+      ]
+    },
+    {
+      id: 'create',
+      label: 'Create',
+      Icon: Zap,
+      featured: true,
+      links: [
+        { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
+        { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
+        { href: '/tools', label: 'Tools', Icon: Wrench },
+      ]
+    },
+    {
+      id: 'business',
+      label: 'Business',
+      Icon: Store,
+      featured: false,
+      links: [
+        { href: '/agency', label: 'Agency', Icon: Briefcase },
+        { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
+      ]
+    },
   ];
 
-  // Only show these links if wallet is connected
-  const connectedLinks = isConnected
-    ? [
-        { href: '/wallet', label: 'Wallet', Icon: Wallet },
-        { href: '/pos', label: 'POS', Icon: QrCode },
-        { href: '/promoter', label: 'Promoter', Icon: Megaphone },
-        { href: '/messages', label: 'Messages', Icon: Mail },
-        { href: '/dashboard', label: 'Dashboard', Icon: LayoutGrid },
-      ]
-    : [];
+  // Connected user menu
+  const connectedGroup = isConnected ? {
+    id: 'account',
+    label: 'Account',
+    Icon: LayoutGrid,
+    featured: false,
+    links: [
+      { href: '/dashboard', label: 'Dashboard', Icon: LayoutGrid },
+      { href: '/wallet', label: 'Wallet', Icon: Wallet },
+      { href: '/messages', label: 'Messages', Icon: Mail },
+      { href: '/promoter', label: 'Promoter', Icon: Megaphone },
+      { href: '/pos', label: 'POS', Icon: QrCode },
+    ]
+  } : null;
 
-  const allLinks = [...navLinks, ...connectedLinks];
+  const allGroups = connectedGroup ? [...menuGroups, connectedGroup] : menuGroups;
 
   return (
     <>
-      {/* Background layer that extends behind safe area */}
       <div
         className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]"
         style={{ height: 'calc(3.5rem + env(safe-area-inset-top, 0px))' }}
@@ -108,59 +152,100 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Navigation Links - Desktop (icons only) */}
-            <nav className="hidden md:flex items-center gap-0.5">
-              {allLinks.map((link) => {
-                const Icon = link.Icon;
-                const isActive = pathname === link.href;
-                const isFeatured = 'featured' in link && link.featured;
-                const isExternal = 'external' in link && link.external;
+            {/* Desktop Navigation - Dropdown Menus */}
+            <nav className="hidden md:flex items-center gap-1" ref={dropdownRef}>
+              {/* Home */}
+              <Link
+                href="/"
+                className={`p-2 rounded-lg transition-colors ${
+                  pathname === '/' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`}
+              >
+                <Home className="w-5 h-5" />
+              </Link>
 
-                const iconClasses = `p-2 rounded-lg transition-colors relative group ${
-                  isActive
-                    ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                    : isFeatured
-                    ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-                    : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-                }`;
+              {/* Dropdown Groups */}
+              {allGroups.map((group) => {
+                const isOpen = openDropdown === group.id;
+                const isActive = group.links.some(link => pathname === link.href);
+                const isFeatured = group.featured;
 
-                const tooltip = (
-                  <span className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-[#1A1A1A] text-[#F5F5F5] text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 delay-150 whitespace-nowrap pointer-events-none z-50 border border-[#333] shadow-lg">
-                    {link.label}
-                  </span>
-                );
+                return (
+                  <div key={group.id} className="relative">
+                    <button
+                      onClick={() => setOpenDropdown(isOpen ? null : group.id)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors ${
+                        isActive || isOpen
+                          ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                          : isFeatured
+                          ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+                          : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                      }`}
+                    >
+                      <group.Icon className="w-4 h-4" />
+                      <span className="text-sm font-medium">{group.label}</span>
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
 
-                return isExternal ? (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={iconClasses}
-                    aria-label={link.label}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {tooltip}
-                  </a>
-                ) : (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={iconClasses}
-                    aria-label={link.label}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {tooltip}
-                  </Link>
+                    {/* Dropdown Menu */}
+                    {isOpen && (
+                      <div className="absolute top-full left-0 mt-1 w-48 bg-[#0A0A0A] border border-[#1A1A1A] rounded-lg shadow-2xl py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                        {group.links.map((link) => {
+                          const Icon = link.Icon;
+                          const isLinkActive = pathname === link.href;
+                          const isExternal = 'external' in link && link.external;
+
+                          const linkClasses = `flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
+                            isLinkActive
+                              ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                              : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                          }`;
+
+                          return isExternal ? (
+                            <a
+                              key={link.href}
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={linkClasses}
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <Icon className="w-4 h-4" />
+                              {link.label}
+                            </a>
+                          ) : (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              className={linkClasses}
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <Icon className="w-4 h-4" />
+                              {link.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
+
+              {/* Guide */}
+              <Link
+                href="/guide"
+                className={`p-2 rounded-lg transition-colors ${
+                  pathname === '/guide' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`}
+              >
+                <BookOpen className="w-5 h-5" />
+              </Link>
             </nav>
 
             {/* Right: Wallet + Mobile Menu */}
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <WalletConnect />
 
-              {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-1.5 sm:p-2 rounded-lg text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A] transition-colors flex-shrink-0"
@@ -181,91 +266,108 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
       {/* Mobile Menu */}
-      <nav
-        className={`fixed z-50 bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto transform transition-transform duration-200 ease-in-out md:hidden ${
-          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{
-          top: 'var(--navbar-height)',
-          height: 'calc(100dvh - var(--navbar-height))',
-          right: 'env(safe-area-inset-right, 0px)',
-          width: 'min(14rem, 60vw)',
-          maxWidth: 'calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 60px)',
-        }}
-      >
-        <div className="p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100% - 50px)' }}>
-          {allLinks.map((link) => {
-            const Icon = link.Icon;
-            const isActive = pathname === link.href;
-            const isFeatured = 'featured' in link && link.featured;
-            const isExternal = 'external' in link && link.external;
-
-            const linkClasses = `flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors active:scale-[0.98] ${
-              isActive
-                ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                : isFeatured
-                ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-                : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
-            }`;
-
-            return isExternal ? (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className={linkClasses}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{link.label}</span>
-              </a>
-            ) : (
+      {mobileMenuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/50 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <nav
+            className="fixed z-50 bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto md:hidden"
+            style={{
+              top: 'var(--navbar-height)',
+              height: 'calc(100dvh - var(--navbar-height))',
+              right: 'env(safe-area-inset-right, 0px)',
+              width: 'min(16rem, 70vw)',
+            }}
+          >
+            <div className="p-3 space-y-4">
+              {/* Home */}
               <Link
-                key={link.href}
-                href={link.href}
+                href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={linkClasses}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === '/' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{link.label}</span>
+                <Home className="w-4 h-4" />
+                Home
               </Link>
-            );
-          })}
-        </div>
 
-        {/* Mobile Footer Links */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#1A1A1A] bg-[#0A0A0A]">
-          <div className="flex items-center justify-center gap-3 text-xs text-[#666]">
-            <a
-              href="https://talent.app/raveculture.base.eth"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#888]"
-            >
-              RaveCulture
-            </a>
-            <span>·</span>
-            <a
-              href="https://base.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#888]"
-            >
-              Base
-            </a>
-          </div>
-        </div>
-      </nav>
+              {/* Mobile Groups */}
+              {allGroups.map((group) => (
+                <div key={group.id} className="space-y-1">
+                  <div className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
+                    group.featured ? 'text-purple-400' : 'text-[#666]'
+                  }`}>
+                    <group.Icon className="w-3.5 h-3.5" />
+                    {group.label}
+                  </div>
+                  {group.links.map((link) => {
+                    const Icon = link.Icon;
+                    const isActive = pathname === link.href;
+                    const isExternal = 'external' in link && link.external;
+
+                    const linkClasses = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      isActive ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                    }`;
+
+                    return isExternal ? (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={linkClasses}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={linkClasses}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              ))}
+
+              {/* Guide */}
+              <Link
+                href="/guide"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === '/guide' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                Guide
+              </Link>
+            </div>
+
+            {/* Mobile Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#1A1A1A] bg-[#0A0A0A]">
+              <div className="flex items-center justify-center gap-3 text-xs text-[#666]">
+                <a href="https://talent.app/raveculture.base.eth" target="_blank" rel="noopener noreferrer" className="hover:text-[#888]">
+                  RaveCulture
+                </a>
+                <span>·</span>
+                <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#888]">
+                  Base
+                </a>
+              </div>
+            </div>
+          </nav>
+        </>
+      )}
     </>
   );
 }
