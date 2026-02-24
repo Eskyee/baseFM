@@ -122,13 +122,16 @@ export function Navbar() {
   return (
     <>
       <div
-        className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]"
+        className="fixed top-0 left-0 right-0 z-40 bg-black"
         style={{ height: 'calc(3.5rem + env(safe-area-inset-top, 0px))' }}
         aria-hidden="true"
       />
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A] border-b border-[#1A1A1A]"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className="fixed top-0 left-0 right-0 z-50 bg-black border-b"
+        style={{ 
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        }}
       >
         <div
           className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8"
@@ -157,8 +160,10 @@ export function Navbar() {
               {/* Home */}
               <Link
                 href="/"
-                className={`p-2 rounded-lg transition-colors ${
-                  pathname === '/' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                className={`p-2 rounded-lg transition-all duration-150 ${
+                  pathname === '/' 
+                    ? 'text-white bg-[#171717]' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                 }`}
               >
                 <Home className="w-5 h-5" />
@@ -174,31 +179,36 @@ export function Navbar() {
                   <div key={group.id} className="relative">
                     <button
                       onClick={() => setOpenDropdown(isOpen ? null : group.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors ${
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-150 ${
                         isActive || isOpen
-                          ? 'text-[#F5F5F5] bg-[#1A1A1A]'
+                          ? 'text-white bg-[#171717]'
                           : isFeatured
-                          ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
-                          : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                          ? 'text-[#0070F3] hover:text-[#0761D1] hover:bg-[rgba(0,112,243,0.1)]'
+                          : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                       }`}
                     >
                       <group.Icon className="w-4 h-4" />
                       <span className="text-sm font-medium">{group.label}</span>
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Dropdown Menu */}
                     {isOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-48 bg-[#0A0A0A] border border-[#1A1A1A] rounded-lg shadow-2xl py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                        {group.links.map((link) => {
+                      <div 
+                        className="absolute top-full left-0 mt-1 w-48 bg-black rounded-lg py-1 animate-slide-down"
+                        style={{
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                        }}
+                      >                        {group.links.map((link) => {
                           const Icon = link.Icon;
                           const isLinkActive = pathname === link.href;
                           const isExternal = 'external' in link && link.external;
 
-                          const linkClasses = `flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
+                          const linkClasses = `flex items-center gap-2.5 px-3 py-2 text-sm transition-all duration-150 ${
                             isLinkActive
-                              ? 'text-[#F5F5F5] bg-[#1A1A1A]'
-                              : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                              ? 'text-white bg-[#171717]'
+                              : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                           }`;
 
                           return isExternal ? (
@@ -234,8 +244,10 @@ export function Navbar() {
               {/* Guide */}
               <Link
                 href="/guide"
-                className={`p-2 rounded-lg transition-colors ${
-                  pathname === '/guide' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                className={`p-2 rounded-lg transition-all duration-150 ${
+                  pathname === '/guide' 
+                    ? 'text-white bg-[#171717]' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                 }`}
               >
                 <BookOpen className="w-5 h-5" />
@@ -248,7 +260,7 @@ export function Navbar() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-1.5 sm:p-2 rounded-lg text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A] transition-colors flex-shrink-0"
+                className="md:hidden p-1.5 sm:p-2 rounded-lg text-[#A3A3A3] hover:text-white hover:bg-[#171717] transition-all duration-150 flex-shrink-0"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -274,12 +286,13 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
           />
           <nav
-            className="fixed z-50 bg-[#0A0A0A] border-l border-[#1A1A1A] overflow-y-auto md:hidden"
+            className="fixed z-50 bg-black overflow-y-auto md:hidden animate-slide-in-right"
             style={{
               top: 'var(--navbar-height)',
               height: 'calc(100dvh - var(--navbar-height))',
               right: 'env(safe-area-inset-right, 0px)',
               width: 'min(16rem, 70vw)',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.1)'
             }}
           >
             <div className="p-3 space-y-4">
@@ -287,8 +300,10 @@ export function Navbar() {
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === '/' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  pathname === '/' 
+                    ? 'text-white bg-[#171717]' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -299,7 +314,7 @@ export function Navbar() {
               {allGroups.map((group) => (
                 <div key={group.id} className="space-y-1">
                   <div className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
-                    group.featured ? 'text-purple-400' : 'text-[#666]'
+                    group.featured ? 'text-[#0070F3]' : 'text-[#737373]'
                   }`}>
                     <group.Icon className="w-3.5 h-3.5" />
                     {group.label}
@@ -309,8 +324,10 @@ export function Navbar() {
                     const isActive = pathname === link.href;
                     const isExternal = 'external' in link && link.external;
 
-                    const linkClasses = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                      isActive ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                    const linkClasses = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
+                      isActive 
+                        ? 'text-white bg-[#171717]' 
+                        : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                     }`;
 
                     return isExternal ? (
@@ -344,8 +361,10 @@ export function Navbar() {
               <Link
                 href="/guide"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === '/guide' ? 'text-[#F5F5F5] bg-[#1A1A1A]' : 'text-[#888] hover:text-[#F5F5F5] hover:bg-[#1A1A1A]/50'
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  pathname === '/guide' 
+                    ? 'text-white bg-[#171717]' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
@@ -354,13 +373,16 @@ export function Navbar() {
             </div>
 
             {/* Mobile Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#1A1A1A] bg-[#0A0A0A]">
-              <div className="flex items-center justify-center gap-3 text-xs text-[#666]">
-                <a href="https://talent.app/raveculture.base.eth" target="_blank" rel="noopener noreferrer" className="hover:text-[#888]">
+            <div 
+              className="absolute bottom-0 left-0 right-0 p-3 bg-black"
+              style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}
+            >
+              <div className="flex items-center justify-center gap-3 text-xs text-[#737373]">
+                <a href="https://talent.app/raveculture.base.eth" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">
                   RaveCulture
                 </a>
                 <span>·</span>
-                <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#888]">
+                <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">
                   Base
                 </a>
               </div>
