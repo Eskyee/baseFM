@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createServerClient } from '@/lib/supabase/client';
 
 // POST - Moderation actions (delete message, ban user, timeout)
 export async function POST(request: NextRequest) {
@@ -14,6 +9,8 @@ export async function POST(request: NextRequest) {
     if (!action || !streamId || !moderatorWallet) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
+
+    const supabase = createServerClient();
 
     // Verify moderator is the stream owner (DJ)
     const { data: stream } = await supabase
@@ -141,6 +138,8 @@ export async function GET(request: NextRequest) {
     if (!streamId || !wallet) {
       return NextResponse.json({ error: 'Stream ID and wallet required' }, { status: 400 });
     }
+
+    const supabase = createServerClient();
 
     const { data: ban } = await supabase
       .from('chat_bans')

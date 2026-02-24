@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCart } from '@/lib/shopify/cart-context';
 import { formatPrice } from '@/lib/shopify/storefront';
 import type { ShopifyProduct } from '@/lib/shopify/storefront';
@@ -283,7 +284,12 @@ export default function ProductPage({ params }: ProductPageProps) {
               </h2>
               <div
                 className="prose prose-invert prose-sm max-w-none text-[#888]"
-                dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+                dangerouslySetInnerHTML={{ 
+                  __html: DOMPurify.sanitize(product.descriptionHtml, {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+                    ALLOWED_ATTR: ['href', 'target', 'rel']
+                  })
+                }}
               />
             </div>
 

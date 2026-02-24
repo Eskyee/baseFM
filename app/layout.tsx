@@ -5,6 +5,7 @@ import { AppShell } from '@/components/AppShell';
 import { SplashScreen } from '@/components/SplashScreen';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { GlobalPlayer } from '@/components/GlobalPlayer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
@@ -70,14 +71,16 @@ export default function RootLayout({
         <meta property="fc:frame:button:1:target" content="https://basefm.space" />
       </head>
       <body className="bg-[#0A0A0A] min-h-screen font-sans">
-        <OnchainProvider>
-          <PlayerProvider>
-            <SplashScreen>
-              <AppShell>{children}</AppShell>
-              <GlobalPlayer />
-            </SplashScreen>
-          </PlayerProvider>
-        </OnchainProvider>
+        <ErrorBoundary>
+          <OnchainProvider>
+            <PlayerProvider>
+              <SplashScreen>
+                <AppShell>{children}</AppShell>
+                <GlobalPlayer />
+              </SplashScreen>
+            </PlayerProvider>
+          </OnchainProvider>
+        </ErrorBoundary>
         <SpeedInsights />
         <script
           dangerouslySetInnerHTML={{
