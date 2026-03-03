@@ -12,9 +12,14 @@ import Image from 'next/image';
  * Key sections:
  * 1. What is baseFM? (Bird's eye overview)
  * 2. Getting Started (Connect wallet)
- * 3. Listening to Shows (Finding and playing streams)
- * 4. For DJs (Starting to stream)
- * 5. Community Features (Tipping, events, etc.)
+ * 3. Staying Safe (Crypto safety tips)
+ * 4. Listening to Shows (Finding and playing streams)
+ * 5. Supporting DJs (Tipping)
+ * 6. Events & Tickets
+ * 7. For DJs (Starting to stream)
+ * 8. Quick Links
+ * 9. Advanced Features (RAVE, streaming software, AI)
+ * 10. All Features Summary
  */
 
 export default function GuidePage() {
@@ -152,7 +157,129 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 3: Listening to Shows */}
+        {/* SECTION 3: Staying Safe */}
+        {/* ============================================================= */}
+        <section className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+              <span className="text-2xl">🛡️</span>
+            </div>
+            <h2 className="text-xl font-bold text-[#F5F5F5]">Staying Safe</h2>
+          </div>
+
+          <div className="bg-gradient-to-br from-yellow-900/20 to-orange-900/20 border border-yellow-500/30 rounded-2xl p-6 space-y-6">
+            <p className="text-[#CCC] leading-relaxed">
+              <strong className="text-yellow-400">Crypto is powerful but requires care.</strong> Here&apos;s what you need to know to stay safe on baseFM and beyond.
+            </p>
+
+            {/* Key Safety Rules */}
+            <div className="space-y-4">
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <h4 className="text-[#F5F5F5] font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-red-400">1.</span>
+                  Never Share Your Recovery Phrase
+                </h4>
+                <p className="text-[#888] text-sm">
+                  Your 12-24 word recovery phrase (seed phrase) is the key to your wallet. <strong className="text-red-400">Never share it with anyone</strong> - not baseFM, not support, not friends. Anyone who asks is a scammer.
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <h4 className="text-[#F5F5F5] font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-orange-400">2.</span>
+                  Check Before You Sign
+                </h4>
+                <p className="text-[#888] text-sm">
+                  Your wallet will ask you to confirm transactions. <strong className="text-orange-400">Always check the amount and destination</strong> before approving. If something looks wrong, reject it.
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <h4 className="text-[#F5F5F5] font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-yellow-400">3.</span>
+                  Start Small
+                </h4>
+                <p className="text-[#888] text-sm">
+                  New to crypto? Start with small amounts you can afford to lose. Learn how transactions work before sending larger sums.
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <h4 className="text-[#F5F5F5] font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-green-400">4.</span>
+                  Transactions Are Final
+                </h4>
+                <p className="text-[#888] text-sm">
+                  Unlike bank transfers, blockchain transactions <strong className="text-green-400">cannot be reversed</strong>. Double-check wallet addresses before sending. If you send to the wrong address, the funds are gone.
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <h4 className="text-[#F5F5F5] font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-blue-400">5.</span>
+                  Gas Fees
+                </h4>
+                <p className="text-[#888] text-sm">
+                  Every transaction on Base costs a small fee (gas). Base fees are very low (usually less than $0.01), but you need a tiny amount of ETH in your wallet to pay them.
+                </p>
+              </div>
+            </div>
+
+            {/* How baseFM Keeps You Safe */}
+            <div className="border-t border-yellow-500/20 pt-6">
+              <h4 className="text-[#F5F5F5] font-semibold mb-4">How baseFM Keeps You Safe</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-start gap-3 bg-[#0A0A0A] rounded-xl p-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <div>
+                    <p className="text-[#F5F5F5] text-sm font-medium">Direct Payments</p>
+                    <p className="text-[#666] text-xs">Tips and tickets go straight to DJs/promoters - we never hold your funds</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-[#0A0A0A] rounded-xl p-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <div>
+                    <p className="text-[#F5F5F5] text-sm font-medium">Base Network</p>
+                    <p className="text-[#666] text-xs">Built on Coinbase&apos;s secure Base chain with low fees</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-[#0A0A0A] rounded-xl p-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <div>
+                    <p className="text-[#F5F5F5] text-sm font-medium">Wallet Confirmation</p>
+                    <p className="text-[#666] text-xs">Every transaction requires your explicit approval</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-[#0A0A0A] rounded-xl p-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <div>
+                    <p className="text-[#F5F5F5] text-sm font-medium">No Hidden Fees</p>
+                    <p className="text-[#666] text-xs">What you see is what you pay - no platform cuts on tips or tickets</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Warning Box */}
+            <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4">
+              <h4 className="text-red-400 font-semibold mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                Watch Out For Scams
+              </h4>
+              <ul className="text-[#888] text-sm space-y-1">
+                <li>• baseFM will <strong className="text-red-400">NEVER</strong> ask for your recovery phrase</li>
+                <li>• baseFM will <strong className="text-red-400">NEVER</strong> DM you first asking for money</li>
+                <li>• If someone promises &quot;free crypto&quot; or &quot;guaranteed returns&quot; - it&apos;s a scam</li>
+                <li>• Only use official links: <strong className="text-[#F5F5F5]">basefm.space</strong></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================= */}
+        {/* SECTION 4: Listening to Shows */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -222,7 +349,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 4: Supporting DJs */}
+        {/* SECTION 5: Supporting DJs */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -270,7 +397,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 5: Events & Tickets */}
+        {/* SECTION 6: Events & Tickets */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -308,7 +435,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 6: For DJs */}
+        {/* SECTION 7: For DJs */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -366,7 +493,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 7: Quick Links */}
+        {/* SECTION 8: Quick Links */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -421,7 +548,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 8: Advanced Features */}
+        {/* SECTION 9: Advanced Features */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -778,7 +905,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 9: Need Help? */}
+        {/* SECTION 10: Need Help? */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-6 border border-purple-500/20 text-center">
@@ -809,7 +936,7 @@ export default function GuidePage() {
         </section>
 
         {/* ============================================================= */}
-        {/* SECTION 10: Feature Summary */}
+        {/* SECTION 11: Feature Summary */}
         {/* ============================================================= */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
