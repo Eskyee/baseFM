@@ -12,7 +12,7 @@ const AICLOUD_URL = '/aicloud';
 const AICLOUD_FEED_URL = '/aicloud/feed';
 const AICLOUD_DASHBOARD_URL = '/aicloud/dashboard';
 
-type Tab = 'tokens' | 'agents' | 'bankr';
+type Tab = 'tokens' | 'agents' | 'bankr' | 'trading';
 
 function ToolsContent() {
   const searchParams = useSearchParams();
@@ -21,7 +21,7 @@ function ToolsContent() {
   const [activeTab, setActiveTab] = useState<Tab>(tabParam || 'tokens');
 
   useEffect(() => {
-    if (tabParam && ['tokens', 'agents', 'bankr'].includes(tabParam)) {
+    if (tabParam && ['tokens', 'agents', 'bankr', 'trading'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
@@ -75,6 +75,16 @@ function ToolsContent() {
             }`}
           >
             Bankr
+          </button>
+          <button
+            onClick={() => handleTabChange('trading')}
+            className={`px-4 py-2 rounded-lg text-sm font-mono font-medium transition-all whitespace-nowrap ${
+              activeTab === 'trading'
+                ? 'bg-[#0052FF] text-white'
+                : 'bg-[#1A1A1A] text-[#888] hover:text-white border border-[#2A2A2A]'
+            }`}
+          >
+            Trading
           </button>
         </div>
 
@@ -215,6 +225,9 @@ const token = await Clanker.deploy({
 
         {/* Bankr Tab */}
         {activeTab === 'bankr' && <BankrSection />}
+
+        {/* Trading Tab */}
+        {activeTab === 'trading' && <TradingSection />}
       </div>
     </div>
   );
@@ -695,6 +708,142 @@ function BankrSection() {
   );
 }
 
+function TradingSection() {
+  return (
+    <div className="space-y-6">
+      {/* Trading Header */}
+      <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A]">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-[#F5F5F5] font-mono flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white text-sm font-bold">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                </svg>
+              </span>
+              Trading Dashboard
+            </h2>
+            <p className="text-[#888] text-sm font-mono mt-1">
+              AI-powered autonomous trading
+            </p>
+          </div>
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">
+            LIVE
+          </span>
+        </div>
+
+        <p className="text-[#666] text-sm font-mono mb-4">
+          Monitor AI trading agents in real-time. View live trades, portfolio balances, and market analysis from the trading feed.
+        </p>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Live Trade Feed
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Portfolio Tracking
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Real-time Balances
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Trade History
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="/aicloud/trading"
+            className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-mono font-semibold hover:opacity-90 transition-opacity active:scale-[0.97]"
+          >
+            Open Trading Dashboard
+          </a>
+          <a
+            href="/aicloud/dashboard"
+            className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
+          >
+            My Agents
+          </a>
+        </div>
+      </div>
+
+      {/* Stats Preview */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Live Trades
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            Watch trades execute in real-time
+          </p>
+        </div>
+
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Portfolio Value
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            Track total portfolio in USD
+          </p>
+        </div>
+
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Analytics
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            View trade history and analysis
+          </p>
+        </div>
+      </div>
+
+      {/* Integration Note */}
+      <div className="border border-green-500/30 rounded-xl p-5 bg-gradient-to-r from-green-500/5 to-emerald-500/5">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <h3 className="text-white font-mono font-semibold text-sm">Supabase Realtime</h3>
+        </div>
+        <p className="text-[#888] text-xs font-mono">
+          All trading data is synced in real-time via Supabase. Trades, balances, and logs update instantly across all connected clients.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ToolsPageSkeleton() {
   return (
     <div className="min-h-screen pb-20">
@@ -706,6 +855,7 @@ function ToolsPageSkeleton() {
         <div className="flex gap-2 mb-8">
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-28" />
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-24" />
+          <div className="h-10 bg-[#1A1A1A] rounded-lg w-20" />
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-20" />
         </div>
         <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A] animate-pulse">
