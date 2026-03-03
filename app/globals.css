@@ -912,3 +912,65 @@ input[type="number"] {
   stroke-dasharray: 100;
   animation: checkmark 0.4s ease-out forwards;
 }
+
+/* ========== Trading Agent Dashboard ========== */
+
+/* Blink animation for cursor */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Balance flash animation when updated */
+@keyframes balance-flash {
+  0% {
+    color: #22c55e;
+  }
+  100% {
+    color: #fafafa;
+  }
+}
+
+.animate-balance-flash {
+  animation: balance-flash 1.5s ease-out forwards;
+}
+
+/* Trading log icons pulse */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Trading scrollbar styling */
+.trading-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.trading-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.trading-scrollbar::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+.trading-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
