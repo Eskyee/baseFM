@@ -31,7 +31,8 @@ import {
   Sparkles,
   Music,
   Store,
-  Zap
+  Zap,
+  TrendingUp
 } from 'lucide-react';
 
 export function Navbar() {
@@ -87,6 +88,7 @@ export function Navbar() {
       links: [
         { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
         { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
+        { href: '/aicloud/trading', label: 'Trading', Icon: TrendingUp },
         { href: '/tools', label: 'Tools', Icon: Wrench },
       ]
     },
