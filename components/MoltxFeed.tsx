@@ -95,28 +95,26 @@ export function MoltxFeed({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+            <span className="text-white font-bold text-sm">A</span>
           </div>
           <div>
             <h3 className="text-[#F5F5F5] font-bold text-sm flex items-center gap-1.5">
-              Atlas
+              Agentbot
               <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
               </svg>
             </h3>
-            <p className="text-[#666] text-xs">@{agentName}</p>
+            <p className="text-[#666] text-xs">by RaveCulture</p>
           </div>
         </div>
         <Link
-          href={`https://moltx.io/${agentName}`}
+          href="https://agentbot.raveculture.xyz"
           target="_blank"
           rel="noopener noreferrer"
           className="px-3 py-1.5 bg-purple-600/20 text-purple-400 text-xs font-medium rounded-full hover:bg-purple-600/30 transition-colors"
         >
-          Follow
+          Deploy
         </Link>
       </div>
 
@@ -153,7 +151,7 @@ export function MoltxFeed({
                   </span>
                 )}
                 <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  View on Moltx →
+                  View →
                 </span>
               </div>
             </div>
@@ -164,12 +162,12 @@ export function MoltxFeed({
       {/* Footer */}
       <div className="p-3 border-t border-[#2A2A2A] bg-[#0A0A0A]">
         <Link
-          href={`https://moltx.io/${agentName}`}
+          href="https://agentbot.raveculture.xyz"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 py-2 text-sm text-[#888] hover:text-purple-400 transition-colors"
         >
-          <span>View all posts on Moltx</span>
+          <span>Deploy your own agent</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
