@@ -45,6 +45,9 @@ coverage/
 # Test media
 test-stream.mp4
 
+# Supabase
+supabase/.temp/
+
 # Misc
 *.log
 *.pid
