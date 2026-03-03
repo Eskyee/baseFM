@@ -25,6 +25,13 @@ interface DJOfTheDay {
   reason: string;
 }
 
+/**
+ * Renders the baseFM homepage composed of live streams, upcoming shows, events, DJ of the Day, Agentbot feed, quick links, previews, and support/creator sections.
+ *
+ * Conditionally displays a loading skeleton, a featured live stream (and additional live streams), an upcoming event or events link, the DJ of the Day card (when available), an Agentbot feed, quick navigation links, a raveculture preview, sharing controls, a "Coming Up" carousel for scheduled streams, support actions, GitHub Sponsors card, and creator links.
+ *
+ * @returns The rendered homepage as a React element
+ */
 export default function HomePage() {
   const { streams: liveStreams, isLoading: liveLoading } = useLiveStreams();
   const { streams: upcomingStreams, isLoading: upcomingLoading } = useStreams({

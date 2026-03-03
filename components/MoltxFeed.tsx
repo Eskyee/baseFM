@@ -19,6 +19,18 @@ interface MoltxFeedProps {
   className?: string;
 }
 
+/**
+ * Render a compact Agentbot feed that loads and displays recent Moltx posts for a given agent.
+ *
+ * Fetches the agent's posts, shows a loading skeleton while awaiting data, and renders a bordered,
+ * scroll-free list of post excerpts with timestamps and interaction counts. If an error occurs or no
+ * posts are available, the component renders nothing.
+ *
+ * @param agentName - Agent profile name to load posts for (defaults to 'Atlas_baseFM')
+ * @param limit - Maximum number of posts to display (defaults to 3)
+ * @param className - Additional CSS classes applied to the outer container
+ * @returns A React element containing the feed UI, or `null` when no posts are available or an error occurred
+ */
 export function MoltxFeed({
   agentName = 'Atlas_baseFM',
   limit = 3,
