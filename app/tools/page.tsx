@@ -217,17 +217,31 @@ const token = await Clanker.deploy({
 }
 
 function AgentsSection() {
-  const [selectedPayment, setSelectedPayment] = useState<'usdc' | 'rave' | 'stripe'>('usdc');
   const [isDeploying, setIsDeploying] = useState(false);
   const [deploymentStep, setDeploymentStep] = useState(0);
 
-  const agents = [
+  const plans = [
     {
-      name: 'Promoter',
-      type: 'Marketing',
-      description: 'Automated social promotion for your shows and releases',
+      name: 'Starter',
+      tag: 'Individuals',
+      description: '1 AI Agent, 2GB RAM, Telegram access, use your own AI key',
+      color: 'blue',
+      price: 19,
+      features: ['1 AI Agent', '2GB RAM', '10GB Storage', 'Telegram'],
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Pro',
+      tag: 'Power Users',
+      description: '1 AI Agent, 4GB RAM, Telegram + WhatsApp, custom domain',
       color: 'purple',
-      price: { usdc: 25, rave: 50000, stripe: 29 },
+      price: 39,
+      features: ['1 AI Agent', '4GB RAM', '50GB Storage', 'Custom Domain'],
+      popular: true,
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -235,11 +249,12 @@ function AgentsSection() {
       ),
     },
     {
-      name: 'Community',
-      type: 'Engagement',
-      description: 'Manage Discord, Telegram, and Farcaster communities 24/7',
-      color: 'blue',
-      price: { usdc: 49, rave: 100000, stripe: 59 },
+      name: 'Scale',
+      tag: 'Teams',
+      description: '3 AI Agents, 8GB RAM, all channels, advanced analytics',
+      color: 'green',
+      price: 79,
+      features: ['3 AI Agents', '8GB RAM', '100GB Storage', 'Analytics'],
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
@@ -247,23 +262,12 @@ function AgentsSection() {
       ),
     },
     {
-      name: 'Trader',
-      type: 'DeFi',
-      description: 'Automated trading strategies and portfolio alerts',
-      color: 'green',
-      price: { usdc: 99, rave: 200000, stripe: 119 },
-      icon: (
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Sentinel',
-      type: 'Security',
-      description: 'Real-time wallet monitoring and threat alerts',
+      name: 'Enterprise',
+      tag: 'Full Service',
+      description: 'Unlimited agents, 16GB RAM, white-label, 24/7 support',
       color: 'orange',
-      price: { usdc: 39, rave: 80000, stripe: 49 },
+      price: 149,
+      features: ['Unlimited Agents', '16GB RAM', '500GB Storage', '24/7 Support'],
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
@@ -279,7 +283,7 @@ function AgentsSection() {
     orange: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
   };
 
-  const handleDeploy = (agentName: string) => {
+  const handleDeploy = (planName: string) => {
     setIsDeploying(true);
     setDeploymentStep(1);
 
@@ -290,7 +294,7 @@ function AgentsSection() {
         setDeploymentStep(step);
         if (step === 4) {
           setTimeout(() => {
-            window.open(`${AGENTBOT_URL}/dashboard?agent=${agentName.toLowerCase()}&payment=${selectedPayment}`, '_blank');
+            window.open(`${AGENTBOT_URL}?plan=${planName.toLowerCase()}`, '_blank');
             setIsDeploying(false);
             setDeploymentStep(0);
           }, 500);
@@ -355,41 +359,12 @@ function AgentsSection() {
           </span>
         </div>
 
-        {/* Payment Method Selection */}
-        <div className="mb-4">
-          <p className="text-[#888] text-xs font-mono mb-2">Payment Method:</p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedPayment('usdc')}
-              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
-                selectedPayment === 'usdc'
-                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
-                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
-              }`}
-            >
-              USDC (Base)
-            </button>
-            <button
-              onClick={() => setSelectedPayment('rave')}
-              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
-                selectedPayment === 'rave'
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
-                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
-              }`}
-            >
-              RAVE Token
-            </button>
-            <button
-              onClick={() => setSelectedPayment('stripe')}
-              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
-                selectedPayment === 'stripe'
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
-              }`}
-            >
-              Card (Stripe)
-            </button>
-          </div>
+        {/* Pricing Note */}
+        <div className="mb-4 p-3 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+          <p className="text-[#888] text-xs font-mono">
+            Plans from <span className="text-green-400 font-semibold">£19/month</span>.
+            Contact <span className="text-purple-400">rbasefm@icloud.com</span> for custom pricing.
+          </p>
         </div>
 
         {/* Actions */}
@@ -448,51 +423,63 @@ function AgentsSection() {
         </div>
       )}
 
-      {/* Agent Cards */}
+      {/* Pricing Plans */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {agents.map((agent) => (
+        {plans.map((plan) => (
           <div
-            key={agent.name}
-            className="border border-[#2A2A2A] rounded-xl p-5 bg-[#0A0A0A] hover:border-[#3A3A3A] transition-colors group"
+            key={plan.name}
+            className={`border rounded-xl p-5 bg-[#0A0A0A] hover:border-[#3A3A3A] transition-colors group relative ${
+              plan.popular ? 'border-purple-500/50' : 'border-[#2A2A2A]'
+            }`}
           >
+            {plan.popular && (
+              <span className="absolute -top-2.5 left-4 px-2 py-0.5 bg-purple-500 text-white text-[10px] font-mono font-semibold rounded">
+                POPULAR
+              </span>
+            )}
             <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-lg ${colorClasses[agent.color].bg} flex items-center justify-center ${colorClasses[agent.color].text}`}>
-                {agent.icon}
+              <div className={`w-12 h-12 rounded-lg ${colorClasses[plan.color].bg} flex items-center justify-center ${colorClasses[plan.color].text}`}>
+                {plan.icon}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-[#F5F5F5] font-mono font-semibold">
-                    {agent.name}
+                    {plan.name}
                   </h3>
-                  <span className={`px-1.5 py-0.5 ${colorClasses[agent.color].bg} ${colorClasses[agent.color].text} text-[10px] font-mono rounded`}>
-                    {agent.type}
+                  <span className={`px-1.5 py-0.5 ${colorClasses[plan.color].bg} ${colorClasses[plan.color].text} text-[10px] font-mono rounded`}>
+                    {plan.tag}
                   </span>
                 </div>
                 <p className="text-[#666] text-xs font-mono line-clamp-2">
-                  {agent.description}
+                  {plan.description}
                 </p>
               </div>
             </div>
 
-            {/* Pricing */}
+            {/* Features */}
             <div className="mt-3 pt-3 border-t border-[#2A2A2A]">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-[#666]">Monthly:</span>
-                <span className={`font-semibold ${
-                  selectedPayment === 'usdc' ? 'text-blue-400' :
-                  selectedPayment === 'rave' ? 'text-purple-400' :
-                  'text-green-400'
-                }`}>
-                  {selectedPayment === 'usdc' && `$${agent.price.usdc} USDC`}
-                  {selectedPayment === 'rave' && `${agent.price.rave.toLocaleString()} RAVE`}
-                  {selectedPayment === 'stripe' && `$${agent.price.stripe}`}
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {plan.features.map((feature) => (
+                  <span key={feature} className="px-2 py-0.5 bg-[#1A1A1A] text-[#888] text-[10px] font-mono rounded">
+                    {feature}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#666] text-xs font-mono">Monthly:</span>
+                <span className="text-green-400 font-mono font-bold">
+                  £{plan.price}
                 </span>
               </div>
             </div>
 
             <button
-              onClick={() => handleDeploy(agent.name)}
-              className="w-full mt-4 px-4 py-2.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white rounded-lg text-sm font-mono font-medium hover:from-purple-500/30 hover:to-blue-500/30 border border-purple-500/30 transition-all group-hover:border-purple-500/50 active:scale-[0.98]"
+              onClick={() => handleDeploy(plan.name)}
+              className={`w-full mt-4 px-4 py-2.5 rounded-lg text-sm font-mono font-medium transition-all active:scale-[0.98] ${
+                plan.popular
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:opacity-90'
+                  : 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white hover:from-purple-500/30 hover:to-blue-500/30 border border-purple-500/30 group-hover:border-purple-500/50'
+              }`}
             >
               Deploy in 60s
             </button>
