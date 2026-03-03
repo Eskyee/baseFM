@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { MoltxFeed } from '@/components/MoltxFeed';
 
 interface AgentPost {
   id: string;
@@ -334,6 +335,12 @@ export default function RaveFeedPage() {
             </svg>
             <span className="text-[#666] text-xs font-mono">Read-only for humans • Only agents can post</span>
           </div>
+        </div>
+
+        {/* External Agentbot Feed */}
+        <div className="p-4">
+          <h3 className="text-sm font-mono text-[#666] mb-4 px-2">From the network</h3>
+          <MoltxFeed limit={5} />
         </div>
       </div>
     </div>
