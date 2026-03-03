@@ -2,10 +2,11 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 const CLANKER_DOCS_URL = 'https://docs.clanker.world';
 const DEPLOY_URL = 'https://www.clanker.world/clanker';
+const AGENTBOT_URL = 'https://agentbot.raveculture.xyz';
+const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/deploy';
 
 type Tab = 'tokens' | 'agents' | 'bankr';
 
@@ -216,34 +217,29 @@ const token = await Clanker.deploy({
 }
 
 function AgentsSection() {
+  const [selectedPayment, setSelectedPayment] = useState<'usdc' | 'rave' | 'stripe'>('usdc');
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deploymentStep, setDeploymentStep] = useState(0);
+
   const agents = [
     {
-      name: 'Atlas',
-      type: 'Research',
-      description: 'Deep research and analysis agent for market intelligence',
+      name: 'Promoter',
+      type: 'Marketing',
+      description: 'Automated social promotion for your shows and releases',
       color: 'purple',
+      price: { usdc: 25, rave: 50000, stripe: 29 },
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
         </svg>
       ),
     },
     {
-      name: 'Trader',
-      type: 'Trading',
-      description: 'Automated trading strategies and portfolio management',
-      color: 'green',
-      icon: (
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Nova',
-      type: 'Community',
-      description: 'Community engagement and social automation',
+      name: 'Community',
+      type: 'Engagement',
+      description: 'Manage Discord, Telegram, and Farcaster communities 24/7',
       color: 'blue',
+      price: { usdc: 49, rave: 100000, stripe: 59 },
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
@@ -251,10 +247,23 @@ function AgentsSection() {
       ),
     },
     {
+      name: 'Trader',
+      type: 'DeFi',
+      description: 'Automated trading strategies and portfolio alerts',
+      color: 'green',
+      price: { usdc: 99, rave: 200000, stripe: 119 },
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z" />
+        </svg>
+      ),
+    },
+    {
       name: 'Sentinel',
-      type: 'Monitoring',
-      description: 'Real-time alerts and security monitoring',
+      type: 'Security',
+      description: 'Real-time wallet monitoring and threat alerts',
       color: 'orange',
+      price: { usdc: 39, rave: 80000, stripe: 49 },
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
@@ -270,30 +279,71 @@ function AgentsSection() {
     orange: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
   };
 
+  const handleDeploy = (agentName: string) => {
+    setIsDeploying(true);
+    setDeploymentStep(1);
+
+    // Simulate deployment steps
+    const steps = [1, 2, 3, 4];
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        setDeploymentStep(step);
+        if (step === 4) {
+          setTimeout(() => {
+            window.open(`${AGENTBOT_URL}/dashboard?agent=${agentName.toLowerCase()}&payment=${selectedPayment}`, '_blank');
+            setIsDeploying(false);
+            setDeploymentStep(0);
+          }, 500);
+        }
+      }, index * 15000 / steps.length); // Total 60 seconds simulation compressed
+    });
+  };
+
   return (
     <div className="space-y-6">
-      {/* StartClaw Header */}
+      {/* Agentbot Header */}
       <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A]">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-[#F5F5F5] font-mono">
-              StartClaw
+            <h2 className="text-xl font-bold text-[#F5F5F5] font-mono flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold">
+                A
+              </span>
+              Agentbot
             </h2>
             <p className="text-[#888] text-sm font-mono mt-1">
-              AI Agent deployment platform
+              by RaveCulture
             </p>
           </div>
-          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-mono rounded">
-            BETA
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">
+            LIVE
           </span>
         </div>
 
+        {/* 60 Second Deploy Banner */}
+        <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-mono font-bold">
+              60s
+            </div>
+            <div>
+              <h3 className="text-white font-mono font-semibold">Deploy in 60 Seconds</h3>
+              <p className="text-[#888] text-xs font-mono">
+                From zero to live agent. Pay with crypto or card.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <p className="text-[#666] text-sm font-mono mb-4">
-          Deploy autonomous AI agents for trading, research, community management, and monitoring.
-          Connect to Telegram, Discord, and Farcaster.
+          Deploy autonomous AI agents for promotion, community management, trading, and monitoring.
+          Built for the underground music scene.
         </p>
 
         <div className="flex flex-wrap gap-2 mb-6">
+          <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
+            Farcaster
+          </span>
           <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
             Telegram
           </span>
@@ -301,10 +351,102 @@ function AgentsSection() {
             Discord
           </span>
           <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
-            Farcaster
+            X / Twitter
           </span>
         </div>
+
+        {/* Payment Method Selection */}
+        <div className="mb-4">
+          <p className="text-[#888] text-xs font-mono mb-2">Payment Method:</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedPayment('usdc')}
+              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
+                selectedPayment === 'usdc'
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
+              }`}
+            >
+              USDC (Base)
+            </button>
+            <button
+              onClick={() => setSelectedPayment('rave')}
+              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
+                selectedPayment === 'rave'
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
+              }`}
+            >
+              RAVE Token
+            </button>
+            <button
+              onClick={() => setSelectedPayment('stripe')}
+              className={`px-3 py-2 rounded-lg text-sm font-mono transition-all ${
+                selectedPayment === 'stripe'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                  : 'bg-[#1A1A1A] text-[#888] border border-[#2A2A2A] hover:text-white'
+              }`}
+            >
+              Card (Stripe)
+            </button>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <a
+            href={AGENTBOT_DEPLOY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg text-sm font-mono font-semibold hover:opacity-90 transition-opacity active:scale-[0.97]"
+          >
+            Launch Agentbot
+          </a>
+          <a
+            href={AGENTBOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
+          >
+            View Docs
+          </a>
+        </div>
       </div>
+
+      {/* Deployment Progress Modal */}
+      {isDeploying && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <div className="bg-[#0A0A0A] border border-[#2A2A2A] rounded-2xl p-6 max-w-md w-full">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white font-mono mb-2">Deploying Agent...</h3>
+              <p className="text-[#888] text-sm font-mono">This takes about 60 seconds</p>
+            </div>
+
+            <div className="space-y-3">
+              {['Initializing agent...', 'Configuring AI model...', 'Setting up integrations...', 'Finalizing deployment...'].map((step, i) => (
+                <div key={i} className={`flex items-center gap-3 ${deploymentStep > i ? 'text-green-400' : deploymentStep === i + 1 ? 'text-white' : 'text-[#555]'}`}>
+                  {deploymentStep > i ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                    </svg>
+                  ) : deploymentStep === i + 1 ? (
+                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border border-current" />
+                  )}
+                  <span className="text-sm font-mono">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Agent Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -332,17 +474,44 @@ function AgentsSection() {
               </div>
             </div>
 
-            <button className="w-full mt-4 px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors group-hover:border-[#3A3A3A] active:scale-[0.98]">
-              Configure Agent
+            {/* Pricing */}
+            <div className="mt-3 pt-3 border-t border-[#2A2A2A]">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-[#666]">Monthly:</span>
+                <span className={`font-semibold ${
+                  selectedPayment === 'usdc' ? 'text-blue-400' :
+                  selectedPayment === 'rave' ? 'text-purple-400' :
+                  'text-green-400'
+                }`}>
+                  {selectedPayment === 'usdc' && `$${agent.price.usdc} USDC`}
+                  {selectedPayment === 'rave' && `${agent.price.rave.toLocaleString()} RAVE`}
+                  {selectedPayment === 'stripe' && `$${agent.price.stripe}`}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleDeploy(agent.name)}
+              className="w-full mt-4 px-4 py-2.5 bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white rounded-lg text-sm font-mono font-medium hover:from-purple-500/30 hover:to-blue-500/30 border border-purple-500/30 transition-all group-hover:border-purple-500/50 active:scale-[0.98]"
+            >
+              Deploy in 60s
             </button>
           </div>
         ))}
       </div>
 
-      {/* Pricing Note */}
+      {/* Agentbot Link */}
       <div className="text-center py-4">
-        <p className="text-[#666] text-xs font-mono">
-          Agents start at $49/month. Coming soon to baseFM.
+        <a
+          href={AGENTBOT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-400 text-sm font-mono hover:text-purple-300 transition-colors"
+        >
+          agentbot.raveculture.xyz
+        </a>
+        <p className="text-[#555] text-xs font-mono mt-1">
+          Powered by RaveCulture
         </p>
       </div>
     </div>
