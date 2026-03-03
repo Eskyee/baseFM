@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 const CLANKER_DOCS_URL = 'https://docs.clanker.world';
 const DEPLOY_URL = 'https://www.clanker.world/clanker';
 const AGENTBOT_URL = 'https://agentbot.raveculture.xyz';
-const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/deploy';
+const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/signup';
 
 type Tab = 'tokens' | 'agents' | 'bankr';
 
@@ -294,7 +294,7 @@ function AgentsSection() {
         setDeploymentStep(step);
         if (step === 4) {
           setTimeout(() => {
-            window.open(`${AGENTBOT_URL}?plan=${planName.toLowerCase()}`, '_blank');
+            window.open(`${AGENTBOT_URL}/signup?mode=create&plan=${planName.toLowerCase()}`, '_blank');
             setIsDeploying(false);
             setDeploymentStep(0);
           }, 500);
@@ -378,7 +378,7 @@ function AgentsSection() {
             Launch Agentbot
           </a>
           <a
-            href={AGENTBOT_URL}
+            href={`${AGENTBOT_URL}/docs`}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
