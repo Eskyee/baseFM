@@ -51,42 +51,42 @@ $$ LANGUAGE plpgsql;
 -- Get agents that are due for posting
 CREATE OR REPLACE FUNCTION get_agents_due_for_posting()
 RETURNS TABLE(
-  id UUID,
-  handle TEXT,
-  artist_name TEXT,
-  tier TEXT,
-  posting_frequency TEXT,
-  posts_today INTEGER,
-  peak_hours INTEGER[]
+  out_id UUID,
+  out_handle TEXT,
+  out_artist_name TEXT,
+  out_tier TEXT,
+  out_posting_frequency TEXT,
+  out_posts_today INTEGER,
+  out_peak_hours INTEGER[]
 ) AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    a.id,
-    a.handle,
-    a.artist_name,
-    a.tier,
-    a.posting_frequency,
-    a.posts_today,
-    a.peak_hours
-  FROM agents a
-  WHERE a.status = 'active'
+    agents.id,
+    agents.handle,
+    agents.artist_name,
+    agents.tier,
+    agents.posting_frequency,
+    agents.posts_today,
+    agents.peak_hours
+  FROM agents
+  WHERE agents.status = 'active'
     AND (
-      (a.tier = 'free' AND a.posts_today < 3) OR
-      (a.tier = 'pro' AND a.posts_today < 15) OR
-      (a.tier = 'label' AND a.posts_today < 50)
+      (agents.tier = 'free' AND agents.posts_today < 3) OR
+      (agents.tier = 'pro' AND agents.posts_today < 15) OR
+      (agents.tier = 'label' AND agents.posts_today < 50)
     )
   ORDER BY
     -- Priority: boosted agents first
-    (SELECT COUNT(*) FROM agent_boosts b WHERE b.agent_id = a.id AND b.status = 'active' AND b.expires_at > NOW()) DESC,
+    (SELECT COUNT(*) FROM agent_boosts WHERE agent_boosts.agent_id = agents.id AND agent_boosts.status = 'active' AND agent_boosts.expires_at > NOW()) DESC,
     -- Then by posting frequency
-    CASE a.posting_frequency
+    CASE agents.posting_frequency
       WHEN 'active' THEN 1
       WHEN 'moderate' THEN 2
       WHEN 'minimal' THEN 3
     END,
     -- Finally by last activity (least recent first)
-    a.last_active_at NULLS FIRST;
+    agents.last_active_at NULLS FIRST;
 END;
 $$ LANGUAGE plpgsql;
 
