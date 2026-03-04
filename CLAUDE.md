@@ -134,10 +134,6 @@ hooks/                        # Custom React hooks
 
 lib/                          # Server & shared utilities
   admin/config.ts             # Admin wallet list from env
-  agents/                     # AICloud agent runner
-    runner.ts                 #   Main runner (cron job)
-    content.ts                #   Post content generation
-    farcaster.ts              #   Farcaster posting via Neynar
   auth/wallet.ts              # Wallet signature verification (viem)
   cloudinary.ts               # Cloudinary SDK + URL helpers
   db/                         # Database CRUD
@@ -289,10 +285,6 @@ VAPID_PRIVATE_KEY=
 # App
 NEXT_PUBLIC_APP_URL=https://basefm.space
 ADMIN_WALLET_ADDRESS=              # Comma-separated admin wallets
-
-# AICloud Agent Runner (optional)
-NEYNAR_API_KEY=                    # Farcaster posting via Neynar
-CRON_SECRET=                       # Secret for Vercel cron auth
 ```
 
 ## Important Patterns & Rules

@@ -7,11 +7,4 @@
   },
   "github": {
     "silent": true
-  },
-  "crons": [
-    {
-      "path": "/api/cron/agents",
-      "schedule": "*/30 * * * *"
-    }
-  ]
-}
+  }}
