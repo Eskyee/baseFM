@@ -28,7 +28,12 @@ import {
   Sparkles,
   Music,
   Store,
-  Bot
+  Bot,
+  Zap,
+  Cloud,
+  Rss,
+  TrendingUp,
+  Wrench
 } from 'lucide-react';
 
 export function Navbar() {
@@ -77,12 +82,23 @@ export function Navbar() {
       ]
     },
     {
+      id: 'create',
+      label: 'Create',
+      Icon: Zap,
+      featured: true,
+      links: [
+        { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
+        { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
+        { href: '/aicloud/trading', label: 'Trading', Icon: TrendingUp },
+        { href: '/tools', label: 'Tools', Icon: Wrench },
+      ]
+    },
+    {
       id: 'business',
       label: 'Business',
       Icon: Store,
       featured: false,
       links: [
-        { href: '/aicloud', label: 'AI Cloud', Icon: Bot },
         { href: '/agency', label: 'Agency', Icon: Briefcase },
         { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
       ]
