@@ -203,6 +203,6 @@ export function filterTradablePicks(picks: TokenPick[]): TokenPick[] {
     (pick) =>
       pick.direction === 'up' &&
       ['high', 'medium'].includes(pick.conviction) &&
-      !AGENT_CONFIG.skipTokens.includes(pick.token)
+      !(AGENT_CONFIG.skipTokens as readonly string[]).includes(pick.token)
   );
 }
