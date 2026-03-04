@@ -28,6 +28,7 @@
     "ethers": "^6.0.0",
     "geist": "^1.7.0",
     "hls.js": "^1.5.15",
+    "html5-qrcode": "^2.3.8",
     "isomorphic-dompurify": "^3.0.0",
     "lucide-react": "^0.572.0",
     "next": "^14.2.35",
