@@ -48,7 +48,11 @@ export function useStream(streamId: string) {
           setStream(streamFromRow(payload.new as StreamRow));
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Stream subscription error:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);

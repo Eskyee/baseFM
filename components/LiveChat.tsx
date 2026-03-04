@@ -72,6 +72,7 @@ export function LiveChat({ streamId, djWalletAddress, userName, userAvatar }: Li
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [chatError, setChatError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +84,19 @@ export function LiveChat({ streamId, djWalletAddress, userName, userAvatar }: Li
   // Fetch initial messages
   useEffect(() => {
     async function fetchMessages() {
+      setChatError(null);
       try {
         const res = await fetch(`/api/chat?streamId=${streamId}`);
         if (res.ok) {
           const data = await res.json();
           setMessages(data.messages || []);
           setTimeout(scrollToBottom, 100);
+        } else {
+          setChatError('Failed to load chat');
         }
       } catch (err) {
         console.error('Failed to fetch messages:', err);
+        setChatError('Failed to load chat');
       }
     }
 
@@ -116,7 +121,11 @@ export function LiveChat({ streamId, djWalletAddress, userName, userAvatar }: Li
           setTimeout(scrollToBottom, 100);
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Chat subscription error:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -187,7 +196,17 @@ export function LiveChat({ streamId, djWalletAddress, userName, userAvatar }: Li
             ref={chatContainerRef}
             className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80 min-h-[200px]"
           >
-            {messages.length === 0 ? (
+            {chatError ? (
+              <div className="text-center py-8">
+                <p className="text-red-400 text-sm">{chatError}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="text-blue-400 text-xs mt-2 hover:underline"
+                >
+                  Reload page
+                </button>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-[#888] text-sm">No messages yet</p>
                 <p className="text-[#666] text-xs mt-1">Be the first to say something!</p>

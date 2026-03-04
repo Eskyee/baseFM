@@ -130,7 +130,11 @@ function MessagesContent() {
           setMessages((prev) => [...prev, newMsg]);
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Messages subscription error:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
