@@ -176,8 +176,13 @@ export default function POSPage() {
 
       const config = {
         fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
+        qrbox: { width: 220, height: 220 },
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
       };
 
       // Prefer back camera on mobile
@@ -487,12 +492,42 @@ export default function POSPage() {
                     </button>
                   )}
 
-                  {/* Camera view container */}
+                  {/* Camera view container - must have explicit height for camera feed */}
                   <div
                     id={scannerContainerId}
-                    className={`overflow-hidden rounded-xl ${cameraActive ? 'block' : 'hidden'}`}
-                    style={{ width: '100%' }}
+                    className={`qr-scanner-container overflow-hidden rounded-xl bg-black relative ${cameraActive ? 'block' : 'hidden'}`}
+                    style={{
+                      width: '100%',
+                      minHeight: cameraActive ? '320px' : '0',
+                    }}
                   />
+
+                  {/* CSS to ensure video fills container */}
+                  <style jsx global>{`
+                    .qr-scanner-container video {
+                      width: 100% !important;
+                      height: auto !important;
+                      min-height: 320px;
+                      object-fit: cover;
+                      border-radius: 0.75rem;
+                    }
+                    .qr-scanner-container > div {
+                      border: none !important;
+                    }
+                    #qr-shaded-region {
+                      border-color: rgba(168, 85, 247, 0.5) !important;
+                    }
+                  `}</style>
+
+                  {/* Scanning indicator overlay */}
+                  {cameraActive && (
+                    <div className="text-center py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                        <span className="text-purple-300 text-sm">Point camera at QR code</span>
+                      </div>
+                    </div>
+                  )}
 
                   {cameraActive && (
                     <button
