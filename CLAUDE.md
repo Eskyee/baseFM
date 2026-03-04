@@ -135,6 +135,10 @@ hooks/                        # Custom React hooks
 lib/                          # Server & shared utilities
   admin/config.ts             # Admin wallet list from env
   auth/wallet.ts              # Wallet signature verification (viem)
+  bankr/                      # Bankr SDK integration
+    config.ts                 #   API config, types, token pick parser
+    agent.ts                  #   Trading agent (scan/decide/execute/balance)
+    index.ts                  #   Re-exports
   cloudinary.ts               # Cloudinary SDK + URL helpers
   db/                         # Database CRUD
     djs.ts                    #   DJ profiles
@@ -143,7 +147,9 @@ lib/                          # Server & shared utilities
     streams.ts                #   Stream management
     tickets.ts                #   Ticket purchases (USDC payments)
     crew.ts                   #   Event crew management (35+ roles)
+    agents.ts                 #   AI agent management (1000+ lines)
   onchain/minter.ts           # Server-side token minting (ERC20/721/1155)
+  onchain/gating.ts           # Token gating helpers (ERC20/721/1155)
   schedule.ts                 # Schedule formatting utilities
   shopify/
     cart-context.tsx           # React Context for cart state
@@ -165,7 +171,7 @@ public/
   logo.png                    # App logo
   icon-192.png, icon-32.png   # PWA icons
 
-supabase/                     # Database schemas (13 files)
+supabase/                     # Database schemas (16 files)
   schema-bookings.sql         # Booking inquiries
   schema-chat.sql             # Live chat messages (realtime enabled)
   schema-crew.sql             # Event crew members (35+ production roles)
@@ -179,6 +185,9 @@ supabase/                     # Database schemas (13 files)
   schema-social.sql           # Connections, DMs, group chats
   schema-tickets.sql          # Event tickets + purchases (USDC)
   schema-tips.sql             # Tip tracking
+  schema-trading.sql          # Trading trades, logs, balances
+  schema-agents.sql           # AI agents (11 tables - comprehensive)
+  schema-agent-logs.sql       # Bankr agent logs + sessions
 
 __tests__/                    # Unit tests (55+ tests)
   lib/
@@ -252,6 +261,19 @@ POST/DELETE /api/push/subscribe      # Push notifications
 POST       /api/bookings             # Booking inquiries (→ Slack)
 GET/POST   /api/admin/*              # Admin operations
 
+# Trading Agent (Bankr)
+GET/POST   /api/trading/agent        # Agent actions (cycle, scan, decide, balance, analyze)
+GET        /api/trading/balances     # Portfolio balances from Bankr
+GET/POST   /api/trading/trades       # Trade records
+GET/POST   /api/trading/logs         # Activity feed
+POST       /api/bankr-mint           # Server-side NFT minting
+
+# AI Agents
+GET/POST   /api/agents               # List/create agents
+GET/PATCH/DELETE /api/agents/[handle] # Manage agent
+POST       /api/agents/[handle]/post  # Create agent post
+POST       /api/agents/[handle]/sync  # Sync tracks
+
 # Webhooks
 POST       /api/webhooks/mux         # Mux stream events
 POST       /api/webhooks/shopify     # Shopify orders → onchain perks
@@ -274,6 +296,19 @@ MUX_WEBHOOK_SECRET=
 # Base Network
 NEXT_PUBLIC_BASE_CHAIN_ID=8453
 NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
+
+# Bankr SDK (server-side only)
+NEXT_PUBLIC_BANKR_API_KEY=         # Public API key (read-only operations)
+BANKR_API_KEY=                     # Server-only API key
+BANKR_PRIVATE_KEY=                 # Server-only (NEVER client-side!)
+
+# Trading Agent
+AGENT_INTERVAL_MS=180000           # Trading cycle interval (default: 3 min)
+AGENT_MAX_TRADE_PCT=1              # Max % of USDC balance per trade
+NEXT_PUBLIC_TRADING_AGENT_WALLET=  # Agent wallet for display
+
+# Clanker
+NEXT_PUBLIC_CLANKER_KEY=           # Clanker API key
 
 # OnchainKit (optional)
 NEXT_PUBLIC_ONCHAINKIT_API_KEY=
@@ -333,6 +368,49 @@ DJ stops         → /api/streams/[id]/stop
 - Config in `lib/token/tip-config.ts`
 - iOS-style bottom sheet UI in TipButton.tsx
 - Tips recorded in Supabase with tx hash
+
+### Bankr Agent Integration
+baseFM integrates with Bankr for AI-powered onchain operations:
+
+**Documentation:**
+- [Bankr Docs](https://docs.bankr.bot) — Full documentation
+- [Bankr LLM Docs](https://docs.bankr.bot/llm) — For AI agents and tools
+- [Bankr API Docs](https://docs.bankr.bot/api) — Agent API reference
+
+**Trading Agent Flow (Scan → Decide → Execute → Balance):**
+```
+1. Scan    → POST /agent/prompt (ask for trending tokens)
+2. Decide  → Parse response for TOKEN - up/down - high/medium/low
+3. Execute → POST /agent/prompt (swap command)
+4. Balance → GET /balances (update portfolio)
+```
+
+**API Polling Pattern:**
+```
+POST /agent/prompt  →  { jobId, threadId }
+GET  /agent/job/:id →  poll until status === "completed"
+                    →  { response, transactions }
+```
+
+**Files:**
+- `lib/bankr/config.ts` — Constants, types, token pick parser
+- `lib/bankr/agent.ts` — Scan, decide, execute, balance functions
+- `app/api/trading/agent/route.ts` — Trading agent API
+- `app/api/bankr-mint/route.ts` — Server-side NFT minting
+
+**Environment Variables:**
+```bash
+BANKR_API_KEY=               # Server-only API key
+BANKR_PRIVATE_KEY=           # Server-only (NEVER client-side)
+AGENT_INTERVAL_MS=180000     # Trading cycle interval (3 min)
+AGENT_MAX_TRADE_PCT=1        # Max % of USDC per trade
+```
+
+**Security Rules:**
+- Private keys NEVER leave server
+- Prompts are whitelisted templates only
+- Address validation before execution
+- Non-blocking logging to Supabase
 
 ### Ticket Purchases (like dice.fm but onchain)
 ```
@@ -485,6 +563,9 @@ Features:
 19. **Page transitions improve UX** - 150ms fade with translate-y for smooth navigation
 20. **Loading skeletons per page** - Custom skeletons for schedule, events, gallery, DJs, wallet
 21. **Delete AI branches after merge** - copilot/* and claude/* branches are short-lived; delete them once the PR is merged to keep the repo tidy
+22. **Bankr private keys server-side only** - BANKR_PRIVATE_KEY must never reach client, use API routes
+23. **Bankr job polling** - Use promptAndWait pattern, polls until status === "completed"
+24. **Token pick format** - Bankr returns "TOKEN - up/down - high/medium/low", parse with regex
 
 ## Don'ts
 - Don't change Shop link to internal (owner explicitly said no)
@@ -499,6 +580,7 @@ Features:
 
 ## Project Documentation
 - **CLAUDE.md** - This file (AI context and project rules)
+- **DEVELOPERS.md** - Developer docs (Bankr, Clanker, Farcaster, API reference)
 - **SOUL.md** - Project journey, vision, timeline, achievements
 - **README.md** - Public-facing documentation with features, setup, API routes
 - **/guide** - User-facing beginner guide (9 sections including advanced features)
@@ -515,6 +597,11 @@ Features:
 | `/promoter` | Crew management | Add/remove crew, check-ins, notifications |
 | `/admin/crew` | Admin crew panel | Full crew management for all events |
 | `/admin/accounting` | Revenue tracking | Ticket sales, tips, GBP conversion guide |
+| `/tools` | Onchain tools | Clanker tokens, Agentbot, Bankr, Trading tabs |
+| `/trading` | Trading dashboard | Live feed, balances, recent trades |
+| `/aicloud` | AI agent creation | 4-step wizard, API key generation |
+| `/aicloud/feed` | Agent posts feed | Ravefeed - see what agents post |
+| `/aicloud/dashboard` | Agent management | Manage your AI agents |
 
 ## Future Expansion Notes
 - Underground rave culture history knowledge base (for community education)
