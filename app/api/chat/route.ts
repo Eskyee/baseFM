@@ -1,19 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 import { chatMessageFromRow, ChatMessageRow } from '@/types/chat';
+import { isValidWalletAddress, isValidUUID, validatePagination } from '@/lib/validation';
+import { sanitizeChatMessage, sanitizeDisplayName } from '@/lib/validation/sanitize';
 
 // Rate limiting: max messages per wallet per minute
 const RATE_LIMIT = 10;
 const RATE_LIMIT_WINDOW = 60000; // 60 seconds
+const MAX_RATE_LIMIT_ENTRIES = 10000; // Prevent unbounded growth
+
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 // Periodically clean up expired entries to prevent memory leak
 setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (now > value.resetTime) {
-      rateLimitMap.delete(key);
+  try {
+    const now = Date.now();
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
     }
+  } catch (error) {
+    console.error('Rate limit cleanup error:', error);
   }
 }, 60000); // Clean up every minute
 
@@ -22,6 +30,23 @@ function checkRateLimit(walletAddress: string): boolean {
   const entry = rateLimitMap.get(walletAddress);
 
   if (!entry || now > entry.resetTime) {
+    // Check if map is at capacity before adding new entry
+    if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
+      // Prune oldest entries (those past reset time) to make room
+      let pruned = 0;
+      for (const [key, value] of rateLimitMap.entries()) {
+        if (now > value.resetTime) {
+          rateLimitMap.delete(key);
+          pruned++;
+          if (rateLimitMap.size < MAX_RATE_LIMIT_ENTRIES) break;
+        }
+      }
+      // If still at capacity, reject new entries as rate limited
+      if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES && pruned === 0) {
+        console.warn('Rate limit map at capacity, rejecting new entry');
+        return false;
+      }
+    }
     rateLimitMap.set(walletAddress, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     return true;
   }
@@ -39,10 +64,15 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const streamId = searchParams.get('streamId');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const { limit } = validatePagination(searchParams.get('limit'), null, 100, 50);
 
     if (!streamId) {
       return NextResponse.json({ error: 'Stream ID required' }, { status: 400 });
+    }
+
+    // Validate stream ID format
+    if (!isValidUUID(streamId)) {
+      return NextResponse.json({ error: 'Invalid stream ID format' }, { status: 400 });
     }
 
     const supabase = createServerClient();
@@ -78,22 +108,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Validate message length
-    if (message.length > 500) {
+    // Validate input formats
+    if (!isValidUUID(streamId)) {
+      return NextResponse.json({ error: 'Invalid stream ID format' }, { status: 400 });
+    }
+    if (!isValidWalletAddress(walletAddress)) {
+      return NextResponse.json({ error: 'Invalid wallet address format' }, { status: 400 });
+    }
+
+    // Validate message length (before sanitization to prevent bypass)
+    if (typeof message !== 'string' || message.length > 500) {
       return NextResponse.json({ error: 'Message too long (max 500 chars)' }, { status: 400 });
     }
 
-    // Basic XSS protection: strip HTML tags and sanitize
-    const sanitizedMessage = message
-      .trim()
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    
-    const sanitizedName = senderName 
-      ? senderName.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 50)
-      : null;
+    // Comprehensive XSS sanitization using dedicated utility
+    const sanitizedMessage = sanitizeChatMessage(message, 500);
+    if (!sanitizedMessage) {
+      return NextResponse.json({ error: 'Invalid message content' }, { status: 400 });
+    }
 
-    // Rate limiting
+    const sanitizedName = senderName ? sanitizeDisplayName(senderName, 50) : null;
+
+    // Rate limiting with memory protection
     if (!checkRateLimit(walletAddress)) {
       return NextResponse.json({ error: 'Too many messages. Please wait.' }, { status: 429 });
     }
@@ -105,7 +141,7 @@ export async function POST(request: NextRequest) {
       .from('chat_messages')
       .insert({
         stream_id: streamId,
-        wallet_address: walletAddress,
+        wallet_address: walletAddress.toLowerCase(),
         message: sanitizedMessage,
         sender_name: sanitizedName,
         sender_avatar: senderAvatar || null,

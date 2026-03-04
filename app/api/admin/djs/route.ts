@@ -10,8 +10,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get('wallet');
 
-    // For now, we'll check admin status on the client side
-    // and just return all DJs here
+    // Server-side admin authorization check
+    if (!isAdminWallet(walletAddress)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
     const supabase = createServerClient();
 

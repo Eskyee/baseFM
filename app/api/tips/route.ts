@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
+import { isValidWalletAddress, isValidUUID, validatePagination } from '@/lib/validation';
 
 // GET - Get tips for a DJ or stream
 export async function GET(request: NextRequest) {
@@ -8,10 +9,22 @@ export async function GET(request: NextRequest) {
     const djId = searchParams.get('djId');
     const streamId = searchParams.get('streamId');
     const wallet = searchParams.get('wallet');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const { limit } = validatePagination(searchParams.get('limit'), null, 100, 20);
+
+    // Validate inputs before using in queries
+    if (djId && !isValidUUID(djId)) {
+      return NextResponse.json({ error: 'Invalid djId format' }, { status: 400 });
+    }
+    if (streamId && !isValidUUID(streamId)) {
+      return NextResponse.json({ error: 'Invalid streamId format' }, { status: 400 });
+    }
+    if (wallet && !isValidWalletAddress(wallet)) {
+      return NextResponse.json({ error: 'Invalid wallet address format' }, { status: 400 });
+    }
 
     const supabase = createServerClient();
 
+    // Build base query
     let query = supabase
       .from('tips')
       .select('*')
@@ -27,8 +40,10 @@ export async function GET(request: NextRequest) {
       query = query.eq('stream_id', streamId);
     }
 
+    // Use proper filter methods instead of string interpolation to prevent SQL injection
     if (wallet) {
-      query = query.or(`sender_wallet.eq.${wallet},recipient_wallet.eq.${wallet}`);
+      const normalizedWallet = wallet.toLowerCase();
+      query = query.or(`sender_wallet.eq.${normalizedWallet},recipient_wallet.eq.${normalizedWallet}`);
     }
 
     const { data, error } = await query;
@@ -69,6 +84,24 @@ export async function POST(request: NextRequest) {
 
     if (!senderWallet || !recipientWallet || !amountWei || !txHash) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Validate wallet addresses and transaction hash
+    if (!isValidWalletAddress(senderWallet)) {
+      return NextResponse.json({ error: 'Invalid sender wallet address' }, { status: 400 });
+    }
+    if (!isValidWalletAddress(recipientWallet)) {
+      return NextResponse.json({ error: 'Invalid recipient wallet address' }, { status: 400 });
+    }
+    if (djId && !isValidUUID(djId)) {
+      return NextResponse.json({ error: 'Invalid djId format' }, { status: 400 });
+    }
+    if (streamId && !isValidUUID(streamId)) {
+      return NextResponse.json({ error: 'Invalid streamId format' }, { status: 400 });
+    }
+    // Validate txHash format (0x + 64 hex chars)
+    if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+      return NextResponse.json({ error: 'Invalid transaction hash' }, { status: 400 });
     }
 
     const supabase = createServerClient();
