@@ -181,11 +181,6 @@ export default function GuidePage() {
               <p className="text-[#F5F5F5] font-medium">Wallet</p>
               <p className="text-[#666] text-xs">Your balance</p>
             </Link>
-            <Link href="/aicloud" className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/20 rounded-xl p-4 hover:border-purple-500/40 transition-colors">
-              <span className="text-xl mb-2 block">🤖</span>
-              <p className="text-[#F5F5F5] font-medium">aicloud</p>
-              <p className="text-[#666] text-xs">AI agents</p>
-            </Link>
             <Link href="/dashboard" className="bg-[#1A1A1A] rounded-xl p-4 hover:bg-[#222] transition-colors">
               <span className="text-xl mb-2 block">🎛️</span>
               <p className="text-[#F5F5F5] font-medium">Dashboard</p>

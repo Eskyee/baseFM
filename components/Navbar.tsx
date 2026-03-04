@@ -8,8 +8,6 @@ import { WalletConnect } from './WalletConnect';
 import {
   Home,
   Calendar,
-  Cloud,
-  Wrench,
   Image,
   Archive,
   ShoppingBag,
@@ -24,15 +22,12 @@ import {
   BookOpen,
   Ticket,
   Cast,
-  Rss,
   QrCode,
   Megaphone,
   ChevronDown,
   Sparkles,
   Music,
-  Store,
-  Zap,
-  TrendingUp
+  Store
 } from 'lucide-react';
 
 export function Navbar() {
@@ -78,18 +73,6 @@ export function Navbar() {
         { href: '/collectives', label: 'Collectives', Icon: UsersRound },
         { href: '/threads', label: 'Threads', Icon: MessageCircle },
         { href: '/farcaster', label: 'Farcaster', Icon: Cast },
-      ]
-    },
-    {
-      id: 'create',
-      label: 'Create',
-      Icon: Zap,
-      featured: true,
-      links: [
-        { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
-        { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
-        { href: '/aicloud/trading', label: 'Trading', Icon: TrendingUp },
-        { href: '/tools', label: 'Tools', Icon: Wrench },
       ]
     },
     {
