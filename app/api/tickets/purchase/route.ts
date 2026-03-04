@@ -87,6 +87,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const hasTicket = await hasTicketForEvent(wallet, eventId);
-  return NextResponse.json({ hasTicket });
+  const { hasTicket, ticketType, eventName } = await hasTicketForEvent(wallet, eventId);
+  return NextResponse.json({ hasTicket, ticketType, eventName });
 }
