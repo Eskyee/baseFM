@@ -27,7 +27,8 @@ import {
   ChevronDown,
   Sparkles,
   Music,
-  Store
+  Store,
+  Bot
 } from 'lucide-react';
 
 export function Navbar() {
@@ -81,6 +82,7 @@ export function Navbar() {
       Icon: Store,
       featured: false,
       links: [
+        { href: '/aicloud', label: 'AI Cloud', Icon: Bot },
         { href: '/agency', label: 'Agency', Icon: Briefcase },
         { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
       ]
