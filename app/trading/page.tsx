@@ -11,8 +11,8 @@ import {
 // Agent started at page load
 const AGENT_STARTED_AT = new Date();
 
-// TODO: Replace with actual agent wallet from config/env
-const AGENT_WALLET = process.env.NEXT_PUBLIC_TRADING_AGENT_WALLET;
+// Agent wallet address from environment
+const AGENT_WALLET = process.env.NEXT_PUBLIC_TRADING_AGENT_WALLET || undefined;
 
 export default function TradingPage() {
   const [activeTab, setActiveTab] = useState<'feed' | 'stats'>('feed');
