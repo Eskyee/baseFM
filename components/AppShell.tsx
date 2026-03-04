@@ -7,6 +7,8 @@ import { PersistentPlayer } from './PersistentPlayer';
 import { NowPlayingMarquee } from './NowPlayingMarquee';
 import { PageTransition } from './PageTransition';
 import { UpdateBanner } from './UpdateBanner';
+import { ToastProvider } from './ui/Toast';
+import { OfflineBanner } from './OfflineBanner';
 
 interface CurrentShow {
   title: string;
@@ -49,17 +51,20 @@ export function AppShell({ children }: AppShellProps) {
         isPlayerVisible: !!currentShow,
       }}
     >
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <div className="navbar-spacer" aria-hidden="true" />
-        <NowPlayingMarquee />
-        <main className={`flex-1 ${currentShow ? 'pb-[72px]' : ''}`}>
-          <PageTransition>{children}</PageTransition>
-        </main>
-        {!currentShow && <Footer />}
-        <PersistentPlayer currentShow={currentShow} />
-        <UpdateBanner />
-      </div>
+      <ToastProvider>
+        <div className="flex flex-col min-h-screen">
+          <OfflineBanner />
+          <Navbar />
+          <div className="navbar-spacer" aria-hidden="true" />
+          <NowPlayingMarquee />
+          <main className={`flex-1 ${currentShow ? 'pb-[72px]' : ''}`}>
+            <PageTransition>{children}</PageTransition>
+          </main>
+          {!currentShow && <Footer />}
+          <PersistentPlayer currentShow={currentShow} />
+          <UpdateBanner />
+        </div>
+      </ToastProvider>
     </PlayerContext.Provider>
   );
 }
