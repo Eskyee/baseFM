@@ -767,7 +767,7 @@ function TradingSection() {
         {/* Actions */}
         <div className="flex flex-wrap gap-3">
           <a
-            href="/aicloud/trading"
+            href="/trading"
             className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-mono font-semibold hover:opacity-90 transition-opacity active:scale-[0.97]"
           >
             Open Trading Dashboard
