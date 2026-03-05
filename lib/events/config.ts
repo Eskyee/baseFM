@@ -24,7 +24,7 @@ export const EVENTS: Event[] = [
     venue: 'Hackney Bridge, London',
     imageUrl: null,
     isPast: true,
-    headliners: ['A Guy Called Gerald', 'Saytek (Live)', 'Jah Scoop', 'Original Dubman'],
+    headliners: ['A Guy Called Gerald', 'Saytek (Live)', 'Jah Scoop', 'Original Dubman', 'Maxim Noize'],
     tags: ['Rave', 'Dub', 'House', 'Techno', 'DNB'],
   },
 ];
