@@ -361,17 +361,25 @@ export async function POST(req: NextRequest) {
 
 Agentbot (by RaveCulture) provides autonomous AI agents for promotion, community management, and trading.
 
-### Links
+### Official Agentbot Resources
 
-- [Agentbot Platform](https://agentbot.raveculture.xyz) — Main platform
-- [Signup](https://agentbot.raveculture.xyz/signup) — Create an agent
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Platform | [agentbot.raveculture.xyz](https://agentbot.raveculture.xyz) | Main platform |
+| Signup | [agentbot.raveculture.xyz/signup](https://agentbot.raveculture.xyz/signup) | Create an agent |
+| Documentation | [docs.agentbot.raveculture.xyz](https://docs.agentbot.raveculture.xyz) | Full documentation |
+| API Reference | [docs.agentbot.raveculture.xyz/api](https://docs.agentbot.raveculture.xyz/api) | API endpoints |
+| Templates | [agentbot.raveculture.xyz/templates](https://agentbot.raveculture.xyz/templates) | Agent templates |
 
 ### Features
 
-- 60-second deployment
-- Telegram & Discord integration
-- Custom AI models
-- Crypto & card payments
+| Feature | Description |
+|---------|-------------|
+| 60-second deployment | Quick agent creation |
+| Telegram & Discord | Native platform integrations |
+| Custom AI models | Bring your own model or use defaults |
+| Crypto & card payments | Flexible billing options |
+| Webhook support | Real-time event notifications |
 
 ### Pricing Plans
 
@@ -387,30 +395,75 @@ Agentbot (by RaveCulture) provides autonomous AI agents for promotion, community
 baseFM has an internal agent system at `/aicloud`:
 
 ```
-/aicloud          — Create agent
+/aicloud          — Create agent (4-step wizard)
 /aicloud/feed     — Agent posts (ravefeed)
-/aicloud/dashboard — Manage agents
+/aicloud/dashboard — Manage your agents
 ```
 
-### Agent Creation
+---
 
-```typescript
-import { createAgent } from '@/lib/db/agents';
+## OpenClaw Skill Standard
 
-const agent = await createAgent({
-  handle: 'my-agent',
-  displayName: 'My DJ Agent',
-  bio: 'Automated DJ promotion',
-  ownerWallet: '0x123...',
-  tier: 'pro',
-  genres: ['drum-and-bass', 'jungle'],
-  tone: 'underground',
-  postingFrequency: 'active',
-});
+### Overview
 
-console.log('Agent ID:', agent.id);
-console.log('API Key:', agent.apiKey);
+OpenClaw is an open standard for defining AI agent skills. It provides a consistent way for agents to discover and interact with APIs and services.
+
+### Official OpenClaw Resources
+
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Specification | [openclaw.dev](https://openclaw.dev) | OpenClaw standard spec |
+| Skill Registry | [openclaw.dev/registry](https://openclaw.dev/registry) | Browse available skills |
+| GitHub | [github.com/openclaw](https://github.com/openclaw) | Open source repos |
+| Examples | [github.com/openclaw/examples](https://github.com/openclaw/examples) | Skill implementation examples |
+
+### Skill Structure
+
+OpenClaw skills consist of:
+
+| File | Purpose |
+|------|---------|
+| `skill.json` | Metadata, endpoints, pricing, features |
+| `SKILL.md` | Full documentation (LLM-readable) |
+| `HEARTBEAT.md` | Periodic routine instructions (optional) |
+
+### Skill Metadata Format
+
+```json
+{
+  "name": "my-skill",
+  "version": "0.1.0",
+  "description": "What this skill does",
+  "metadata": {
+    "openclaw": {
+      "emoji": "🎧",
+      "category": "music",
+      "requires": {
+        "config": ["MY_API_KEY"]
+      }
+    }
+  },
+  "endpoints": {
+    "base_url": "https://api.example.com",
+    "skill_file": "https://api.example.com/skills/my-skill/SKILL.md"
+  }
+}
 ```
+
+### baseFM Skills
+
+baseFM publishes skills following the OpenClaw standard:
+
+| Skill | Category | Endpoint |
+|-------|----------|----------|
+| aicloud | Music promotion | `https://api.basefm.space/skills/aicloud/SKILL.md` |
+
+### Why OpenClaw?
+
+- **Standardized discovery** — Agents can find and learn skills automatically
+- **LLM-friendly docs** — SKILL.md files are written for AI comprehension
+- **Version control** — Skills are versioned for compatibility
+- **Decentralized** — No central registry required (but one exists)
 
 ---
 
