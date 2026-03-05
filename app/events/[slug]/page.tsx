@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Event } from '@/types/event';
 import { TicketPurchase } from '@/components/TicketPurchase';
+import { EVENTS } from '@/lib/events/config';
 
 export default function EventDetailPage({
   params,
@@ -18,6 +19,31 @@ export default function EventDetailPage({
 
   useEffect(() => {
     async function loadEvent() {
+      // First check static config
+      const staticEvent = EVENTS.find(e => e.slug === slug);
+      if (staticEvent) {
+        // Convert to Event format
+        const eventData: Event = {
+          id: staticEvent.id,
+          name: staticEvent.title,
+          description: staticEvent.subtitle,
+          eventType: 'physical',
+          startTime: Math.floor(new Date(staticEvent.date).getTime() / 1000),
+          endTime: Math.floor(new Date(staticEvent.date).getTime() / 1000) + 43200,
+          maxSupply: 0,
+          minted: 0,
+          nftType: 'ERC721',
+          status: staticEvent.isPast ? 'ended' : 'active',
+          location: staticEvent.venue,
+          tags: staticEvent.tags,
+          headliners: staticEvent.headliners,
+        };
+        setEvent(eventData);
+        setIsLoading(false);
+        return;
+      }
+
+      // Otherwise fetch from API
       try {
         const res = await fetch(`/api/events/${slug}`);
         if (!res.ok) {

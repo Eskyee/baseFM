@@ -16,7 +16,7 @@ export interface Event {
 export const EVENTS: Event[] = [
   {
     id: '1',
-    slug: 'strobe-soundsystem-launch',
+    slug: 'strobe-soundsystem',
     title: 'The STROBE Soundsystem Launch',
     subtitle: 'A new London-based audiovisual sound system & party series',
     date: '2026-02-14',
