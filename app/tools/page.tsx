@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 // Clanker URLs
+const CLANKER_URL = 'https://clanker.world';
 const CLANKER_DOCS_URL = 'https://docs.clanker.world';
 const CLANKER_API_URL = 'https://docs.clanker.world/api';
 const DEPLOY_URL = 'https://www.clanker.world/clanker';
@@ -13,19 +14,17 @@ const CLANKER_FARCASTER_URL = 'https://warpcast.com/clanker';
 // Agentbot URLs
 const AGENTBOT_URL = 'https://agentbot.raveculture.xyz';
 const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/signup';
-const AGENTBOT_DOCS_URL = 'https://docs.agentbot.raveculture.xyz';
-const AGENTBOT_API_URL = 'https://docs.agentbot.raveculture.xyz/api';
+const AGENTBOT_DOCS_URL = 'https://agentbot.raveculture.xyz/docs';
+const AGENTBOT_BLOG_URL = 'https://agentbot.raveculture.xyz/blog';
 
 // Bankr URLs
+const BANKR_URL = 'https://bankr.bot';
 const BANKR_DOCS_URL = 'https://docs.bankr.bot';
-const BANKR_LLM_URL = 'https://docs.bankr.bot/llm';
-const BANKR_API_URL = 'https://docs.bankr.bot/api';
-const BANKR_SDK_URL = 'https://docs.bankr.bot/sdk';
-const BANKR_DASHBOARD_URL = 'https://bankr.bot/dashboard';
+const BANKR_LLM_URL = 'https://docs.bankr.bot/llm-gateway/overview';
+const BANKR_API_URL = 'https://docs.bankr.bot/agent-api/overview';
 
 // OpenClaw URLs
-const OPENCLAW_URL = 'https://openclaw.dev';
-const OPENCLAW_REGISTRY_URL = 'https://openclaw.dev/registry';
+const OPENCLAW_URL = 'https://openclaw.ai';
 
 // Internal aicloud routes
 const AICLOUD_URL = '/aicloud';
@@ -195,7 +194,18 @@ const token = await Clanker.deploy({
               {/* Developer Resources */}
               <div className="mt-6 pt-4 border-t border-[#2A2A2A]">
                 <h3 className="text-[#888] text-xs font-mono mb-3 uppercase tracking-wider">Developer Resources</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <a
+                    href={CLANKER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-[#0052FF] border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Site
+                  </a>
                   <a
                     href={CLANKER_DOCS_URL}
                     target="_blank"
@@ -511,7 +521,7 @@ function AgentsSection() {
         {/* Developer Resources */}
         <div className="mt-6 pt-4 border-t border-[#2A2A2A]">
           <h3 className="text-[#888] text-xs font-mono mb-3 uppercase tracking-wider">Developer Resources</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <a
               href={AGENTBOT_DOCS_URL}
               target="_blank"
@@ -524,15 +534,15 @@ function AgentsSection() {
               Docs
             </a>
             <a
-              href={AGENTBOT_API_URL}
+              href={AGENTBOT_BLOG_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
               </svg>
-              API
+              Blog
             </a>
             <a
               href={OPENCLAW_URL}
@@ -544,17 +554,6 @@ function AgentsSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
               </svg>
               OpenClaw
-            </a>
-            <a
-              href={OPENCLAW_REGISTRY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-green-400 border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              Skills
             </a>
           </div>
         </div>
@@ -870,7 +869,18 @@ function BankrSection() {
         {/* Developer Resources */}
         <div className="mt-4 pt-3 border-t border-[#2A2A2A]">
           <h3 className="text-[#888] text-xs font-mono mb-2 uppercase tracking-wider">Developer Resources</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <a
+              href={BANKR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-green-400 border border-[#2A2A2A] transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Site
+            </a>
             <a
               href={BANKR_DOCS_URL}
               target="_blank"
@@ -883,28 +893,6 @@ function BankrSection() {
               Docs
             </a>
             <a
-              href={BANKR_API_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-              API
-            </a>
-            <a
-              href={BANKR_SDK_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              SDK
-            </a>
-            <a
               href={BANKR_LLM_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -913,19 +901,18 @@ function BankrSection() {
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              LLM
+              LLM Gateway
             </a>
             <a
-              href={BANKR_DASHBOARD_URL}
+              href={BANKR_API_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-green-400 border border-[#2A2A2A] transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
-              Dashboard
+              Agent API
             </a>
           </div>
         </div>
