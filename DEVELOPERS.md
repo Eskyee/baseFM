@@ -26,12 +26,23 @@ Bankr is an AI-powered crypto trading assistant that handles onchain operations 
 - **Token Trading** — Automated trading agent
 - **Portfolio Management** — Balance checking and tracking
 
-### Documentation Links
+### Official Bankr Resources
 
-- [Bankr Docs](https://docs.bankr.bot) — Full documentation
-- [Bankr LLM Docs](https://docs.bankr.bot/llm) — LLM-friendly documentation (for AI agents)
-- [Bankr API Docs](https://docs.bankr.bot/api) — Agent API reference
-- [Bankr Examples](https://github.com/BankrBot/claude-plugins) — Example apps
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Main Documentation | [docs.bankr.bot](https://docs.bankr.bot) | Full Bankr documentation |
+| LLM Documentation | [docs.bankr.bot/llm](https://docs.bankr.bot/llm) | AI/LLM-friendly docs (for agents and tools) |
+| API Reference | [docs.bankr.bot/api](https://docs.bankr.bot/api) | Agent API endpoints and schemas |
+| SDK Reference | [docs.bankr.bot/sdk](https://docs.bankr.bot/sdk) | JavaScript/TypeScript SDK reference |
+| Example Apps | [github.com/BankrBot/claude-plugins](https://github.com/BankrBot/claude-plugins) | Reference implementations |
+| Dashboard | [bankr.bot/dashboard](https://bankr.bot/dashboard) | Manage API keys and settings |
+| Status Page | [status.bankr.bot](https://status.bankr.bot) | API status and uptime |
+
+### Quick Links
+
+- **Get API Key**: [bankr.bot/api](https://bankr.bot/api)
+- **SDK Install**: `npm install @bankr/sdk`
+- **Support**: [Bankr Discord](https://discord.gg/bankr) or [docs.bankr.bot/support](https://docs.bankr.bot/support)
 
 ### Agent Trading Flow
 
@@ -62,15 +73,21 @@ GET  /agent/job/:id →  poll until status === "completed"
 npm install @bankr/sdk
 ```
 
+See official SDK docs: [docs.bankr.bot/sdk](https://docs.bankr.bot/sdk)
+
 ### Configuration
 
 ```bash
-# .env.local
-BANKR_API_KEY=your_api_key          # Server-only API key
-BANKR_PRIVATE_KEY=your_private_key  # Server-only private key (NEVER client-side)
+# .env.local (server-side only)
+BANKR_API_KEY=your_api_key          # Get from bankr.bot/api
+BANKR_PRIVATE_KEY=your_private_key  # NEVER expose client-side
+
+# Optional trading agent settings
 AGENT_INTERVAL_MS=180000            # Trading cycle interval (3 min default)
 AGENT_MAX_TRADE_PCT=1               # Max % of USDC per trade
 ```
+
+**Getting API Keys**: Register at [bankr.bot/api](https://bankr.bot/api) to obtain your API key. The private key is your wallet's private key for signing transactions.
 
 ### Usage Examples
 
@@ -156,13 +173,23 @@ Based on my analysis, here are my picks:
 - BRETT - down - low
 ```
 
-### Security Best Practices
+### Security Requirements
 
-1. **Server-Side Only** — Private keys NEVER reach the client
-2. **Whitelisted Prompts** — Use template prompts, no user free text
-3. **Address Validation** — Always validate with `isAddress()` before execution
-4. **Non-Blocking Logging** — Log failures shouldn't break the agent
-5. **Read-Only Mode** — API keys can be locked to read-only in Bankr dashboard
+> ⚠️ **CRITICAL: Follow these security rules when integrating Bankr**
+
+| Rule | Description |
+|------|-------------|
+| **Server-Side Only** | `BANKR_PRIVATE_KEY` must NEVER be exposed to the client. Use API routes only. |
+| **Whitelisted Prompts** | Use template prompts from your codebase. Never pass raw user input to Bankr. |
+| **Address Validation** | Always validate addresses with `isAddress()` from viem before execution. |
+| **Rate Limiting** | Implement rate limits on any endpoint that calls Bankr. |
+| **Read-Only Mode** | Lock API keys to read-only in [Bankr Dashboard](https://bankr.bot/dashboard) when not trading. |
+
+**What NOT to expose:**
+- Private keys (BANKR_PRIVATE_KEY)
+- Internal prompt templates (your trading strategy)
+- Wallet addresses tied to trading operations
+- Session/thread IDs from Bankr responses
 
 ### Troubleshooting
 
@@ -181,17 +208,32 @@ Based on my analysis, here are my picks:
 
 Clanker v4 provides one-click ERC-20 token deployment on Base with built-in Uniswap v4 liquidity.
 
-### Documentation Links
+### Official Clanker Resources
 
-- [Clanker Docs](https://docs.clanker.world) — Full documentation
-- [Deploy Token](https://www.clanker.world/clanker) — Token deployment UI
+| Resource | URL | Description |
+|----------|-----|-------------|
+| Main Documentation | [docs.clanker.world](https://docs.clanker.world) | Full Clanker documentation |
+| API Reference | [docs.clanker.world/api](https://docs.clanker.world/api) | API endpoints and schemas |
+| Token Deployer | [clanker.world/clanker](https://www.clanker.world/clanker) | Deploy tokens via UI |
+| Farcaster Bot | [@clanker on Farcaster](https://warpcast.com/clanker) | Deploy via Farcaster cast |
+| Token Explorer | [clanker.world/tokens](https://www.clanker.world/tokens) | Browse deployed tokens |
+| GitHub | [github.com/clanker](https://github.com/clanker) | Open source code and SDKs |
+
+### Quick Links
+
+- **Deploy via Farcaster**: Cast to [@clanker](https://warpcast.com/clanker) with token details
+- **SDK Install**: `npm install @clanker/sdk`
+- **Support**: [Clanker Discord](https://discord.gg/clanker)
 
 ### Features
 
-- Uniswap v4 Liquidity Pool
-- Vesting Mechanisms
-- Creator Rewards
-- Base Native
+| Feature | Description |
+|---------|-------------|
+| Uniswap v4 Liquidity | Automatic DEX liquidity on deployment |
+| Vesting Mechanisms | Built-in token vesting for teams |
+| Creator Rewards | 40% of LP rewards to deployer |
+| Base Native | Deploys directly on Base (chain 8453) |
+| Farcaster Integration | Deploy via social cast |
 
 ### Usage
 
@@ -213,8 +255,10 @@ console.log('Contract:', token.address);
 ### Configuration
 
 ```bash
-NEXT_PUBLIC_CLANKER_KEY=your_clanker_key
+NEXT_PUBLIC_CLANKER_KEY=your_clanker_key  # Get from clanker.world/api
 ```
+
+**Getting API Keys**: Register at [clanker.world/api](https://www.clanker.world/api) or [docs.clanker.world/api-keys](https://docs.clanker.world/api-keys).
 
 ### Use Cases
 
@@ -223,6 +267,12 @@ NEXT_PUBLIC_CLANKER_KEY=your_clanker_key
 | DJ Tokens | Launch fan tokens with built-in utility |
 | Show Tokens | Create tokens for exclusive show access |
 | Community | Token-gated communities and rewards |
+
+### Deployment Methods
+
+1. **Via Farcaster** (easiest): Cast to @clanker with token name, symbol, and image
+2. **Via API**: Use the SDK for programmatic deployment
+3. **Via UI**: Deploy directly at [clanker.world/clanker](https://www.clanker.world/clanker)
 
 ---
 
@@ -576,4 +626,4 @@ VAPID_PRIVATE_KEY=
 
 ---
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-05*
