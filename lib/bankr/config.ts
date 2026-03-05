@@ -15,11 +15,10 @@
 
 export const BANKR_API_BASE = 'https://api.bankr.bot';
 
-// API endpoints
+// API endpoints (Bankr uses prompt-based API for all operations)
 export const BANKR_ENDPOINTS = {
   prompt: '/agent/prompt',
   job: (jobId: string) => `/agent/job/${jobId}`,
-  balances: '/balances',
 } as const;
 
 // ============================================================

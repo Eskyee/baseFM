@@ -611,11 +611,23 @@ function BankrSection() {
       try {
         const res = await fetch('/api/trading/balances');
         const data = await res.json();
-        if (data.id === 'unconfigured' || data.id === 'error') {
+        if (data.id === 'unconfigured') {
           setApiStatus('disconnected');
+        } else if (data.id === 'error' || data.id === 'timeout') {
+          // API is configured but returned an error - still show as connected
+          // The user can try again via the chat interface
+          setApiStatus('connected');
+          if (data.error) {
+            setMessages((prev) => [...prev, {
+              role: 'assistant',
+              content: `Note: ${data.error}. You may need to enable Agent API access at bankr.bot/api`,
+            }]);
+          }
         } else {
           setApiStatus('connected');
-          setBalance({ totalUsd: data.totalUsd, breakdown: data.breakdown });
+          if (data.totalUsd > 0) {
+            setBalance({ totalUsd: data.totalUsd, breakdown: data.breakdown });
+          }
         }
       } catch {
         setApiStatus('disconnected');

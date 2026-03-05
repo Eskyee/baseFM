@@ -21,6 +21,7 @@ import {
   filterTradablePicks,
   type BankrPromptResponse,
   type BankrJobResponse,
+  type BankrBalance,
   type BankrBalanceResponse,
   type TokenPick,
   type TradeDecision,
@@ -107,24 +108,38 @@ export async function promptAndWait(prompt: string): Promise<BankrJobResponse> {
 }
 
 /**
- * Fetch current wallet balances from Bankr.
+ * Fetch current wallet balances from Bankr using prompt API.
  */
 export async function fetchBalances(): Promise<BankrBalanceResponse> {
-  const apiKey = getBankrApiKey();
+  const result = await promptAndWait(SCAN_PROMPTS.portfolio);
 
-  const response = await fetch(`${BANKR_API_BASE}${BANKR_ENDPOINTS.balances}`, {
-    headers: {
-      'X-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Bankr balances failed: ${response.status}`);
+  if (!result.response) {
+    throw new Error('No response from Bankr balance check');
   }
 
-  return response.json();
+  // Parse balance info from natural language response
+  const balances: BankrBalance[] = [];
+  const tokenPattern = /([A-Z]{2,10}):\s*\$?([\d,]+\.?\d*)/gi;
+  let match;
+
+  while ((match = tokenPattern.exec(result.response)) !== null) {
+    const [, symbol, value] = match;
+    const usdValue = parseFloat(value.replace(/,/g, ''));
+    if (!isNaN(usdValue) && usdValue > 0) {
+      balances.push({
+        symbol: symbol.toUpperCase(),
+        amount: value,
+        usdValue: usdValue.toString(),
+      });
+    }
+  }
+
+  const totalUsd = balances.reduce(
+    (sum, b) => sum + parseFloat(b.usdValue || '0'),
+    0
+  );
+
+  return { balances, totalUsd };
 }
 
 // ============================================================
