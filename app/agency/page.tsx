@@ -43,6 +43,12 @@ const pillars = [
     description: 'Not an agency. A network. Promoters, artists, crews, ravers — all plugged into the same mission. We rise together.',
     heritage: ['Crew Network', 'Knowledge Sharing', 'Resource Pooling', 'Mutual Support'],
   },
+  {
+    icon: '💻',
+    title: 'Web Development',
+    description: 'Modern websites and web apps built with Next.js. From landing pages to full-stack applications with CMS and e-commerce.',
+    heritage: ['Next.js Apps', 'E-commerce', 'CMS Integration', 'API Development'],
+  },
 ];
 
 const timeline = [
@@ -140,6 +146,15 @@ export default function AgencyPage() {
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
+              </Link>
+              <Link
+                href="/agency/web-design"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#1A1A1A] border border-[#333] rounded-full text-[#F5F5F5] font-semibold text-lg hover:bg-[#252525] hover:border-purple-500/50 transition-all"
+              >
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                Web Design
               </Link>
               <a
                 href="https://warpcast.com/raveculture"

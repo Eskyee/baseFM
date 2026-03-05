@@ -7,6 +7,14 @@ export const metadata = {
 
 const services = [
   {
+    id: 'web-design',
+    title: 'Web Design & Development',
+    description: 'Modern, fast websites built with Next.js. From landing pages to full web applications with CMS integration.',
+    icon: '💻',
+    features: ['Next.js/React', 'Mobile First', 'CMS Integration', 'SEO Optimized'],
+    priceFrom: 'From £750',
+  },
+  {
     id: 'sound-system',
     title: 'Sound System Hire',
     description: 'Full festival-grade PA systems from intimate venues to main stage productions. Funktion-One, Martin Audio, and more.',
@@ -161,7 +169,7 @@ export default function ServicesPage() {
               Request Quote
             </Link>
             <a
-              href="mailto:bookings@raveculture.xyz"
+              href="mailto:rbasefm@icloud.com"
               className="px-6 py-3 bg-[#1A1A1A] rounded-full text-[#F5F5F5] font-semibold hover:bg-[#252525] transition-colors"
             >
               Email Us
