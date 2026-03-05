@@ -16,16 +16,16 @@ export interface Event {
 export const EVENTS: Event[] = [
   {
     id: '1',
-    slug: 'strobe-soundsystem',
-    title: 'STROBE SOUNDSYSTEM',
-    subtitle: 'Dub to Live Techno & Drum & Bass',
-    date: '2025-02-01',
-    displayDate: 'February 2025',
-    venue: '360 Warehouse',
+    slug: 'strobe-soundsystem-launch',
+    title: 'The STROBE Soundsystem Launch',
+    subtitle: 'A new London-based audiovisual sound system & party series',
+    date: '2026-02-14',
+    displayDate: 'Saturday, 14 Feb 2026',
+    venue: 'Hackney Bridge, London',
     imageUrl: null,
     isPast: true,
-    headliners: ['SAYTEK LIVE', 'JAH SCOOP', 'ORIGINAL DUBMAN'],
-    tags: ['Launch Event', '16 Stacks'],
+    headliners: ['A Guy Called Gerald', 'Saytek (Live)', 'Jah Scoop', 'Original Dubman'],
+    tags: ['Rave', 'Dub', 'House', 'Techno', 'DNB'],
   },
 ];
 

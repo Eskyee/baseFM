@@ -29,6 +29,6 @@ INSERT INTO public.events (
   'UK',
   '{A Guy Called Gerald, Saytek}',
   '{Rave, Dub, House, Techno, DNB}',
-  'approved',
+  'ended',
   NULL
 );
