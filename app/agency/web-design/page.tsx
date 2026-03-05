@@ -8,6 +8,13 @@ export const metadata = {
 
 const portfolioProjects = [
   {
+    name: 'Web Design Agency',
+    description: 'Professional web design services page with portfolio, pricing, and contact form',
+    tech: ['Next.js', 'TypeScript', 'Tailwind', 'Vercel'],
+    url: 'https://base.fm/agency/web-design',
+    category: 'website',
+  },
+  {
     name: 'baseFM Radio',
     description: 'Live streaming radio platform with wallet integration',
     tech: ['Next.js', 'Supabase', 'Wagmi', 'Livepeer'],
