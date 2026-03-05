@@ -11,35 +11,35 @@ const portfolioProjects = [
     name: 'Web Design Agency',
     description: 'Professional web design services page with portfolio, pricing, and contact form',
     tech: ['Next.js', 'TypeScript', 'Tailwind', 'Vercel'],
-    url: 'https://base.fm/agency/web-design',
+    url: '/agency/web-design',
     category: 'website',
   },
   {
     name: 'baseFM Radio',
     description: 'Live streaming radio platform with wallet integration',
     tech: ['Next.js', 'Supabase', 'Wagmi', 'Livepeer'],
-    url: 'https://base.fm',
+    url: 'https://ra.co/basfm-radio',
     category: 'webapp',
   },
   {
     name: 'AI Cloud Dashboard',
     description: 'AI agent management and analytics platform',
     tech: ['Next.js', 'TypeScript', 'Tailwind', 'Charts'],
-    url: 'https://base.fm/aicloud',
+    url: '/aicloud',
     category: 'webapp',
   },
   {
     name: 'Event Platform',
     description: 'Event discovery and ticket management system',
     tech: ['Next.js', 'Supabase', 'Stripe', 'Vercel'],
-    url: 'https://base.fm/events',
+    url: '/events',
     category: 'website',
   },
   {
     name: 'Crew Management',
     description: 'Team coordination and scheduling tool',
     tech: ['Next.js', 'Real-time', 'Auth', 'Dashboard'],
-    url: 'https://base.fm/admin/crew',
+    url: '/admin/crew',
     category: 'webapp',
   },
 ];
@@ -173,34 +173,37 @@ export default function WebDesignPage() {
 
         {/* Project Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {portfolioProjects.map((project) => (
-            <a
-              key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-[#1A1A1A] rounded-2xl p-6 border border-[#2A2A2A] hover:border-purple-500/50 transition-all"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-[#F5F5F5] font-bold text-xl group-hover:text-purple-400 transition-colors">
-                    {project.name}
-                  </h3>
-                  <p className="text-[#888] text-sm mt-1">{project.description}</p>
+          {portfolioProjects.map((project) => {
+            const isExternal = project.url.startsWith('http');
+            return (
+              <Link
+                key={project.name}
+                href={project.url}
+                target={isExternal ? '_blank' : undefined}
+                rel={isExternal ? 'noopener noreferrer' : undefined}
+                className="group bg-[#1A1A1A] rounded-2xl p-6 border border-[#2A2A2A] hover:border-purple-500/50 transition-all"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-[#F5F5F5] font-bold text-xl group-hover:text-purple-400 transition-colors">
+                      {project.name}
+                    </h3>
+                    <p className="text-[#888] text-sm mt-1">{project.description}</p>
+                  </div>
+                  <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                 </div>
-                <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((t) => (
-                  <span key={t} className="px-2 py-1 bg-[#0A0A0A] rounded-full text-xs text-[#666]">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </a>
-          ))}
+                <div className="flex flex-wrap gap-2">
+                  {project.tech.map((t) => (
+                    <span key={t} className="px-2 py-1 bg-[#0A0A0A] rounded-full text-xs text-[#666]">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
