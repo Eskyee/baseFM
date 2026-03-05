@@ -528,6 +528,53 @@ const bankr = new BankrClient({
 
               <section>
                 <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
+                  <span className="text-green-400">|</span>
+                  Agent Skills Directory
+                </h2>
+                <div className="bg-[#1A1A1A] rounded-2xl p-5">
+                  <p className="text-[#888] mb-4">
+                    Add pre-built skills to your AI agents using the Vercel Labs Skills Directory.
+                    Skills extend agent capabilities with tools for browsing, coding, data analysis, and more.
+                  </p>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-sm mb-4">
+                    <p className="text-[#666] text-xs mb-2">Install skills via npx:</p>
+                    <code className="text-green-400">npx skills add vercel-labs/agent-skills</code>
+                  </div>
+                  <div className="grid gap-3">
+                    <a
+                      href="https://github.com/vercel-labs/agent-skills"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-[#F5F5F5] font-medium">Browse Skills</p>
+                        <p className="text-[#666] text-sm">github.com/vercel-labs/agent-skills</p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#666] group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                    <a
+                      href="https://sdk.vercel.ai/docs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-[#F5F5F5] font-medium">Vercel AI SDK</p>
+                        <p className="text-[#666] text-sm">sdk.vercel.ai/docs</p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#666] group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
                   <span className="text-blue-400">|</span>
                   baseFM AI Cloud
                 </h2>
