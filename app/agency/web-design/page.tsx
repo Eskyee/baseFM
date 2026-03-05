@@ -18,7 +18,8 @@ const portfolioProjects = [
     name: 'baseFM Radio',
     description: 'Live streaming radio platform with wallet integration',
     tech: ['Next.js', 'Supabase', 'Wagmi', 'Livepeer'],
-    url: 'https://ra.co/basfm-radio',
+    url: 'https://basefm.space',
+    tagline: 'Live streaming radio platform with wallet integration',
     category: 'webapp',
   },
   {
@@ -188,7 +189,7 @@ export default function WebDesignPage() {
                     <h3 className="text-[#F5F5F5] font-bold text-xl group-hover:text-purple-400 transition-colors">
                       {project.name}
                     </h3>
-                    <p className="text-[#888] text-sm mt-1">{project.description}</p>
+                    <p className="text-[#888] text-sm mt-1">{project.tagline || project.description}</p>
                   </div>
                   <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
