@@ -598,45 +598,139 @@ function AgentsSection() {
 
 function BankrSection() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
-    { role: 'assistant', content: 'Hey! I\'m Bankr, your onchain assistant. Ask me about token prices, your portfolio, or market data.' },
+    { role: 'assistant', content: 'Hey! I\'m Bankr, the baseFM trading agent. I can scan for trending tokens, check portfolio balances, and execute trades.' },
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [balance, setBalance] = useState<{ totalUsd: number; breakdown: Record<string, number> } | null>(null);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // Check API status and fetch balance on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch('/api/trading/balances');
+        const data = await res.json();
+        if (data.id === 'unconfigured' || data.id === 'error') {
+          setApiStatus('disconnected');
+        } else {
+          setApiStatus('connected');
+          setBalance({ totalUsd: data.totalUsd, breakdown: data.breakdown });
+        }
+      } catch {
+        setApiStatus('disconnected');
+      }
+    };
+    checkStatus();
+  }, []);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setInput('');
+    setIsLoading(true);
 
-    // Simulated response
-    setTimeout(() => {
-      let response = 'I\'m currently in demo mode. Connect your wallet to get real portfolio data and trading insights.';
+    try {
+      // Determine action based on user message
+      let action = 'scan';
+      let token = '';
+      const lowerMsg = userMessage.toLowerCase();
 
-      if (userMessage.toLowerCase().includes('rave')) {
-        response = 'RAVE (RaveCulture) is the native token of baseFM. Hold 5,000 RAVE for community access and DJ streaming privileges.';
-      } else if (userMessage.toLowerCase().includes('eth') || userMessage.toLowerCase().includes('price')) {
-        response = 'For real-time price data, connect your wallet. I can then show you portfolio values, price alerts, and market trends.';
-      } else if (userMessage.toLowerCase().includes('portfolio')) {
-        response = 'Connect your wallet to view your portfolio. I\'ll show you token balances, NFTs, and recent transactions on Base.';
+      if (lowerMsg.includes('balance') || lowerMsg.includes('portfolio')) {
+        action = 'balance';
+      } else if (lowerMsg.includes('analyze') || lowerMsg.includes('check')) {
+        // Extract token name
+        const tokenMatch = userMessage.match(/\b([A-Z]{2,10})\b/);
+        if (tokenMatch) {
+          action = 'analyze';
+          token = tokenMatch[1];
+        }
       }
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: response }]);
-    }, 500);
+      const res = await fetch('/api/trading/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, token }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        // API not configured - show helpful message
+        if (data.error === 'Bankr API not configured') {
+          setMessages((prev) => [...prev, {
+            role: 'assistant',
+            content: 'Bankr API is not configured. Set BANKR_API_KEY and BANKR_PRIVATE_KEY in Vercel environment variables to enable trading.',
+          }]);
+        } else {
+          setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${data.error}` }]);
+        }
+      } else if (action === 'balance' && data.balance) {
+        const breakdown = Object.entries(data.balance.breakdown)
+          .map(([symbol, value]) => `${symbol}: $${(value as number).toFixed(2)}`)
+          .join(', ');
+        setMessages((prev) => [...prev, {
+          role: 'assistant',
+          content: `Portfolio Value: $${data.balance.totalUsd.toFixed(2)}\n\n${breakdown || 'No holdings found'}`,
+        }]);
+        setBalance(data.balance);
+      } else if (action === 'analyze' && data.analysis) {
+        setMessages((prev) => [...prev, {
+          role: 'assistant',
+          content: `${token}: ${data.analysis.direction} (${data.analysis.conviction} conviction)`,
+        }]);
+      } else if (data.response) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.response.substring(0, 500) }]);
+      } else {
+        setMessages((prev) => [...prev, { role: 'assistant', content: 'Scan complete. Check the trading dashboard for details.' }]);
+      }
+    } catch (err) {
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: 'Failed to connect to Bankr API. Check your environment variables.',
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
       {/* Bankr Header */}
       <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">B</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">B</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-[#F5F5F5] font-mono">Bankr</h2>
+              <p className="text-[#888] text-xs font-mono">AI Trading Agent</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-[#F5F5F5] font-mono">Bankr</h2>
-            <p className="text-[#888] text-xs font-mono">AI Trading Assistant</p>
+          <span className={`px-2 py-1 text-xs font-mono rounded ${
+            apiStatus === 'connected' ? 'bg-green-500/20 text-green-400' :
+            apiStatus === 'disconnected' ? 'bg-red-500/20 text-red-400' :
+            'bg-yellow-500/20 text-yellow-400'
+          }`}>
+            {apiStatus === 'connected' ? 'CONNECTED' :
+             apiStatus === 'disconnected' ? 'NOT CONFIGURED' : 'CHECKING...'}
+          </span>
+        </div>
+        {/* Balance Display */}
+        {balance && balance.totalUsd > 0 && (
+          <div className="mt-3 pt-3 border-t border-[#2A2A2A]">
+            <p className="text-[#888] text-xs font-mono">Agent Portfolio</p>
+            <p className="text-green-400 text-lg font-mono font-bold">${balance.totalUsd.toFixed(2)}</p>
           </div>
+        )}
+        {/* Info Note */}
+        <div className="mt-3 p-2 bg-[#1A1A1A] rounded-lg">
+          <p className="text-[#666] text-[10px] font-mono">
+            Bankr operates with a server-side wallet (BANKR_PRIVATE_KEY). Set BANKR_API_KEY in Vercel to enable.
+          </p>
         </div>
       </div>
 
@@ -670,14 +764,21 @@ function BankrSection() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask about tokens, prices, portfolio..."
-              className="flex-1 px-4 py-2.5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-sm font-mono text-[#F5F5F5] placeholder:text-[#666] focus:outline-none focus:border-[#0052FF]"
+              placeholder="Scan trending, check balance, analyze RAVE..."
+              disabled={isLoading}
+              className="flex-1 px-4 py-2.5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-sm font-mono text-[#F5F5F5] placeholder:text-[#666] focus:outline-none focus:border-[#0052FF] disabled:opacity-50"
             />
             <button
               onClick={handleSend}
-              className="px-4 py-2.5 bg-[#0052FF] text-white rounded-xl text-sm font-mono font-semibold hover:bg-[#0052FF]/80 transition-colors active:scale-[0.97]"
+              disabled={isLoading}
+              className="px-4 py-2.5 bg-[#0052FF] text-white rounded-xl text-sm font-mono font-semibold hover:bg-[#0052FF]/80 transition-colors active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Send
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Wait
+                </>
+              ) : 'Send'}
             </button>
           </div>
         </div>
@@ -686,24 +787,44 @@ function BankrSection() {
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
         <button
-          onClick={() => setInput('What is RAVE?')}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+          onClick={() => { setInput('scan trending tokens'); }}
+          disabled={isLoading}
+          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
         >
-          What is RAVE?
+          Scan Trending
         </button>
         <button
-          onClick={() => setInput('Show my portfolio')}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+          onClick={() => { setInput('check balance'); }}
+          disabled={isLoading}
+          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
         >
-          My Portfolio
+          Check Balance
         </button>
         <button
-          onClick={() => setInput('ETH price')}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+          onClick={() => { setInput('analyze RAVE'); }}
+          disabled={isLoading}
+          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
         >
-          ETH Price
+          Analyze RAVE
         </button>
       </div>
+
+      {/* Setup Instructions */}
+      {apiStatus === 'disconnected' && (
+        <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
+          <h3 className="text-yellow-400 font-mono font-semibold text-sm mb-2">Setup Required</h3>
+          <p className="text-[#888] text-xs font-mono mb-2">
+            Add these environment variables in Vercel:
+          </p>
+          <div className="bg-[#1A1A1A] rounded-lg p-3 text-xs font-mono text-[#888]">
+            <p>BANKR_API_KEY=your_api_key</p>
+            <p>BANKR_PRIVATE_KEY=your_private_key</p>
+          </div>
+          <p className="text-[#666] text-[10px] font-mono mt-2">
+            Get your API key at <a href="https://docs.bankr.bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">docs.bankr.bot</a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
