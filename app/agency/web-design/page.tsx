@@ -147,26 +147,6 @@ export default function WebDesignPage() {
 
       {/* Tech Stack */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-y border-[#2A2A2A] bg-[#0A0A0A]/50">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#portfolio"
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white font-semibold hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
-              >
-                See Our Work
-              </a>
-              <a
-                href="#contact"
-                className="px-8 py-4 bg-[#1A1A1A] rounded-full text-[#F5F5F5] font-semibold hover:bg-[#252525] transition-colors border border-[#2A2A2A]"
-              >
-                Get a Quote
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tech Stack */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-y border-[#2A2A2A] bg-[#0A0A0A]/50">
         <p className="text-center text-[#666] text-sm mb-6">POWERED BY MODERN TECH</p>
         <div className="flex flex-wrap justify-center gap-6 sm:gap-12">
           {['Next.js', 'React', 'TypeScript', 'Tailwind', 'Supabase', 'Vercel'].map((tech) => (
@@ -184,26 +164,9 @@ export default function WebDesignPage() {
           </p>
         </div>
 
-        {/* Filter */}
-        <div className="flex justify-center gap-2 mb-8">
-          {['all', 'website', 'webapp'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filter === f 
-                  ? 'bg-purple-600 text-white' 
-                  : 'bg-[#1A1A1A] text-[#888] hover:text-white'
-              }`}
-            >
-              {f === 'all' ? 'All Projects' : f === 'website' ? 'Websites' : 'Web Apps'}
-            </button>
-          ))}
-        </div>
-
         {/* Project Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredProjects.map((project) => (
+          {portfolioProjects.map((project) => (
             <a
               key={project.name}
               href={project.url}
@@ -364,89 +327,7 @@ export default function WebDesignPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Your Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] text-[#F5F5F5] focus:border-purple-500 focus:outline-none"
-                  placeholder="John Smith"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] text-[#F5F5F5] focus:border-purple-500 focus:outline-none"
-                  placeholder="john@example.com"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Project Type</label>
-                <select
-                  aria-label="Project type"
-                  required
-                  value={formData.projectType}
-                  onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] text-[#F5F5F5] focus:border-purple-500 focus:outline-none"
-                >
-                  <option value="">Select type...</option>
-                  <option value="landing">Landing Page</option>
-                  <option value="website">Business Website</option>
-                  <option value="webapp">Web Application</option>
-                  <option value="redesign">Redesign</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Budget Range</label>
-                <select
-                  aria-label="Budget range"
-                  value={formData.budget}
-                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] text-[#F5F5F5] focus:border-purple-500 focus:outline-none"
-                >
-                  <option value="">Select budget...</option>
-                  <option value="under750">Under £750</option>
-                  <option value="750-1500">£750 - £1,500</option>
-                  <option value="1500-3000">£1,500 - £3,000</option>
-                  <option value="3000+">£3,000+</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Project Details</label>
-              <textarea
-                rows={4}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0A0A0A] rounded-xl border border-[#2A2A2A] text-[#F5F5F5] focus:border-purple-500 focus:outline-none resize-none"
-                placeholder="Tell us about your project, goals, and any specific requirements..."
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-semibold hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
-            >
-              Send Inquiry
-            </button>
-
-            <p className="text-center text-[#666] text-xs">
-              Or send us a message using the form above.
-            </p>
-          </form>
+          <WebDesignContactForm />
         </div>
       </div>
 
