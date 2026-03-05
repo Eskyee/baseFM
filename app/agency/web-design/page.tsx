@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { WebDesignContactForm } from '@/components/WebDesignContactForm';
 
 export const metadata = {
   title: 'Web Design Agency | baseFM',
@@ -111,26 +111,6 @@ const process = [
 ];
 
 export default function WebDesignPage() {
-  const [filter, setFilter] = useState('all');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    projectType: '',
-    budget: '',
-    message: '',
-  });
-
-  const filteredProjects = filter === 'all' 
-    ? portfolioProjects 
-    : portfolioProjects.filter(p => p.category === filter);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Web Design Inquiry: ${formData.projectType}`);
-    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\nProject Type: ${formData.projectType}\nBudget: ${formData.budget}\n\nMessage:\n${formData.message}`);
-    // Form submission opens email client (no direct email displayed)
-  };
-
   return (
     <div className="min-h-screen pb-24">
       {/* Hero */}
@@ -147,6 +127,26 @@ export default function WebDesignPage() {
             <p className="text-[#888] text-lg mb-8 max-w-2xl mx-auto">
               Fast, modern websites built with Next.js. From concept to launch — we handle everything so you can focus on your business.
             </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="#portfolio"
+                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white font-semibold hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
+              >
+                See Our Work
+              </a>
+              <a
+                href="#contact"
+                className="px-8 py-4 bg-[#1A1A1A] rounded-full text-[#F5F5F5] font-semibold hover:bg-[#252525] transition-colors border border-[#2A2A2A]"
+              >
+                Get a Quote
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tech Stack */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-y border-[#2A2A2A] bg-[#0A0A0A]/50">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="#portfolio"
