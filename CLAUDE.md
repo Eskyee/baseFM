@@ -382,8 +382,10 @@ baseFM integrates with Bankr for AI-powered onchain operations:
 1. Scan    → POST /agent/prompt (ask for trending tokens)
 2. Decide  → Parse response for TOKEN - up/down - high/medium/low
 3. Execute → POST /agent/prompt (swap command)
-4. Balance → GET /balances (update portfolio)
+4. Balance → POST /agent/prompt (portfolio query) — NO /balances endpoint!
 ```
+
+**IMPORTANT:** Bankr uses a prompt-based API for ALL operations including balance checks. There is no `/balances` REST endpoint. Always use `/agent/prompt` with natural language queries like "Show my portfolio balance on Base".
 
 **API Polling Pattern:**
 ```
@@ -566,6 +568,7 @@ Features:
 22. **Bankr private keys server-side only** - BANKR_PRIVATE_KEY must never reach client, use API routes
 23. **Bankr job polling** - Use promptAndWait pattern, polls until status === "completed"
 24. **Token pick format** - Bankr returns "TOKEN - up/down - high/medium/low", parse with regex
+25. **Bankr has NO /balances endpoint** - All operations use `/agent/prompt` with natural language, including balance checks. Parse portfolio info from the response text.
 
 ## Don'ts
 - Don't change Shop link to internal (owner explicitly said no)
