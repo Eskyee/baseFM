@@ -408,21 +408,6 @@ export default function AgencyPage() {
             <h3 className="text-[#F5F5F5] font-bold mb-1">Base</h3>
             <p className="text-[#888] text-sm">@raveculture</p>
           </a>
-
-          {/* Vercel */}
-          <a
-            href="https://vercel.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#1A1A1A] rounded-2xl p-6 text-center border border-[#2A2A2A] hover:border-white/50 transition-all"
-          >
-            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-3">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 76 16" fill="currentColor">
-                <path d="M37 0L55 16H44L41 12.5L37 15L33 12.5L30 16H19L37 0ZM55 0V16H62V0H55ZM0 0V16H7V0H0Z"/>
-            </div>
-            <h3 className="text-[#F5F5F5] font-bold mb-1">Vercel</h3>
-            <p className="text-[#888] text-sm">Hosted On</p>
-          </a>
         </div>
 
         {/* Bottom tagline */}
