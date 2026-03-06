@@ -792,7 +792,7 @@ function BankrSection() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected' | 'unconfigured'>('checking');
   const [balance, setBalance] = useState<{ totalUsd: number; breakdown: Record<string, number> } | null>(null);
 
   // Check API status and fetch balance on mount
@@ -802,7 +802,7 @@ function BankrSection() {
         const res = await fetch('/api/trading/balances');
         const data = await res.json();
         if (data.id === 'unconfigured') {
-          setApiStatus('disconnected');
+          setApiStatus('unconfigured');
         } else if (data.id === 'error' || data.id === 'timeout') {
           // API is configured but returned an error - still show as connected
           // The user can try again via the chat interface
@@ -820,6 +820,7 @@ function BankrSection() {
           }
         }
       } catch {
+        // Network error - API might be configured but we can't reach it
         setApiStatus('disconnected');
       }
     };
@@ -1007,8 +1008,8 @@ function BankrSection() {
         ))}
       </div>
 
-      {/* Setup Instructions */}
-      {apiStatus === 'disconnected' && (
+      {/* Setup Instructions - only show when API key is not configured */}
+      {apiStatus === 'unconfigured' && (
         <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
           <h3 className="text-yellow-400 font-mono font-semibold text-sm mb-2">Setup Required</h3>
           <p className="text-[#888] text-xs font-mono mb-2">
@@ -1020,6 +1021,16 @@ function BankrSection() {
           </div>
           <p className="text-[#666] text-[10px] font-mono mt-2">
             Get your API key at <a href="https://docs.bankr.bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">docs.bankr.bot</a>
+          </p>
+        </div>
+      )}
+
+      {/* Network error - API configured but can't connect */}
+      {apiStatus === 'disconnected' && (
+        <div className="border border-orange-500/30 rounded-xl p-4 bg-orange-500/5">
+          <h3 className="text-orange-400 font-mono font-semibold text-sm mb-2">Connection Issue</h3>
+          <p className="text-[#888] text-xs font-mono">
+            Unable to connect to Bankr API. The service may be temporarily unavailable.
           </p>
         </div>
       )}

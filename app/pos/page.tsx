@@ -171,7 +171,10 @@ export default function POSPage() {
         setScannerInput(walletAddress);
 
         // Stop camera after successful scan
-        stopCamera();
+        if (html5QrCodeRef.current) {
+          html5QrCodeRef.current.stop().catch(() => {});
+          setCameraActive(false);
+        }
       };
 
       const config = {

@@ -97,6 +97,7 @@ export async function GET() {
       id: 'error',
       totalUsd: 0,
       breakdown: {},
+      error: 'Network error connecting to Bankr API',
     });
   }
 }

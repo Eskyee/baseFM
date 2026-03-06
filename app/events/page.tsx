@@ -50,7 +50,7 @@ export default function EventsPage() {
         <header className="flex items-center justify-between">
           <div>
             <h1 className="text-[#F5F5F5] text-xl font-bold">Events</h1>
-            <p className="text-[#888] text-sm">Discover what's happening</p>
+            <p className="text-[#888] text-sm">Discover what&apos;s happening</p>
           </div>
           <div className="flex items-center gap-2">
             <Link
