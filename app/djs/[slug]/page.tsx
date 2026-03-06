@@ -124,7 +124,6 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const pastStreams = streams.filter(s => s.status === 'ENDED').slice(0, 12);
   const upcomingStreams = streams.filter(s => s.status === 'CREATED' || s.status === 'PREPARING');
   const hasAvatar = !!dj.avatarUrl;
-  const hasCover = !!dj.coverImageUrl;
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -148,7 +147,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
       <div className="relative">
         {/* Banner container with proper aspect ratio for different screens */}
         <div className="relative w-full aspect-[3/1] sm:aspect-[4/1] md:aspect-[5/1] max-h-80 overflow-hidden">
-          {hasCover ? (
+          {dj.coverImageUrl ? (
             <Image
               src={dj.coverImageUrl}
               alt={`${dj.name} cover`}
