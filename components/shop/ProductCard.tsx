@@ -2,9 +2,21 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import type { ImageLoaderProps } from 'next/image';
 import { formatPrice } from '@/lib/shopify/storefront';
 import type { ShopifyProduct } from '@/lib/shopify/storefront';
 import { parseOnchainTags } from '@/lib/shopify/config';
+
+// Shopify CDN supports resizing via the `width` query param, e.g.
+//   https://cdn.shopify.com/s/files/.../image.jpg?v=1&width=800
+// This lets Next.js request appropriately-sized images without needing
+// the Vercel image optimizer, keeping Shopify CDN as the resize layer.
+// See: https://shopify.dev/docs/api/liquid/filters/img_url
+function shopifyLoader({ src, width }: ImageLoaderProps): string {
+  const url = new URL(src);
+  url.searchParams.set('width', String(width));
+  return url.toString();
+}
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -23,10 +35,10 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="aspect-square bg-[#0A0A0A] relative overflow-hidden">
         {product.featuredImage ? (
           <Image
+            loader={shopifyLoader}
             src={product.featuredImage.url}
             alt={product.featuredImage.altText || product.title}
             fill
-            unoptimized
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

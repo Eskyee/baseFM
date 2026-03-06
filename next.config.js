@@ -47,6 +47,15 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'image.mux.com',
       },
+      // Shopify CDN - used by shopifyLoader in ProductCard
+      {
+        protocol: 'https',
+        hostname: 'cdn.shopify.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.myshopify.com',
+      },
     ],
   },
 
