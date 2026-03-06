@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 
+export const dynamic = "force-dynamic";
+
 // GET /api/transactions?wallet=0x...
 export async function GET(request: NextRequest) {
   try {
