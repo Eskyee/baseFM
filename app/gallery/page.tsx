@@ -160,7 +160,7 @@ export default function GalleryPage() {
       <div className="flex flex-col items-center justify-center pt-12 pb-8 px-4">
         <div className="mb-6">
           <Image
-            src="/logo.png"
+            src="/IMG_raveculture.png"
             alt="RaveCulture"
             width={180}
             height={180}
@@ -253,7 +253,7 @@ export default function GalleryPage() {
               >
                 <div className="relative overflow-hidden rounded-lg bg-white/5">
                   <Image
-                    src={image.secure_url || '/logo.png'}
+                    src={image.secure_url || '/IMG_raveculture.png'}
                     alt={`Gallery image ${index + 1}`}
                     width={image.width}
                     height={image.height}
@@ -352,7 +352,7 @@ export default function GalleryPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={selectedImage.secure_url || '/logo.png'}
+              src={selectedImage.secure_url || '/IMG_raveculture.png'}
               alt={`Full screen view of image ${selectedIndex + 1}`}
               width={selectedImage.width}
               height={selectedImage.height}
