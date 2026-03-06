@@ -8,9 +8,8 @@ import {
   streamFromRow,
 } from '@/types/stream';
 
-const supabase = createServerClient();
-
 export async function createStream(input: CreateStreamInput): Promise<Stream> {
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('streams')
     .insert({
@@ -35,6 +34,7 @@ export async function createStream(input: CreateStreamInput): Promise<Stream> {
 }
 
 export async function getStreamById(id: string): Promise<Stream | null> {
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('streams')
     .select('*')
@@ -54,6 +54,7 @@ export async function getStreams(filters?: {
   djWalletAddress?: string;
   limit?: number;
 }): Promise<Stream[]> {
+  const supabase = createServerClient();
   let query = supabase.from('streams').select('*');
 
   if (filters?.status) {
@@ -88,6 +89,7 @@ export async function updateStream(
   id: string,
   input: UpdateStreamInput
 ): Promise<Stream> {
+  const supabase = createServerClient();
   const updateData: Record<string, unknown> = {};
 
   if (input.title !== undefined) updateData.title = input.title;
@@ -122,6 +124,7 @@ export async function updateStreamStatus(
   id: string,
   status: StreamStatus
 ): Promise<Stream> {
+  const supabase = createServerClient();
   const updateData: Record<string, unknown> = {
     status,
     updated_at: new Date().toISOString(),
@@ -154,6 +157,7 @@ export async function updateStreamWithMuxDetails(
     hlsPlaybackUrl: string;
   }
 ): Promise<Stream> {
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('streams')
     .update({
@@ -173,6 +177,7 @@ export async function updateStreamWithMuxDetails(
 }
 
 export async function deleteStream(id: string): Promise<void> {
+  const supabase = createServerClient();
   const { error } = await supabase.from('streams').delete().eq('id', id);
 
   if (error) throw new Error(`Failed to delete stream: ${error.message}`);

@@ -123,10 +123,35 @@ export async function updateDJ(walletAddress: string, input: UpdateDJInput): Pro
 
   const updateData: Record<string, unknown> = {};
 
+  // Handle name change with unique slug generation
   if (input.name !== undefined) {
     updateData.name = input.name;
-    // Update slug if name changes
-    updateData.slug = generateSlug(input.name);
+
+    // Generate unique slug for the new name
+    const baseSlug = generateSlug(input.name);
+    let slug = baseSlug;
+    let counter = 1;
+
+    // Check for existing slug (excluding current DJ)
+    while (true) {
+      const { data: existing } = await supabase
+        .from('djs')
+        .select('wallet_address')
+        .eq('slug', slug)
+        .neq('wallet_address', walletAddress.toLowerCase())
+        .single();
+
+      if (!existing) break;
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+      // Safety limit to prevent infinite loops
+      if (counter > 100) {
+        slug = `${baseSlug}-${Date.now()}`;
+        break;
+      }
+    }
+
+    updateData.slug = slug;
   }
   if (input.bio !== undefined) updateData.bio = input.bio;
   if (input.avatarUrl !== undefined) updateData.avatar_url = input.avatarUrl;
@@ -150,16 +175,33 @@ export async function updateDJ(walletAddress: string, input: UpdateDJInput): Pro
     .select()
     .single();
 
+  // Handle unique constraint violation gracefully
+  if (error?.code === '23505') {
+    throw new Error('A DJ with this name already exists. Please choose a different name.');
+  }
   if (error) throw new Error(error.message);
   return djFromRow(data as DJRow);
 }
 
-export async function incrementDJShowCount(walletAddress: string): Promise<void> {
+export async function incrementDJShowCount(walletAddress: string): Promise<boolean> {
   const supabase = createServerClient();
 
-  await supabase.rpc('increment_dj_shows', {
+  const { data, error } = await supabase.rpc('increment_dj_shows', {
     wallet: walletAddress.toLowerCase(),
   });
+
+  if (error) {
+    console.error('Failed to increment DJ show count:', error.message);
+    return false;
+  }
+
+  // RPC returns boolean indicating success
+  if (data === false) {
+    console.warn(`No DJ found with wallet: ${walletAddress}`);
+    return false;
+  }
+
+  return true;
 }
 
 // Admin functions

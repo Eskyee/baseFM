@@ -4,59 +4,39 @@ import { chatMessageFromRow, ChatMessageRow } from '@/types/chat';
 import { isValidWalletAddress, isValidUUID, validatePagination } from '@/lib/validation';
 import { sanitizeChatMessage, sanitizeDisplayName } from '@/lib/validation/sanitize';
 
-// Rate limiting: max messages per wallet per minute
-const RATE_LIMIT = 10;
-const RATE_LIMIT_WINDOW = 60000; // 60 seconds
-const MAX_RATE_LIMIT_ENTRIES = 10000; // Prevent unbounded growth
+// Rate limiting configuration
+const RATE_LIMIT = 10; // Max messages per window
+const RATE_LIMIT_WINDOW_SECONDS = 60; // Window duration in seconds
 
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+/**
+ * Distributed rate limiting using Supabase
+ * Works across all serverless instances
+ */
+async function checkRateLimit(walletAddress: string): Promise<boolean> {
+  const supabase = createServerClient();
 
-// Periodically clean up expired entries to prevent memory leak
-setInterval(() => {
   try {
-    const now = Date.now();
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetTime) {
-        rateLimitMap.delete(key);
-      }
-    }
-  } catch (error) {
-    console.error('Rate limit cleanup error:', error);
-  }
-}, 60000); // Clean up every minute
+    // Use the database function for atomic rate limit checking
+    const { data, error } = await supabase.rpc('check_rate_limit', {
+      p_identifier: walletAddress.toLowerCase(),
+      p_context: 'chat',
+      p_max_requests: RATE_LIMIT,
+      p_window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+    });
 
-function checkRateLimit(walletAddress: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(walletAddress);
-
-  if (!entry || now > entry.resetTime) {
-    // Check if map is at capacity before adding new entry
-    if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
-      // Prune oldest entries (those past reset time) to make room
-      let pruned = 0;
-      for (const [key, value] of rateLimitMap.entries()) {
-        if (now > value.resetTime) {
-          rateLimitMap.delete(key);
-          pruned++;
-          if (rateLimitMap.size < MAX_RATE_LIMIT_ENTRIES) break;
-        }
-      }
-      // If still at capacity, reject new entries as rate limited
-      if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES && pruned === 0) {
-        console.warn('Rate limit map at capacity, rejecting new entry');
-        return false;
-      }
+    if (error) {
+      // If rate limit check fails, log but allow the request
+      // This prevents rate limiting from breaking chat entirely
+      console.error('Rate limit check failed:', error.message);
+      return true;
     }
-    rateLimitMap.set(walletAddress, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+
+    return data === true;
+  } catch (err) {
+    console.error('Rate limit error:', err);
+    // Fail open - allow request if rate limiting is broken
     return true;
   }
-
-  if (entry.count >= RATE_LIMIT) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
 }
 
 // GET - Fetch recent messages for a stream
@@ -129,8 +109,9 @@ export async function POST(request: NextRequest) {
 
     const sanitizedName = senderName ? sanitizeDisplayName(senderName, 50) : null;
 
-    // Rate limiting with memory protection
-    if (!checkRateLimit(walletAddress)) {
+    // Distributed rate limiting via Supabase
+    const withinLimit = await checkRateLimit(walletAddress);
+    if (!withinLimit) {
       return NextResponse.json({ error: 'Too many messages. Please wait.' }, { status: 429 });
     }
 

@@ -129,11 +129,19 @@ export async function recordTicketPurchase(purchase: {
     return null;
   }
 
-  // Increment sold count
-  await supabase.rpc('increment_ticket_sold', {
+  // Increment sold count with error handling
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('increment_ticket_sold', {
     ticket_uuid: purchase.ticketId,
     qty: purchase.quantity,
   });
+
+  if (rpcError) {
+    console.error('Error incrementing ticket sold count:', rpcError.message);
+    // Don't return null here - the purchase was recorded successfully
+    // The sold count can be reconciled later if needed
+  } else if (rpcResult === false) {
+    console.warn(`Failed to increment sold count for ticket: ${purchase.ticketId}`);
+  }
 
   return {
     id: data.id,
