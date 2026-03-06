@@ -6,6 +6,7 @@ import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
+import { MoltxFeed } from '@/components/MoltxFeed';
 import Link from 'next/link';
 import {
   getNextUpcomingEvent,
@@ -320,6 +321,15 @@ export default function HomePage() {
             </Link>
           </section>
         )}
+
+        {/* === ATLAS AGENT FEED === */}
+        <section>
+          <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+            Atlas AI Agent
+          </h2>
+          <MoltxFeed agentName="Atlas_baseFM" limit={3} />
+        </section>
 
         {/* === QUICK LINKS — always visible === */}
         <section>

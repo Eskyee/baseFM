@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/lib/supabase/client';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const wallet = searchParams.get('wallet');
@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
     if (!wallet) {
       return NextResponse.json({ error: 'Wallet required' }, { status: 400 });
     }
+
+    const supabase = createServerClient();
 
     // Get DJ profile
     const { data: dj } = await supabase
