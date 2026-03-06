@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 import type { Trade } from '@/types/trading';
 
+// Never statically pre-render — this route reads from Supabase at runtime
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/trading/trades
  * Fetches recent trades from local database

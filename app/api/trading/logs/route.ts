@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 import type { TradingLog } from '@/types/trading';
 
+// Never statically pre-render — this route reads from Supabase at runtime
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/trading/logs
  * Fetches trading activity logs
