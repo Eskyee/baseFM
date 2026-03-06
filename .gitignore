@@ -48,6 +48,9 @@ test-stream.mp4
 # Supabase
 supabase/.temp/
 
+# Claude/MCP
+.mcp.json
+
 # Misc
 *.log
 *.pid
