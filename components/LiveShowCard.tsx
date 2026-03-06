@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePlayer, CurrentStream } from '@/contexts/PlayerContext';
 
 // Default fallback image - baseFM logo
@@ -81,10 +82,11 @@ export function LiveShowCard({
             : 'aspect-square rounded-lg'
         }`}
       >
-        <img
+        <Image
           src={imageUrl}
           alt={title}
-          className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${
+          fill
+          className={`transition-transform duration-300 group-hover:scale-105 ${
             hasCustomArtwork ? 'object-cover' : 'object-contain p-8 bg-[#0A0A0A]'
           }`}
         />

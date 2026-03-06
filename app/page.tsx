@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
@@ -282,16 +283,17 @@ export default function HomePage() {
               className="block bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-colors group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
+                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
                   {djOfTheDay.dj.avatarUrl ? (
-                    <img
+                    <Image
                       src={djOfTheDay.dj.avatarUrl}
                       alt={djOfTheDay.dj.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <img src="/logo.png" alt="" className="w-8 h-8 opacity-50" />
+                      <Image src="/logo.png" alt="" width={32} height={32} className="opacity-50" />
                     </div>
                   )}
                 </div>
@@ -522,6 +524,19 @@ export default function HomePage() {
             <p className="text-[#666] text-xs text-center">
               Created by Eskyee for baseFM
             </p>
+            {/* Vercel Logo */}
+            <div className="mt-4 flex justify-center">
+              <a
+                href="https://vercel.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="opacity-60 hover:opacity-100 transition-opacity"
+              >
+                <svg width="80" height="16" viewBox="0 0 2048 407" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M467.444 406.809L233.722 0.335938L0 406.809H467.444ZM703.186 388.306L898.51 18.813H814.024L679.286 287.152L544.547 18.813H460.061L655.385 388.306H703.186ZM2034.31 18.813V388.307H1964.37V18.813H2034.31ZM1644.98 250.395C1644.98 221.599 1650.99 196.272 1663.01 174.415C1675.03 152.557 1691.79 135.731 1713.28 123.935C1734.77 112.139 1759.91 106.241 1788.69 106.241C1814.19 106.241 1837.14 111.792 1857.54 122.894C1877.94 133.996 1894.15 150.476 1906.17 172.333C1918.19 194.191 1924.39 220.905 1924.75 252.477V268.61H1718.75C1720.2 291.508 1726.94 309.549 1738.96 322.733C1751.35 335.57 1767.93 341.988 1788.69 341.988C1801.8 341.988 1813.83 338.519 1824.75 331.58C1835.68 324.641 1843.88 315.274 1849.34 303.478L1920.93 308.682C1912.18 334.702 1895.79 355.519 1871.75 371.131C1847.7 386.744 1820.02 394.55 1788.69 394.55C1759.91 394.55 1734.77 388.652 1713.28 376.856C1691.79 365.06 1675.03 348.233 1663.01 326.376C1650.99 304.518 1644.98 279.192 1644.98 250.395ZM1852.62 224.375C1850.07 201.823 1842.97 185.344 1831.31 174.935C1819.65 164.18 1805.45 158.802 1788.69 158.802C1769.38 158.802 1753.72 164.527 1741.7 175.976C1729.67 187.425 1722.21 203.558 1719.29 224.375H1852.62Z" fill="white"/>
+                </svg>
+              </a>
+            </div>
           </div>
         </section>
 

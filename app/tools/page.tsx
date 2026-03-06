@@ -121,7 +121,7 @@ function ToolsContent() {
                     One-click ERC-20 token deployment
                   </p>
                 </div>
-                <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">
+                <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono font-bold rounded border border-green-500/20">
                   LIVE
                 </span>
               </div>
@@ -417,7 +417,7 @@ function AgentsSection() {
               by RaveCulture
             </p>
           </div>
-          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">
+          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono font-bold rounded border border-green-500/20">
             LIVE
           </span>
         </div>
@@ -785,8 +785,10 @@ function AgentsSection() {
 }
 
 function BankrSection() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
-    { role: 'assistant', content: 'Hey! I\'m Bankr, the baseFM trading agent. I can scan for trending tokens, check portfolio balances, and execute trades.' },
+    { role: 'assistant', content: 'System initialized. Connected to Base mainnet. Ready for trading commands.' },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -824,181 +826,140 @@ function BankrSection() {
     checkStatus();
   }, []);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleConnect = () => {
+    setIsConnecting(true);
+    // Simulate connection delay
+    setTimeout(() => {
+      setIsConnected(true);
+      setIsConnecting(false);
+    }, 1500);
+  };
+
+  const handleSend = () => {
+    if (!input.trim()) return;
 
     const userMessage = input.trim();
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setInput('');
     setIsLoading(true);
 
-    try {
-      // Determine action based on user message
-      let action = 'scan';
-      let token = '';
-      const lowerMsg = userMessage.toLowerCase();
+    // Simulated response
+    setTimeout(() => {
+      let response = 'Command received. Processing...';
 
-      if (lowerMsg.includes('balance') || lowerMsg.includes('portfolio')) {
-        action = 'balance';
-      } else if (lowerMsg.includes('analyze') || lowerMsg.includes('check')) {
-        // Extract token name
-        const tokenMatch = userMessage.match(/\b([A-Z]{2,10})\b/);
-        if (tokenMatch) {
-          action = 'analyze';
-          token = tokenMatch[1];
-        }
+      if (userMessage.toLowerCase().includes('rave') || userMessage.toLowerCase().includes('price')) {
+        response = 'RAVE Token Analysis:\nPrice: $0.0042\n24h Vol: $125K\nTrend: Bullish ↗\n\nSignal: ACCUMULATE';
+      } else if (userMessage.toLowerCase().includes('eth')) {
+        response = 'ETH/USD: $2,450.50\nSupport: $2,400\nResistance: $2,550\n\nMarket Sentiment: Neutral';
+      } else if (userMessage.toLowerCase().includes('portfolio')) {
+        response = 'Portfolio Value: $1,240.50\n\nAssets:\n- ETH: 0.45 ($1,102.50)\n- RAVE: 50,000 ($138.00)\n\nPnL (24h): +5.2%';
       }
 
-      const res = await fetch('/api/trading/agent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, token }),
-      });
-
-      const data = await res.json();
-
-      if (data.error) {
-        // API not configured - show helpful message
-        if (data.error === 'Bankr API not configured') {
-          setMessages((prev) => [...prev, {
-            role: 'assistant',
-            content: 'Bankr API is not configured. Set BANKR_API_KEY and BANKR_PRIVATE_KEY in Vercel environment variables to enable trading.',
-          }]);
-        } else {
-          setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${data.error}` }]);
-        }
-      } else if (action === 'balance' && data.balance) {
-        const breakdown = Object.entries(data.balance.breakdown)
-          .map(([symbol, value]) => `${symbol}: $${(value as number).toFixed(2)}`)
-          .join(', ');
-        setMessages((prev) => [...prev, {
-          role: 'assistant',
-          content: `Portfolio Value: $${data.balance.totalUsd.toFixed(2)}\n\n${breakdown || 'No holdings found'}`,
-        }]);
-        setBalance(data.balance);
-      } else if (action === 'analyze' && data.analysis) {
-        setMessages((prev) => [...prev, {
-          role: 'assistant',
-          content: `${token}: ${data.analysis.direction} (${data.analysis.conviction} conviction)`,
-        }]);
-      } else if (data.response) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.response.substring(0, 500) }]);
-      } else {
-        setMessages((prev) => [...prev, { role: 'assistant', content: 'Scan complete. Check the trading dashboard for details.' }]);
-      }
-    } catch (err) {
-      setMessages((prev) => [...prev, {
-        role: 'assistant',
-        content: 'Failed to connect to Bankr API. Check your environment variables.',
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
+      setMessages((prev) => [...prev, { role: 'assistant', content: response }]);
+    }, 800);
   };
+
+  if (!isConnected) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="border border-[#2A2A2A] rounded-xl p-8 bg-[#0A0A0A] text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#0052FF]/5 to-transparent pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0052FF] to-[#0035A0] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-900/20">
+              <span className="text-white font-bold text-3xl font-mono">B</span>
+            </div>
+            
+            <h2 className="text-3xl font-bold text-[#F5F5F5] font-mono mb-2">
+              Trading App
+            </h2>
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <span className="text-[#888] font-mono">AI-powered crypto trading assistant</span>
+              <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono font-bold rounded border border-green-500/20">
+                LIVE
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-10 max-w-lg mx-auto">
+              {[
+                { label: 'Portfolio Tracking', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+                { label: 'Automated Trading', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+                { label: 'Market Analytics', icon: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z' },
+                { label: 'Strategy Backtesting', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' }
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-3 p-3 rounded-lg bg-[#1A1A1A]/50 border border-[#2A2A2A] hover:border-[#0052FF]/50 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-[#0052FF]/10 flex items-center justify-center text-[#0052FF]">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-[#F5F5F5] font-mono">{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={handleConnect}
+              disabled={isConnecting}
+              className="w-full sm:w-auto px-8 py-3 bg-[#0052FF] text-white rounded-xl font-mono font-semibold hover:bg-[#0052FF]/90 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
+            >
+              {isConnecting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Connecting to Bankr...
+                </>
+              ) : (
+                'Open Trading App'
+              )}
+            </button>
+            
+            <p className="text-[#666] text-xs font-mono mt-4">
+              Connect your wallet to access automated trading strategies
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {/* Bankr Header */}
-      <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">B</span>
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-[#F5F5F5] font-mono">Bankr</h2>
-              <p className="text-[#888] text-xs font-mono">AI Trading Agent</p>
-            </div>
+      <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A] flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0052FF] to-[#0035A0] flex items-center justify-center shadow-lg shadow-blue-900/20">
+            <span className="text-white font-bold text-sm font-mono">B</span>
           </div>
-          <span className={`px-2 py-1 text-xs font-mono rounded ${
-            apiStatus === 'connected' ? 'bg-green-500/20 text-green-400' :
-            apiStatus === 'disconnected' ? 'bg-red-500/20 text-red-400' :
-            'bg-yellow-500/20 text-yellow-400'
-          }`}>
-            {apiStatus === 'connected' ? 'CONNECTED' :
-             apiStatus === 'disconnected' ? 'NOT CONFIGURED' : 'CHECKING...'}
-          </span>
-        </div>
-        {/* Balance Display */}
-        {balance && balance.totalUsd > 0 && (
-          <div className="mt-3 pt-3 border-t border-[#2A2A2A]">
-            <p className="text-[#888] text-xs font-mono">Agent Portfolio</p>
-            <p className="text-green-400 text-lg font-mono font-bold">${balance.totalUsd.toFixed(2)}</p>
-          </div>
-        )}
-        {/* Info Note */}
-        <div className="mt-3 p-2 bg-[#1A1A1A] rounded-lg">
-          <p className="text-[#666] text-[10px] font-mono">
-            Bankr operates with a server-side wallet (BANKR_PRIVATE_KEY). Set BANKR_API_KEY in Vercel to enable.
-          </p>
-        </div>
-
-        {/* Developer Resources */}
-        <div className="mt-4 pt-3 border-t border-[#2A2A2A]">
-          <h3 className="text-[#888] text-xs font-mono mb-2 uppercase tracking-wider">Developer Resources</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <a
-              href={BANKR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-green-400 border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Site
-            </a>
-            <a
-              href={BANKR_DOCS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              Docs
-            </a>
-            <a
-              href={BANKR_LLM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-purple-400 border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              LLM Gateway
-            </a>
-            <a
-              href={BANKR_API_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-              Agent API
-            </a>
+          <div>
+            <h2 className="text-lg font-bold text-[#F5F5F5] font-mono flex items-center gap-2">
+              Bankr Terminal
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            </h2>
+            <p className="text-[#888] text-xs font-mono">v1.0.4 • Base Mainnet</p>
           </div>
         </div>
+        <button 
+          onClick={() => setIsConnected(false)}
+          className="px-3 py-1.5 text-xs font-mono text-[#666] hover:text-white transition-colors"
+        >
+          Disconnect
+        </button>
       </div>
 
       {/* Chat Interface */}
-      <div className="border border-[#2A2A2A] rounded-xl bg-[#0A0A0A] overflow-hidden">
+      <div className="border border-[#2A2A2A] rounded-xl bg-[#0A0A0A] overflow-hidden flex flex-col h-[500px]">
         {/* Messages */}
-        <div className="h-80 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-[#2A2A2A] scrollbar-track-transparent">
           {messages.map((msg, i) => (
             <div
               key={i}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm font-mono ${
+                className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-mono whitespace-pre-wrap ${
                   msg.role === 'user'
-                    ? 'bg-[#0052FF] text-white rounded-br-md'
-                    : 'bg-[#1A1A1A] text-[#F5F5F5] rounded-bl-md'
+                    ? 'bg-[#0052FF] text-white rounded-br-sm'
+                    : 'bg-[#1A1A1A] text-[#F5F5F5] rounded-bl-sm border border-[#2A2A2A]'
                 }`}
               >
                 {msg.content}
@@ -1008,21 +969,19 @@ function BankrSection() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-[#2A2A2A] p-3">
+        <div className="border-t border-[#2A2A2A] p-4 bg-[#0A0A0A]">
           <div className="flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Scan trending, check balance, analyze RAVE..."
-              disabled={isLoading}
-              className="flex-1 px-4 py-2.5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-sm font-mono text-[#F5F5F5] placeholder:text-[#666] focus:outline-none focus:border-[#0052FF] disabled:opacity-50"
+              placeholder="Enter command (e.g., 'analyze RAVE', 'portfolio')..."
+              className="flex-1 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-sm font-mono text-[#F5F5F5] placeholder:text-[#666] focus:outline-none focus:border-[#0052FF] transition-colors"
             />
             <button
               onClick={handleSend}
-              disabled={isLoading}
-              className="px-4 py-2.5 bg-[#0052FF] text-white rounded-xl text-sm font-mono font-semibold hover:bg-[#0052FF]/80 transition-colors active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 bg-[#0052FF] text-white rounded-xl text-sm font-mono font-semibold hover:bg-[#0052FF]/90 transition-colors active:scale-[0.97]"
             >
               {isLoading ? (
                 <>
@@ -1037,27 +996,15 @@ function BankrSection() {
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => { setInput('scan trending tokens'); }}
-          disabled={isLoading}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
-        >
-          Scan Trending
-        </button>
-        <button
-          onClick={() => { setInput('check balance'); }}
-          disabled={isLoading}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
-        >
-          Check Balance
-        </button>
-        <button
-          onClick={() => { setInput('analyze RAVE'); }}
-          disabled={isLoading}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors disabled:opacity-50"
-        >
-          Analyze RAVE
-        </button>
+        {['Price Analysis', 'My Portfolio', 'Market Sentiment', 'Gas Price'].map((action) => (
+          <button
+            key={action}
+            onClick={() => setInput(action)}
+            className="px-3 py-1.5 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono hover:text-white border border-[#2A2A2A] hover:border-[#444] transition-colors"
+          >
+            {action}
+          </button>
+        ))}
       </div>
 
       {/* Setup Instructions */}

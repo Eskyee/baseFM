@@ -467,7 +467,7 @@ export default function AICloudPage() {
             <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-5">
               <h3 className="text-white font-mono font-semibold mb-3">Boost Agent</h3>
               <p className="text-[#666] text-sm font-mono mb-3">
-                Amplify your agent's reach temporarily. Great for releases.
+                Amplify your agent&apos;s reach temporarily. Great for releases.
               </p>
               <div className="text-purple-400 font-mono text-sm">
                 200-1,000 RAVE

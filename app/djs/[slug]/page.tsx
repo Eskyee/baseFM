@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAccount } from 'wagmi';
 import { DJ } from '@/types/dj';
 import { Stream } from '@/types/stream';
@@ -57,7 +58,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
     }
 
     fetchData();
-  }, [params.slug]);
+  }, [params.slug, address]);
 
   const handleFollow = async () => {
     if (!address || !dj || isFollowLoading) return;
@@ -148,10 +149,11 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         {/* Banner container with proper aspect ratio for different screens */}
         <div className="relative w-full aspect-[3/1] sm:aspect-[4/1] md:aspect-[5/1] max-h-80 overflow-hidden">
           {hasCover ? (
-            <img
+            <Image
               src={dj.coverImageUrl}
               alt={`${dj.name} cover`}
-              className="w-full h-full object-cover object-center"
+              fill
+              className="object-cover object-center"
               style={{ objectPosition: 'center 30%' }}
             />
           ) : (
@@ -213,11 +215,12 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             {/* Avatar - Larger and more prominent */}
             <div className="relative flex-shrink-0">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50">
-                <img
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50">
+                <Image
                   src={dj.avatarUrl || DEFAULT_AVATAR}
                   alt={dj.name}
-                  className={`w-full h-full ${hasAvatar ? 'object-cover' : 'object-contain p-6'}`}
+                  fill
+                  className={`${hasAvatar ? 'object-cover' : 'object-contain p-6'}`}
                 />
               </div>
               {/* Live indicator on avatar if streaming */}
@@ -437,17 +440,20 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                     >
                       <div className="aspect-square bg-[#0A0A0A] relative">
                         {stream.coverImageUrl ? (
-                          <img
+                          <Image
                             src={stream.coverImageUrl}
                             alt={stream.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <img
+                            <Image
                               src="/logo.png"
                               alt="baseFM"
-                              className="w-12 h-12 opacity-30 object-contain"
+                              width={48}
+                              height={48}
+                              className="opacity-30 object-contain"
                             />
                           </div>
                         )}

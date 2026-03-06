@@ -20,10 +20,9 @@ export async function GET(
       return NextResponse.json({ error: 'Promoter not found' }, { status: 404 });
     }
 
-    // Get promoter's events
+    // Get promoter's events (both upcoming and past)
     const events = await getAllEvents({
       promoterId: promoter.id,
-      status: 'approved',
     });
 
     return NextResponse.json({ promoter, events });

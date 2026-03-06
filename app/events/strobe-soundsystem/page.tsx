@@ -76,6 +76,7 @@ const EVENT_DATA: {
       subtitle: 'Roots to Drum & Bass',
       hostedBy: 'MC Tempo',
       lineup: [
+        { artist: 'Maxim Noize', genre: 'Hard Techno' },
         { artist: 'K0TTI', genre: 'Minimal' },
         { artist: 'COMPETITION WINNER', genre: '', isSpecial: true },
         { artist: 'Medeea Haruki', genre: 'Melodic' },

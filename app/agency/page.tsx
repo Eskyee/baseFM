@@ -43,6 +43,12 @@ const pillars = [
     description: 'Not an agency. A network. Promoters, artists, crews, ravers — all plugged into the same mission. We rise together.',
     heritage: ['Crew Network', 'Knowledge Sharing', 'Resource Pooling', 'Mutual Support'],
   },
+  {
+    icon: '💻',
+    title: 'Web Development',
+    description: 'Modern websites and web apps built with Next.js. From landing pages to full-stack applications with CMS and e-commerce.',
+    heritage: ['Next.js Apps', 'E-commerce', 'CMS Integration', 'API Development'],
+  },
 ];
 
 const timeline = [
@@ -109,7 +115,7 @@ export default function AgencyPage() {
               Plugged In · DIY Network
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#F5F5F5] mb-6 leading-tight">
-              We Don't Wait For<br />
+              We Don&apos;t Wait For<br />
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
                 Permission
               </span>
@@ -140,6 +146,15 @@ export default function AgencyPage() {
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
+              </Link>
+              <Link
+                href="/agency/web-design"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#1A1A1A] border border-[#333] rounded-full text-[#F5F5F5] font-semibold text-lg hover:bg-[#252525] hover:border-purple-500/50 transition-all"
+              >
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                Web Design
               </Link>
               <a
                 href="https://warpcast.com/raveculture"
@@ -274,7 +289,7 @@ export default function AgencyPage() {
               Standing On Shoulders
             </h2>
             <p className="text-[#888]">
-              We didn't invent this. We're continuing what the pioneers started.
+              We didn&apos;t invent this. We&apos;re continuing what the pioneers started.
             </p>
           </div>
 
@@ -290,8 +305,8 @@ export default function AgencyPage() {
           </div>
 
           <p className="text-center text-[#444] text-xs mt-8 max-w-lg mx-auto">
-            "The history of rave is the history of people creating spaces outside the system.
-            We're not nostalgic — we're building the next chapter."
+            &quot;The history of rave is the history of people creating spaces outside the system.
+            We&apos;re not nostalgic — we&apos;re building the next chapter.&quot;
           </p>
         </div>
       </section>
@@ -329,7 +344,7 @@ export default function AgencyPage() {
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F5F5] mb-4">Plug In</h2>
           <p className="text-[#888] max-w-2xl mx-auto">
-            Whether you're an artist, promoter, or just someone who believes in the culture — let's connect.
+            Whether you&apos;re an artist, promoter, or just someone who believes in the culture — let&apos;s connect.
           </p>
         </div>
 

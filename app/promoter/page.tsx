@@ -66,6 +66,7 @@ export default function PromoterDashboard() {
     if (eventId) {
       loadCrew();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   // Add crew member

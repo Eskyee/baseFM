@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { DJ } from '@/types/dj';
 
 const DEFAULT_AVATAR = '/logo.png';
@@ -159,10 +160,11 @@ function DJCard({ dj }: { dj: DJ }) {
     >
       {/* Avatar */}
       <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3">
-        <img
+        <Image
           src={dj.avatarUrl || DEFAULT_AVATAR}
           alt={dj.name}
-          className={`w-full h-full transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
+          fill
+          className={`transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
             hasAvatar ? 'object-cover' : 'object-contain p-8'
           }`}
         />

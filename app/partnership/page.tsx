@@ -218,7 +218,7 @@ export default function PartnershipPage() {
             {/* Active testimonial quote */}
             <div className="flex items-center p-8 sm:p-12 bg-white/[0.02] border border-white/[0.06] rounded-3xl relative overflow-hidden">
               <div className="absolute top-4 left-6 text-[120px] text-purple-500/10 font-serif leading-none">
-                "
+                &quot;
               </div>
               <p className="text-xl sm:text-2xl leading-relaxed text-white/90 relative z-10">
                 {testimonials[activePartner].quote}
@@ -238,7 +238,7 @@ export default function PartnershipPage() {
             Built for every corner of electronic music
           </h2>
           <p className="text-lg text-white/50 mb-16 max-w-[600px]">
-            Whether you're a legendary club, independent label, or global festival—
+            Whether you&apos;re a legendary club, independent label, or global festival—
             baseFM adapts to your vision.
           </p>
 

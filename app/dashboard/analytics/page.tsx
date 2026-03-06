@@ -96,22 +96,18 @@ export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>('all');
 
   useEffect(() => {
-    async function fetchAnalytics() {
-      if (!address) return;
-      try {
-        const res = await fetch(`/api/analytics?wallet=${address}`, {
-          headers: {
-            'x-wallet-address': address,
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setAnalytics(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      } finally {
-        setIsLoading(false);
+    if (address) {
+      fetchAnalytics();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch(`/api/analytics?wallet=${address}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAnalytics(data);
       }
     }
 
