@@ -1,1043 +1,345 @@
 # baseFM Comprehensive Code Review Report
-**Date**: February 24, 2026  
-**Reviewer**: Kiro AI  
-**Repository**: https://github.com/Eskyee/baseFM
+**Date**: March 6, 2026  
+**Reviewer**: GitHub Copilot  
+**Repository**: https://github.com/Eskyee/baseFM  
+**Previous Review**: February 24, 2026 (Kiro AI)
 
 ---
 
 ## Executive Summary
 
-**Overall Grade: B+ (Very Good)**
+**Overall Grade: B (Good)**
 
-baseFM is a well-architected, production-ready onchain radio platform with comprehensive features. The codebase demonstrates good practices in most areas but has some security concerns and technical debt that should be addressed before scaling.
+Since the last review (February 24, 2026) several critical issues have been resolved, including the XSS vulnerability in the shop page, missing input validation, and webhook signature verification. TypeScript strict mode has been enabled. However, new or persisting issues remain, primarily around admin API authentication, npm vulnerabilities in direct dependencies, and missing HTTP security headers.
 
 ### Key Findings
-- ✅ **23 Strengths** identified
-- ⚠️ **12 Medium-priority issues** found
-- 🔴 **3 Critical security concerns** discovered
-- 📊 **23 npm vulnerabilities** (1 low, 2 moderate, 20 high)
+- ✅ **11 improvements** since the previous review
+- 🔴 **2 Critical security issues** remain
+- ⚠️ **6 Medium-priority issues** found
+- 📊 **8 npm vulnerabilities** (1 moderate, 7 high) — down from 23
 
 ---
 
-## 1. API Routes Deep Dive
+## What Has Been Fixed Since the Last Review
 
-### ✅ Strengths
+| # | Issue | Status |
+|---|-------|--------|
+| 1 | XSS in `app/shop/[handle]/page.tsx` — now uses DOMPurify | ✅ Fixed |
+| 2 | No admin authentication middleware — `lib/middleware/admin-auth.ts` created | ✅ Fixed |
+| 3 | No tx hash validation — `lib/validation/index.ts` created and used | ✅ Fixed |
+| 4 | Mux webhook had no signature verification — now verified with HMAC | ✅ Fixed |
+| 5 | Shopify webhook had no signature verification — now verified with HMAC | ✅ Fixed |
+| 6 | TypeScript strict mode was off — now enabled in `tsconfig.json` | ✅ Fixed |
+| 7 | Chat had no sanitization — `lib/validation/sanitize.ts` created | ✅ Fixed |
+| 8 | Ticket purchase had no on-chain verification — `lib/onchain/verify-transaction.ts` | ✅ Fixed |
+| 9 | Input validation library missing — comprehensive `lib/validation/index.ts` added | ✅ Fixed |
+| 10 | Realtime subscription leak in `LiveChat.tsx` — cleanup now in `useEffect` return | ✅ Fixed |
+| 11 | Low test coverage — now 78 passing tests across 4 files | ✅ Improved |
 
-#### Error Handling (Good Examples)
+---
+
+## 1. Critical Security Issues
+
+### 🔴 Issue 1: Admin API Routes Accept Wallet Address From Request Body (Unauthenticated)
+
+**Severity**: CRITICAL  
+**Files affected**:
+- `app/api/admin/community/route.ts` (GET has **no auth check at all**)
+- `app/api/admin/djs/route.ts` (GET reads wallet from query param, no signature)
+- `app/api/admin/community/route.ts` POST reads wallet from body
+- `app/api/admin/promoters/route.ts`
+- `app/api/admin/events/route.ts`
+- `app/api/admin/clear-streams/route.ts`
+
+**Description**: Admin routes check if a provided `walletAddress` is in the admin list, but they accept that wallet address as a plain string from the request body or query params — no cryptographic proof is required. Any attacker who knows (or guesses) an admin wallet address can forge this header/body value and pass the authorization check.
+
+Additionally, `GET /api/admin/community` has **zero** authentication — it returns all member wallet addresses, bios, and token balances to any unauthenticated caller.
+
 ```typescript
-// app/api/streams/route.ts - Good error handling
-try {
-  const streams = await getStreams({ ... });
-  return NextResponse.json({ streams });
-} catch (error) {
-  console.error('Error fetching streams:', error);
-  return NextResponse.json(
-    { error: 'Failed to fetch streams' },
-    { status: 500 }
-  );
+// CURRENT — INSECURE: walletAddress from untrusted request body
+const { walletAddress, memberId, action } = body;
+if (!isAdminWallet(walletAddress)) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 }
 ```
 
-#### Input Validation
-```typescript
-// app/api/djs/route.ts - Good validation
-if (!body.name || !body.walletAddress) {
-  return NextResponse.json(
-    { error: 'Missing required fields: name, walletAddress' },
-    { status: 400 }
-  );
-}
-
-if (!isValidWalletAddress(body.walletAddress)) {
-  return NextResponse.json(
-    { error: 'Invalid wallet address format' },
-    { status: 400 }
-  );
-}
-```
-
-#### Cleanup on Failure
-```typescript
-// app/api/streams/route.ts - Good cleanup logic
-if (streamId) {
-  try {
-    await deleteStream(streamId);
-    console.log('Cleaned up orphaned stream:', streamId);
-  } catch (cleanupError) {
-    console.error('Failed to cleanup orphaned stream:', cleanupError);
-  }
-}
-```
-
-### ⚠️ Issues Found
-
-#### 1. Duplicate Transaction Prevention (Good)
-```typescript
-// app/api/tips/route.ts - Prevents duplicate tips
-const { data: existing } = await supabase
-  .from('tips')
-  .select('id')
-  .eq('tx_hash', txHash)
-  .single();
-
-if (existing) {
-  return NextResponse.json({ error: 'Tip already recorded' }, { status: 409 });
-}
-```
-
-#### 2. Missing Rate Limiting
-**Issue**: No rate limiting on API routes  
-**Risk**: API abuse, DoS attacks  
-**Recommendation**: Add rate limiting middleware
+**Recommendation**: Require a wallet signature for admin actions, using the existing `verifyWalletSignature` function in `lib/auth/wallet.ts`. Add auth to the community GET route.
 
 ```typescript
-// lib/middleware/rate-limit.ts (SUGGESTED)
-import { NextRequest, NextResponse } from 'next/server';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-});
-
-export async function withRateLimit(
-  request: NextRequest,
-  handler: () => Promise<NextResponse>
-) {
-  const ip = request.ip ?? '127.0.0.1';
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    );
-  }
-
-  return handler();
+// RECOMMENDED: Verify signature + admin wallet
+const { walletAddress, signature, nonce, ...rest } = body;
+if (!isAdminWallet(walletAddress)) {
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 }
-```
-
-#### 3. No Request Logging
-**Issue**: No structured logging for debugging  
-**Recommendation**: Add request/response logging
-
-```typescript
-// lib/middleware/logger.ts (SUGGESTED)
-export function logRequest(req: NextRequest, res: NextResponse) {
-  console.log({
-    timestamp: new Date().toISOString(),
-    method: req.method,
-    url: req.url,
-    status: res.status,
-    ip: req.ip,
-  });
+const isValid = await verifyWalletSignature(walletAddress, nonce, signature);
+if (!isValid) {
+  return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
 }
 ```
 
 ---
 
-## 2. Security Analysis
+### 🔴 Issue 2: npm Vulnerabilities in Direct Dependencies (8 Total: 1 Moderate, 7 High)
 
-### 🔴 CRITICAL ISSUES
-
-#### Issue #1: Service Role Key Usage
-**File**: `lib/supabase/client.ts`  
 **Severity**: HIGH  
-**Risk**: Service role key has admin privileges
-
-```typescript
-// CURRENT (RISKY)
-export function createServerClient() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-```
-
-**Analysis**:
-- ✅ Good: Only used in API routes (server-side)
-- ✅ Good: Not exposed in client bundle
-- ⚠️ Risk: Used in 3 API routes without proper auth checks
-
-**Files using service role key**:
-1. `app/api/viewers/route.ts`
-2. `app/api/analytics/route.ts`
-3. `app/api/moderation/route.ts`
-
-**Recommendation**: Add admin authentication middleware
-
-```typescript
-// lib/middleware/admin-auth.ts (SUGGESTED)
-export async function requireAdmin(request: NextRequest) {
-  const wallet = request.headers.get('x-wallet-address');
-  const adminWallets = process.env.ADMIN_WALLET_ADDRESSES?.split(',') || [];
-  
-  if (!wallet || !adminWallets.includes(wallet.toLowerCase())) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
-  }
-}
-
-// Usage in API routes
-export async function GET(request: NextRequest) {
-  const authError = await requireAdmin(request);
-  if (authError) return authError;
-  
-  // ... admin logic
-}
-```
-
-#### Issue #2: XSS Vulnerability
-**File**: `app/shop/[handle]/page.tsx`  
-**Severity**: MEDIUM  
-**Risk**: Potential XSS if Shopify HTML is compromised
-
-```typescript
-// CURRENT (RISKY)
-<div
-  className="prose prose-invert prose-sm max-w-none text-[#888]"
-  dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
-/>
-```
-
-**Recommendation**: Sanitize HTML before rendering
-
-```typescript
-// Install: npm install dompurify isomorphic-dompurify
-import DOMPurify from 'isomorphic-dompurify';
-
-// SAFER
-<div
-  className="prose prose-invert prose-sm max-w-none text-[#888]"
-  dangerouslySetInnerHTML={{ 
-    __html: DOMPurify.sanitize(product.descriptionHtml) 
-  }}
-/>
-```
-
-#### Issue #3: Private Key Exposure Risk
-**Files**: 
-- `lib/onchain/minter.ts`
-- `app/api/bankr-mint/route.ts`
-- `app/api/events/access/route.ts`
-
-```typescript
-// CURRENT
-const MINTER_PRIVATE_KEY = process.env.MINTER_PRIVATE_KEY as `0x${string}` | undefined;
-const privateKey = process.env.BANKR_PRIVATE_KEY;
-```
-
-**Analysis**:
-- ✅ Good: Only used server-side
-- ⚠️ Risk: No key rotation mechanism
-- ⚠️ Risk: No monitoring for unauthorized usage
-
-**Recommendation**: Use AWS KMS or similar for key management
-
-```typescript
-// lib/kms/keys.ts (SUGGESTED)
-import { KMSClient, DecryptCommand } from '@aws-sdk/client-kms';
-
-export async function getPrivateKey(keyId: string): Promise<string> {
-  const client = new KMSClient({ region: 'us-east-1' });
-  const command = new DecryptCommand({
-    KeyId: keyId,
-    CiphertextBlob: Buffer.from(process.env.ENCRYPTED_KEY!, 'base64'),
-  });
-  
-  const response = await client.send(command);
-  return Buffer.from(response.Plaintext!).toString('utf-8');
-}
-```
-
-### ⚠️ MEDIUM ISSUES
-
-#### Issue #4: No CSRF Protection
-**Risk**: Cross-site request forgery on state-changing operations  
-**Recommendation**: Add CSRF tokens for POST/PUT/DELETE
-
-```typescript
-// lib/middleware/csrf.ts (SUGGESTED)
-import { NextRequest, NextResponse } from 'next/server';
-
-export function validateCSRF(request: NextRequest) {
-  if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
-    const token = request.headers.get('x-csrf-token');
-    const cookie = request.cookies.get('csrf-token')?.value;
-    
-    if (!token || token !== cookie) {
-      return NextResponse.json(
-        { error: 'Invalid CSRF token' },
-        { status: 403 }
-      );
-    }
-  }
-}
-```
-
-#### Issue #5: SQL Injection Risk (Low)
-**Analysis**: Using Supabase client (parameterized queries)  
-**Status**: ✅ Safe - Supabase handles escaping  
-**Note**: No raw SQL found in codebase
-
----
-
-## 3. Component Analysis
-
-### ✅ Strengths
-
-#### Error Boundary Implementation
-**File**: `components/ErrorBoundary.tsx`
-
-```typescript
-export class ErrorBoundary extends Component<Props, State> {
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
-  }
-  
-  // ... good fallback UI
-}
-```
-
-**Status**: ✅ Well implemented  
-**Issue**: Not used in `app/layout.tsx`
-
-**Recommendation**: Wrap root layout
-
-```typescript
-// app/layout.tsx (SUGGESTED)
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <ErrorBoundary>
-          <Providers>
-            {children}
-          </Providers>
-        </ErrorBoundary>
-      </body>
-    </html>
-  );
-}
-```
-
-#### TipButton Component
-**File**: `components/TipButton.tsx`
-
-**Strengths**:
-- ✅ Proper transaction handling
-- ✅ Loading states
-- ✅ Error handling
-- ✅ Multi-token support (ETH, USDC, RAVE, cbBTC)
-
-**Issues**:
-- ⚠️ No transaction retry logic
-- ⚠️ No gas estimation
-
-**Recommendation**: Add retry and gas estimation
-
-```typescript
-// SUGGESTED IMPROVEMENTS
-const estimateGas = async () => {
-  try {
-    const gas = await publicClient.estimateGas({
-      to: djWalletAddress,
-      value: parseEther(amount),
-    });
-    setEstimatedGas(gas);
-  } catch (error) {
-    console.error('Gas estimation failed:', error);
-  }
-};
-
-const sendWithRetry = async (maxRetries = 3) => {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await sendTransaction({ ... });
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-    }
-  }
-};
-```
-
-### ⚠️ Component Issues
-
-#### Issue #6: Large Components
-**Files**:
-- `components/TipButton.tsx` (15,944 bytes)
-- `components/ShareApp.tsx` (19,903 bytes)
-- `components/TicketPurchase.tsx` (13,208 bytes)
-
-**Recommendation**: Split into smaller components
-
-```typescript
-// TipButton.tsx (SUGGESTED REFACTOR)
-export function TipButton(props) {
-  return (
-    <TipModal isOpen={isOpen} onClose={handleClose}>
-      <TokenSelector 
-        selected={selectedToken} 
-        onChange={setSelectedToken} 
-      />
-      <AmountInput 
-        value={amount} 
-        onChange={setAmount} 
-        presets={TIP_PRESETS} 
-      />
-      <MessageInput value={message} onChange={setMessage} />
-      <TipSubmitButton 
-        onSubmit={handleTip} 
-        isPending={isPending} 
-      />
-    </TipModal>
-  );
-}
-```
-
-#### Issue #7: Missing Loading Skeletons
-**Files**: Many pages lack loading states  
-**Recommendation**: Add skeleton loaders
-
-```typescript
-// components/ui/Skeleton.tsx (SUGGESTED)
-export function Skeleton({ className }: { className?: string }) {
-  return (
-    <div 
-      className={`animate-pulse bg-gray-800 rounded ${className}`}
-      aria-label="Loading..."
-    />
-  );
-}
-
-// Usage
-{isLoading ? (
-  <Skeleton className="h-20 w-full" />
-) : (
-  <StreamCard stream={stream} />
-)}
-```
-
----
-
-## 4. Testing Analysis
-
-### Current State
-- ✅ Vitest configured
-- ✅ 1 test file found: `__tests__/token-config.test.ts`
-- ❌ No coverage reporting
-- ❌ No integration tests
-- ❌ No E2E tests
-
-### Test Coverage Gaps
-
-#### Missing Tests
-1. **API Routes** (0% coverage)
-   - No tests for `/api/streams`
-   - No tests for `/api/djs`
-   - No tests for `/api/tips`
-
-2. **Database Functions** (0% coverage)
-   - No tests for `lib/db/streams.ts`
-   - No tests for `lib/db/djs.ts`
-
-3. **Components** (0% coverage)
-   - No tests for `TipButton`
-   - No tests for `ErrorBoundary`
-
-### Recommendations
-
-#### 1. Add API Route Tests
-```typescript
-// __tests__/api/streams.test.ts (SUGGESTED)
-import { describe, it, expect, vi } from 'vitest';
-import { GET, POST } from '@/app/api/streams/route';
-
-describe('GET /api/streams', () => {
-  it('should return streams', async () => {
-    const request = new Request('http://localhost/api/streams');
-    const response = await GET(request);
-    const data = await response.json();
-    
-    expect(response.status).toBe(200);
-    expect(data).toHaveProperty('streams');
-  });
-
-  it('should filter by status', async () => {
-    const request = new Request('http://localhost/api/streams?status=live');
-    const response = await GET(request);
-    const data = await response.json();
-    
-    expect(data.streams.every(s => s.status === 'live')).toBe(true);
-  });
-});
-
-describe('POST /api/streams', () => {
-  it('should create stream with valid data', async () => {
-    const body = {
-      title: 'Test Stream',
-      djName: 'Test DJ',
-      djWalletAddress: '0x1234567890123456789012345678901234567890',
-    };
-    
-    const request = new Request('http://localhost/api/streams', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-    
-    const response = await POST(request);
-    expect(response.status).toBe(201);
-  });
-
-  it('should reject invalid wallet address', async () => {
-    const body = {
-      title: 'Test Stream',
-      djName: 'Test DJ',
-      djWalletAddress: 'invalid',
-    };
-    
-    const request = new Request('http://localhost/api/streams', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-    
-    const response = await POST(request);
-    expect(response.status).toBe(400);
-  });
-});
-```
-
-#### 2. Add Component Tests
-```typescript
-// __tests__/components/TipButton.test.tsx (SUGGESTED)
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { TipButton } from '@/components/TipButton';
-
-describe('TipButton', () => {
-  it('should render tip button', () => {
-    render(
-      <TipButton 
-        djWalletAddress="0x123..." 
-        djName="Test DJ" 
-      />
-    );
-    
-    expect(screen.getByText(/tip/i)).toBeInTheDocument();
-  });
-
-  it('should open modal on click', () => {
-    render(<TipButton djWalletAddress="0x123..." djName="Test DJ" />);
-    
-    fireEvent.click(screen.getByText(/tip/i));
-    expect(screen.getByText(/send tip/i)).toBeInTheDocument();
-  });
-
-  it('should validate amount', () => {
-    render(<TipButton djWalletAddress="0x123..." djName="Test DJ" />);
-    
-    fireEvent.click(screen.getByText(/tip/i));
-    const input = screen.getByPlaceholderText(/amount/i);
-    fireEvent.change(input, { target: { value: '-1' } });
-    
-    expect(screen.getByText(/invalid amount/i)).toBeInTheDocument();
-  });
-});
-```
-
-#### 3. Add Coverage Reporting
-```json
-// package.json (SUGGESTED)
-{
-  "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
-  },
-  "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^4.0.18"
-  }
-}
-```
-
-#### 4. Add E2E Tests (Playwright)
-```typescript
-// e2e/streaming.spec.ts (SUGGESTED)
-import { test, expect } from '@playwright/test';
-
-test('DJ can create and start stream', async ({ page }) => {
-  await page.goto('/dashboard');
-  
-  // Connect wallet
-  await page.click('text=Connect Wallet');
-  await page.click('text=Coinbase Wallet');
-  
-  // Create stream
-  await page.click('text=Create Stream');
-  await page.fill('input[name="title"]', 'Test Stream');
-  await page.fill('textarea[name="description"]', 'Test Description');
-  await page.click('button[type="submit"]');
-  
-  // Verify stream created
-  await expect(page.locator('text=Stream created')).toBeVisible();
-  await expect(page.locator('text=RTMP URL')).toBeVisible();
-});
-```
-
----
-
-## 5. npm Vulnerabilities
-
-### Summary
-```
-23 vulnerabilities (1 low, 2 moderate, 20 high)
-```
-
-### High-Severity Issues
-- **minimatch** - ReDoS vulnerability
-- **glob** - Affected by minimatch
-- **eslint** - Deprecated (v8.57.1)
-
-### Recommendations
-
-#### 1. Update ESLint
+**Command**: `npm audit` reports 8 vulnerabilities (1 moderate, 7 high)
+
+| Package | Version | CVE | Severity | Impact |
+|---------|---------|-----|----------|--------|
+| `next` | 14.2.35 | GHSA-9g9p-9gw9-jx7f | HIGH | DoS via Image Optimizer |
+| `next` | 14.2.35 | GHSA-h25m-26qc-wcjf | HIGH | DoS via HTTP deserialization (React Server Components) |
+| `dompurify` | 3.3.1 | GHSA-v2wj-7wpq-c8vv | MODERATE | XSS bypass |
+| `hono` | 4.12.2 | GHSA-5pq2-9x2x-5p6w | HIGH | Cookie attribute injection |
+| `hono` | 4.12.2 | GHSA-p6xx-57qc-3wxr | HIGH | SSE control field injection via CR/LF |
+| `hono` | 4.12.2 | GHSA-q5qw-h33p-qvwr | HIGH | Arbitrary file access via serveStatic |
+| `rollup` | 4.x | GHSA-mw96-cpmx-2vgc | HIGH | Arbitrary file write (build dep) |
+| `minimatch` | multiple | GHSA-7r86-cg39-jmmj | HIGH | ReDoS (dev dep) |
+
+**Next.js** and **DOMPurify** are direct production dependencies. The DOMPurify vulnerability is particularly notable since it was recently added to fix the shop page XSS, but the installed version is still in the vulnerable range.
+
+**Recommended fix**:
 ```bash
-npm install -D eslint@^9.0.0 eslint-config-next@latest
-```
-
-#### 2. Update Dependencies
-```bash
+# Fix non-breaking vulnerabilities:
 npm audit fix
-npm audit fix --force  # For breaking changes
+
+# Check what upgrades are needed for next.js and dompurify:
+npm outdated
 ```
 
-#### 3. Add Dependabot
-```yaml
-# .github/dependabot.yml (SUGGESTED)
-version: 2
-updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-```
+Note: Upgrading `next` to 15.x is a breaking change and requires testing.
 
 ---
 
-## 6. Performance Recommendations
+## 2. Medium Priority Issues
 
-### Current Optimizations (Good)
-- ✅ Service worker v4 with caching
-- ✅ Image optimization (AVIF/WebP)
-- ✅ Tree-shaking for lucide-react, wagmi, viem
-- ✅ Loading states and page transitions
+### ⚠️ Issue 3: Missing Critical HTTP Security Headers
 
-### Suggested Improvements
+**Severity**: MEDIUM  
+**Files**: `next.config.js`
 
-#### 1. Add Bundle Analysis
-```json
-// package.json (SUGGESTED)
-{
-  "scripts": {
-    "analyze": "ANALYZE=true next build"
-  }
+The `next.config.js` defines some security headers (`X-Content-Type-Options`, `X-DNS-Prefetch-Control`, `Referrer-Policy`) but is missing several important ones:
+
+| Missing Header | Risk |
+|---------------|------|
+| `X-Frame-Options: DENY` | Clickjacking |
+| `Content-Security-Policy` | XSS, data injection |
+| `Strict-Transport-Security` | SSL stripping / MITM |
+| `Permissions-Policy` | Browser feature abuse |
+
+**Recommendation**: Add to `next.config.js` headers:
+```javascript
+{ key: 'X-Frame-Options', value: 'DENY' },
+{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+```
+
+A `Content-Security-Policy` is complex to add (requires allowing Mux, Supabase, Cloudinary, etc.) but highly recommended.
+
+---
+
+### ⚠️ Issue 4: In-Memory Rate Limiting Won't Work on Vercel (Serverless)
+
+**Severity**: MEDIUM  
+**File**: `app/api/chat/route.ts`
+
+The chat rate limiter uses a module-level `Map`:
+```typescript
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+```
+
+On Vercel (serverless), each request may hit a different function instance. The in-memory map is not shared across instances, making the rate limit ineffective under load.
+
+**Recommendation**: Use an external store such as Upstash Redis (or KV), or Vercel's KV store. Alternatively, move rate limit tracking to Supabase.
+
+---
+
+### ⚠️ Issue 5: Stream Ownership Check Uses Unverified Wallet Address
+
+**Severity**: MEDIUM  
+**Files**: `app/api/streams/[id]/setup-mux/route.ts`, `app/api/streams/[id]/stop/route.ts`
+
+Stream management routes check DJ ownership using the wallet address from the request body:
+```typescript
+if (body.djWalletAddress?.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
+  return NextResponse.json({ error: 'Unauthorized: you do not own this stream' }, { status: 403 });
 }
 ```
+
+The `stop` route has optional signature verification via `verifyWalletSignature` but this is marked "recommended for production" rather than required. The `setup-mux` route has no signature check.
+
+**Recommendation**: Make signature verification mandatory on all stream mutation endpoints.
+
+---
+
+### ⚠️ Issue 6: TypeScript `as any` in Stream Stop Route
+
+**Severity**: LOW  
+**File**: `app/api/streams/[id]/stop/route.ts:48`
+
+```typescript
+if (!STOPPABLE_STATUSES.includes(stream.status as any)) {
+```
+
+`stream.status` should be typed as `StreamStatus` or `string`, and `STOPPABLE_STATUSES` as `readonly StreamStatus[]`. The cast is unnecessary and hides a potential type mismatch.
+
+**Fix**:
+```typescript
+if (!STOPPABLE_STATUSES.includes(stream.status as StreamStatus)) {
+```
+Or, define `STOPPABLE_STATUSES` as `string[]` and remove the cast.
+
+---
+
+### ⚠️ Issue 7: No Rate Limiting on Other Mutation Endpoints
+
+**Severity**: MEDIUM  
+**Affected routes**: `/api/bookings`, `/api/community` (POST), `/api/tips` (POST), `/api/tickets/purchase` (POST)
+
+Only the `/api/chat` route has rate limiting. Mutation endpoints that trigger external calls (Slack notifications, on-chain reads, Supabase writes) are unprotected from bulk submission.
+
+---
+
+### ⚠️ Issue 8: API Route Cache Headers Expose Dynamic Data
+
+**Severity**: LOW  
+**File**: `next.config.js`
 
 ```javascript
-// next.config.js (SUGGESTED)
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
-module.exports = withBundleAnalyzer({
-  // ... existing config
-});
-```
-
-#### 2. Add Lighthouse CI
-```yaml
-# .github/workflows/lighthouse.yml (SUGGESTED)
-name: Lighthouse CI
-on: [push]
-jobs:
-  lighthouse:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: npm ci
-      - run: npm run build
-      - uses: treosh/lighthouse-ci-action@v9
-        with:
-          urls: |
-            http://localhost:3000
-            http://localhost:3000/schedule
-            http://localhost:3000/djs
-          uploadArtifacts: true
-```
-
-#### 3. Optimize Images
-```typescript
-// next.config.js (SUGGESTED)
-module.exports = {
-  images: {
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 2592000, // 30 days
-  },
-};
-```
-
----
-
-## 7. Code Quality Improvements
-
-### TypeScript Strictness
-
-#### Current: Not Strict
-```json
-// tsconfig.json (CURRENT)
+// API routes - short cache for dynamic data
 {
-  "compilerOptions": {
-    "strict": false  // ❌
-  }
-}
-```
-
-#### Recommended: Enable Strict Mode
-```json
-// tsconfig.json (SUGGESTED)
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true
-  }
-}
-```
-
-### ESLint Configuration
-
-#### Add Stricter Rules
-```json
-// .eslintrc.json (SUGGESTED)
-{
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  source: '/api/:path*',
+  headers: [
+    { key: 'Cache-Control', value: 'public, s-maxage=10, stale-while-revalidate=59' },
   ],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "no-console": ["warn", { "allow": ["error", "warn"] }]
-  }
-}
+},
 ```
 
-### Add Prettier
-```json
-// .prettierrc (SUGGESTED)
-{
-  "semi": true,
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "printWidth": 100,
-  "tabWidth": 2
-}
-```
+This applies a shared cache header to **all** API routes, including sensitive mutation endpoints and user-specific data (e.g., `/api/analytics`, `/api/tips`). Mutation routes (POST, PATCH, DELETE) should explicitly return `Cache-Control: no-store, no-cache`.
 
 ---
 
-## 8. Documentation Improvements
+## 3. Strengths
 
-### Current Documentation (Excellent)
-- ✅ Comprehensive README.md
-- ✅ CLAUDE.md (22,965 bytes)
-- ✅ SOUL.md (4,170 bytes)
-- ✅ TODO.md (5,163 bytes)
-- ✅ BETA_TESTING.md (4,497 bytes)
+The following areas are well-implemented and should be preserved:
 
-### Suggested Additions
+### Security
+- ✅ **Mux webhook**: HMAC signature verification with `crypto.timingSafeEqual`
+- ✅ **Shopify webhook**: HMAC signature verification with `crypto.timingSafeEqual`
+- ✅ **DOMPurify**: Installed and used in shop page with explicit allowed tags/attrs
+- ✅ **Input sanitization**: Comprehensive `lib/validation/sanitize.ts` with HTML entity encoding, pattern matching, and length enforcement
+- ✅ **Validation library**: `lib/validation/index.ts` with wallet, UUID, tx hash, slug validators
+- ✅ **On-chain tx verification**: `lib/onchain/verify-transaction.ts` verifies actual USDC Transfer events before recording ticket purchases
+- ✅ **Duplicate tip prevention**: Checks tx hash uniqueness before insert
+- ✅ **TypeScript strict mode**: Enabled in `tsconfig.json`
+- ✅ **Private keys server-side only**: `BANKR_PRIVATE_KEY` only used in `app/api/**`
 
-#### 1. API Documentation (OpenAPI)
-```yaml
-# docs/openapi.yml (SUGGESTED)
-openapi: 3.0.0
-info:
-  title: baseFM API
-  version: 1.0.0
-paths:
-  /api/streams:
-    get:
-      summary: Get streams
-      parameters:
-        - name: status
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-              enum: [idle, live, ended]
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  streams:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Stream'
-```
+### API Design
+- ✅ **Consistent error handling**: All routes have `try/catch` returning appropriate HTTP status codes
+- ✅ **Good input validation**: Wallet address, UUID, and tx hash validation on all relevant endpoints
+- ✅ **Wallet normalization**: `.toLowerCase()` used consistently before comparisons
+- ✅ **Cron route protected**: `/api/cron/trading` verifies `CRON_SECRET` before running
 
-#### 2. Architecture Diagrams
-```markdown
-# docs/ARCHITECTURE.md (SUGGESTED)
-
-## System Architecture
-
-### Data Flow
-```
-User → Next.js → Supabase → Postgres
-                ↓
-              Mux (RTMP → HLS)
-                ↓
-              Base (Wallet, Tokens)
-```
-
-### Component Hierarchy
-```
-App
-├── Layout
-│   ├── Navbar
-│   ├── GlobalPlayer
-│   └── Footer
-├── Pages
-│   ├── Home
-│   ├── Dashboard
-│   └── DJs
-└── Providers
-    ├── WagmiProvider
-    └── QueryProvider
-```
-```
-
-#### 3. Contributing Guide
-```markdown
-# CONTRIBUTING.md (SUGGESTED)
-
-## Development Workflow
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Make changes
-4. Run tests: `npm test`
-5. Run linter: `npm run lint`
-6. Commit: `git commit -m 'Add amazing feature'`
-7. Push: `git push origin feature/amazing-feature`
-8. Open Pull Request
-
-## Code Style
-
-- Use TypeScript strict mode
-- Follow ESLint rules
-- Write tests for new features
-- Update documentation
-
-## Testing
-
-- Unit tests: `npm test`
-- E2E tests: `npm run test:e2e`
-- Coverage: `npm run test:coverage`
-```
+### Code Quality
+- ✅ **78 tests passing** across 4 test files covering tips, tickets, crew, and token config
+- ✅ **Realtime subscriptions cleaned up** properly in `useEffect` return functions
+- ✅ **Chat rate limiting**: In-memory rate limiter with bounded Map size and periodic cleanup
+- ✅ **Admin middleware**: `lib/middleware/admin-auth.ts` created with `requireAdmin` and `isAdmin` helpers
 
 ---
 
-## 9. Priority Action Items
+## 4. Test Coverage
 
-### 🔴 CRITICAL (Do Immediately)
+```
+Test Files  4 passed (4)
+Tests       78 passed (78)
 
-1. **Add Admin Authentication**
-   - Protect service role key endpoints
-   - Add wallet-based admin checks
-   - Estimated time: 2 hours
+Coverage:
+  __tests__/lib/crew.test.ts      — 23 tests
+  __tests__/lib/tickets.test.ts   — 18 tests
+  __tests__/lib/tip-config.test.ts — 19 tests
+  __tests__/token-config.test.ts  — 18 tests
+```
 
-2. **Sanitize HTML in Shop**
-   - Install DOMPurify
-   - Sanitize product descriptions
-   - Estimated time: 30 minutes
+**Coverage gaps** (no tests for):
+- API route handlers (most critical paths)
+- `lib/validation/index.ts` and `lib/validation/sanitize.ts`
+- `lib/onchain/verify-transaction.ts`
+- `lib/streaming/mux.ts` (webhook signature verification)
+- React components
 
-3. **Fix npm Vulnerabilities**
-   - Run `npm audit fix`
-   - Update ESLint to v9
-   - Estimated time: 1 hour
+---
+
+## 5. Priority Action Items
+
+### 🔴 CRITICAL (Address Immediately)
+
+1. **Add auth to `GET /api/admin/community`**
+   - Add `isAdminWallet` check using query param wallet
+   - Estimated time: 15 minutes
+
+2. **Fix npm vulnerabilities**
+   - Run `npm audit fix` for non-breaking fixes (dompurify, hono, rollup, minimatch)
+   - Plan Next.js 15 upgrade for next sprint
+   - Estimated time: 1 hour (non-breaking) + testing sprint for Next.js upgrade
+
+3. **Consider requiring signatures on admin mutation routes**
+   - The existing `verifyWalletSignature` in `lib/auth/wallet.ts` can be reused
+   - This is a larger change but significantly improves security
+   - Estimated time: 4 hours
 
 ### ⚠️ HIGH PRIORITY (This Week)
 
-4. **Add Rate Limiting**
-   - Install Upstash Redis
-   - Add rate limit middleware
-   - Estimated time: 3 hours
-
-5. **Add Error Boundary to Layout**
-   - Wrap root layout
-   - Test error scenarios
+4. **Add missing security headers**
+   - `X-Frame-Options`, `HSTS`, `Permissions-Policy`
    - Estimated time: 30 minutes
 
-6. **Enable TypeScript Strict Mode**
-   - Enable strict in tsconfig
-   - Fix type errors
-   - Estimated time: 4-8 hours
+5. **Replace in-memory rate limiter with distributed store**
+   - Use Vercel KV or Upstash Redis
+   - Estimated time: 2 hours
 
-7. **Add Test Coverage**
-   - Write API route tests
-   - Add component tests
-   - Target 60% coverage
-   - Estimated time: 8-16 hours
+6. **Make signature verification mandatory on stream mutations**
+   - Already implemented in `stop` route as optional — make it required
+   - Estimated time: 1 hour
 
 ### 📊 MEDIUM PRIORITY (This Month)
 
-8. **Add CSRF Protection**
-   - Implement CSRF tokens
-   - Add to all mutations
-   - Estimated time: 2 hours
+7. **Fix `as any` cast in stream stop route**
+   - Estimated time: 5 minutes
 
-9. **Refactor Large Components**
-   - Split TipButton
-   - Split ShareApp
-   - Split TicketPurchase
-   - Estimated time: 4 hours
+8. **Add `Cache-Control: no-store` to mutation API routes**
+   - Estimated time: 30 minutes
 
-10. **Add Loading Skeletons**
-    - Create Skeleton component
-    - Add to all pages
-    - Estimated time: 3 hours
-
-11. **Add E2E Tests**
-    - Install Playwright
-    - Write critical path tests
-    - Estimated time: 8 hours
-
-12. **Add API Documentation**
-    - Create OpenAPI spec
-    - Generate docs site
-    - Estimated time: 4 hours
+9. **Expand test coverage**
+   - Add tests for `lib/validation/*`, API routes
+   - Estimated time: 8–16 hours
 
 ---
 
-## 10. Metrics & Benchmarks
+## 6. Metrics
 
-### Current Metrics
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| **API Routes** | 45+ | - | ✅ Excellent |
-| **Pages** | 20+ | - | ✅ Excellent |
-| **Test Coverage** | ~5% | 80% | 🔴 Poor |
-| **TypeScript Strict** | No | Yes | 🔴 Missing |
-| **npm Vulnerabilities** | 23 | 0 | ⚠️ High |
-| **Bundle Size** | Unknown | <500KB | ⚠️ Unknown |
-| **Lighthouse Score** | Unknown | >90 | ⚠️ Unknown |
-
-### Recommended Targets
-- **Test Coverage**: 80%+ for critical paths
-- **TypeScript**: Strict mode enabled
-- **npm Vulnerabilities**: 0 high/critical
-- **Bundle Size**: <500KB initial load
-- **Lighthouse Performance**: >90
-- **Lighthouse Accessibility**: >95
-- **Lighthouse Best Practices**: >95
-- **Lighthouse SEO**: >90
+| Metric | Previous (Feb 24) | Current (Mar 6) | Target |
+|--------|-----------------|----------------|--------|
+| npm Vulnerabilities | 23 (1L, 2M, 20H) | **8 (1M, 7H)** | 0 |
+| TypeScript Strict | ❌ Off | ✅ On | ✅ On |
+| Passing Tests | Unknown | **78** | 80%+ coverage |
+| Admin Auth | ❌ Missing | ⚠️ Partial (no sig) | Signed |
+| XSS Protection | ❌ Missing | ✅ DOMPurify | ✅ |
+| Webhook Verification | ❌ Missing | ✅ HMAC | ✅ |
+| Tx Verification | ❌ Missing | ✅ On-chain | ✅ |
+| Security Headers | ⚠️ Partial | ⚠️ Partial | ✅ Full |
+| Rate Limiting | ⚠️ Chat only | ⚠️ Chat only | All mutations |
 
 ---
 
-## 11. Conclusion
+## 7. Conclusion
 
-### Summary
+baseFM has made **significant security improvements** since the last review. The most dangerous issues (XSS, missing webhook verification, no tx validation) have been resolved. The codebase is clean, well-structured, and TypeScript strict mode is now active.
 
-baseFM is a **well-built, production-ready platform** with:
-- ✅ Solid architecture
-- ✅ Comprehensive features
-- ✅ Good documentation
-- ✅ Active development
+The two remaining critical issues are the admin API authentication weakness and the npm vulnerabilities in direct dependencies (especially Next.js). Both are actionable without major refactoring.
 
-However, it needs:
-- 🔴 Security hardening (admin auth, XSS protection)
-- ⚠️ Better test coverage (currently ~5%)
-- ⚠️ TypeScript strict mode
-- ⚠️ Dependency updates (23 vulnerabilities)
-
-### Estimated Effort to A+ Grade
-
-| Priority | Tasks | Time | Impact |
-|----------|-------|------|--------|
-| Critical | 3 tasks | 3.5 hours | High |
-| High | 4 tasks | 15-27 hours | High |
-| Medium | 5 tasks | 21 hours | Medium |
-| **Total** | **12 tasks** | **39.5-51.5 hours** | **High** |
-
-### Recommendation
-
-**Proceed with production deployment** after addressing:
-1. Admin authentication (2 hours)
-2. HTML sanitization (30 minutes)
-3. npm vulnerabilities (1 hour)
-
-Then tackle testing and TypeScript strictness in parallel over the next 2-4 weeks.
+**Recommendation**: Run `npm audit fix`, add auth to the unauthenticated admin GET route, and add the missing security headers. The platform is otherwise in good shape for continued production use.
 
 ---
 
-## 12. Resources
-
-### Tools to Install
-```bash
-# Security
-npm install dompurify isomorphic-dompurify
-npm install @upstash/ratelimit @upstash/redis
-
-# Testing
-npm install -D @playwright/test
-npm install -D @vitest/ui @vitest/coverage-v8
-
-# Code Quality
-npm install -D prettier eslint-config-prettier
-npm install -D @next/bundle-analyzer
-
-# Monitoring
-npm install @sentry/nextjs
-```
-
-### Useful Links
-- [Next.js Security Best Practices](https://nextjs.org/docs/app/building-your-application/configuring/security)
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [Supabase Security](https://supabase.com/docs/guides/auth/row-level-security)
-- [Wagmi Best Practices](https://wagmi.sh/react/guides/best-practices)
-
----
-
-**Report Generated**: February 24, 2026  
-**Next Review**: March 24, 2026 (1 month)
+**Report Generated**: March 6, 2026  
+**Next Review**: April 6, 2026 (1 month)
