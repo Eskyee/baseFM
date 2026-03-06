@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase/client';
 
 export const metadata = {
@@ -125,7 +126,7 @@ export default async function PromotersPage() {
             <div>
               <h3 className="text-[#F5F5F5] font-bold text-lg mb-1">Need Help Finding the Right DJ?</h3>
               <p className="text-[#888] text-sm">
-                Tell us about your event and we'll recommend the perfect artist.
+                Tell us about your event and we&apos;ll recommend the perfect artist.
               </p>
             </div>
             <Link
@@ -158,9 +159,9 @@ function DJCard({ dj }: { dj: {
     <div className="bg-[#1A1A1A] rounded-2xl p-5 border border-[#2A2A2A] hover:border-purple-500/50 transition-all group">
       <div className="flex items-start gap-4 mb-4">
         {/* Avatar */}
-        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
           {dj.avatar_url ? (
-            <img src={dj.avatar_url} alt={dj.display_name} className="w-full h-full object-cover" />
+            <Image src={dj.avatar_url} alt={dj.display_name} fill className="object-cover" />
           ) : (
             <span className="text-2xl">🎧</span>
           )}

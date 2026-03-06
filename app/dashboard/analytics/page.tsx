@@ -33,6 +33,7 @@ export default function AnalyticsPage() {
     if (address) {
       fetchAnalytics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   const fetchAnalytics = async () => {

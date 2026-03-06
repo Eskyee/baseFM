@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import Hls from 'hls.js';
 
 interface AudioPlayerProps {
@@ -127,11 +128,12 @@ export function AudioPlayer({
     <div className="bg-gray-900 rounded-lg p-4 w-full max-w-md mx-auto">
       {/* Cover Image */}
       {coverImageUrl && (
-        <div className="mb-4">
-          <img
+        <div className="mb-4 relative h-48">
+          <Image
             src={coverImageUrl}
             alt={title || 'Stream cover'}
-            className="w-full h-48 object-cover rounded-lg"
+            fill
+            className="object-cover rounded-lg"
           />
         </div>
       )}

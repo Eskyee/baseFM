@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
@@ -282,16 +283,17 @@ export default function HomePage() {
               className="block bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-colors group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
+                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
                   {djOfTheDay.dj.avatarUrl ? (
-                    <img
+                    <Image
                       src={djOfTheDay.dj.avatarUrl}
                       alt={djOfTheDay.dj.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <img src="/logo.png" alt="" className="w-8 h-8 opacity-50" />
+                      <Image src="/logo.png" alt="" width={32} height={32} className="opacity-50" />
                     </div>
                   )}
                 </div>

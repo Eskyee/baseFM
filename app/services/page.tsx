@@ -159,7 +159,7 @@ export default function ServicesPage() {
         {/* CTA */}
         <div className="mt-8 text-center">
           <p className="text-[#888] text-sm mb-4">
-            Need a custom package? We'll tailor a solution to your event.
+            Need a custom package? We&apos;ll tailor a solution to your event.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

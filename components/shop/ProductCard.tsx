@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatPrice } from '@/lib/shopify/storefront';
 import type { ShopifyProduct } from '@/lib/shopify/storefront';
 import { parseOnchainTags } from '@/lib/shopify/config';
@@ -21,10 +22,11 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image */}
       <div className="aspect-square bg-[#0A0A0A] relative overflow-hidden">
         {product.featuredImage ? (
-          <img
+          <Image
             src={product.featuredImage.url}
             alt={product.featuredImage.altText || product.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]">
