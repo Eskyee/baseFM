@@ -16,6 +16,7 @@ interface GalleryImage {
   secure_url: string;
 }
 
+// TODO: Move this to @/lib/abis.ts for shared usage
 const balanceOfAbi = [
   {
     inputs: [{ name: 'account', type: 'address' }],
@@ -89,6 +90,8 @@ export default function GalleryPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      // SECURITY NOTE: The backend MUST verify this address via signature or session.
+      // Relying solely on this field allows impersonation.
       if (address) {
         formData.append('walletAddress', address);
       }
@@ -163,7 +166,6 @@ export default function GalleryPage() {
             height={180}
             className="rounded-2xl"
             priority
-            unoptimized
           />
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-3 tracking-tight">
@@ -244,18 +246,20 @@ export default function GalleryPage() {
                 key={image.id}
                 className="group mb-4 break-inside-avoid cursor-zoom-in"
                 onClick={() => openModal(image, index)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && openModal(image, index)}
               >
                 <div className="relative overflow-hidden rounded-lg bg-white/5">
                   <Image
                     src={image.secure_url}
-                    alt=""
+                    alt={`Gallery image ${index + 1}`}
                     width={image.width}
                     height={image.height}
                     className="transform transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITETQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEEEQA/KpZLtdLY7GW7PnPtNqUQG1OKKd4xxjPWKr0UtZSlCBgAYApSnZo0f/2Q=="
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                    unoptimized
                   />
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -285,6 +289,9 @@ export default function GalleryPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image details"
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/80 backdrop-blur-2xl" />
@@ -292,6 +299,7 @@ export default function GalleryPage() {
           {/* Close button */}
           <button
             onClick={closeModal}
+            aria-label="Close modal"
             className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,6 +314,7 @@ export default function GalleryPage() {
                 e.stopPropagation();
                 navigateImage('prev');
               }}
+              aria-label="Previous image"
               className="absolute left-4 z-50 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,6 +330,7 @@ export default function GalleryPage() {
                 e.stopPropagation();
                 navigateImage('next');
               }}
+              aria-label="Next image"
               className="absolute right-4 z-50 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,12 +351,11 @@ export default function GalleryPage() {
           >
             <Image
               src={selectedImage.secure_url}
-              alt=""
+              alt={`Full screen view of image ${selectedIndex + 1}`}
               width={selectedImage.width}
               height={selectedImage.height}
               className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
               priority
-              unoptimized
             />
           </div>
         </div>
