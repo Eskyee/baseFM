@@ -150,7 +150,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         <div className="relative w-full aspect-[3/1] sm:aspect-[4/1] md:aspect-[5/1] max-h-80 overflow-hidden">
           {hasCover ? (
             <Image
-              src={dj.coverImageUrl}
+              src={dj.coverImageUrl || ''}
               alt={`${dj.name} cover`}
               fill
               className="object-cover object-center"

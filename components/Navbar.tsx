@@ -9,9 +9,7 @@ import { WalletConnect } from './WalletConnect';
 import {
   Home,
   Calendar,
-  Cloud,
-  Wrench,
-  Image,
+  Image as ImageIcon,
   Archive,
   ShoppingBag,
   Users,
@@ -25,14 +23,18 @@ import {
   BookOpen,
   Ticket,
   Cast,
-  Rss,
   QrCode,
   Megaphone,
   ChevronDown,
   Sparkles,
   Music,
   Store,
-  Zap
+  Bot,
+  Zap,
+  Cloud,
+  Rss,
+  TrendingUp,
+  Wrench
 } from 'lucide-react';
 
 export function Navbar() {
@@ -64,7 +66,7 @@ export function Navbar() {
         { href: '/schedule', label: 'Schedule', Icon: Calendar },
         { href: '/events', label: 'Events', Icon: Ticket },
         { href: '/djs', label: 'DJs', Icon: Disc3 },
-        { href: '/gallery', label: 'Gallery', Icon: Image },
+        { href: '/gallery', label: 'Gallery', Icon: ImageIcon },
         { href: '/archive', label: 'Archive', Icon: Archive },
       ]
     },
@@ -88,6 +90,7 @@ export function Navbar() {
       links: [
         { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
         { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
+        { href: '/trading', label: 'Trading', Icon: TrendingUp },
         { href: '/tools', label: 'Tools', Icon: Wrench },
       ]
     },

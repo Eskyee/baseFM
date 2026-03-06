@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getEventCrew, logCrewNotification, type CrewRole } from '@/lib/db/crew';
 import { sendSlackMessage } from '@/lib/slack/webhook';
+import { sendPushToWallets } from '@/lib/push/send';
 
 // Notification templates
 const NOTIFICATION_TEMPLATES: Record<string, { title: string; body: string }> = {
@@ -105,9 +106,26 @@ export async function POST(request: NextRequest) {
       // Slack not configured or failed
     }
 
-    // TODO: Send push notifications to crew wallets
-    // This would require storing push subscriptions per wallet
-    // For now, we log the notification and rely on Slack
+    // Send push notifications to crew wallets
+    const crewWallets = crewToNotify
+      .map(c => c.walletAddress)
+      .filter((w): w is string => !!w);
+
+    if (crewWallets.length > 0) {
+      try {
+        const pushResult = await sendPushToWallets(crewWallets, {
+          title,
+          body: messageBody,
+          url: `/events/${eventId}`,
+          tag: `crew-${eventId}-${notificationType}`,
+        });
+        if (pushResult.sent > 0) {
+          sentVia.push('push');
+        }
+      } catch {
+        // Push notifications failed, continue with other channels
+      }
+    }
 
     // Log the notification
     await logCrewNotification(

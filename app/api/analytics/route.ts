@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
-import { requireAdmin } from '@/lib/middleware/admin-auth';
+import { isAdmin } from '@/lib/middleware/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  // Require admin authentication
-  const authError = await requireAdmin(request);
-  if (authError) return authError;
-
   try {
     const { searchParams } = new URL(request.url);
     const wallet = searchParams.get('wallet');
+    const requestingWallet = request.headers.get('x-wallet-address')?.toLowerCase();
 
     if (!wallet) {
       return NextResponse.json({ error: 'Wallet required' }, { status: 400 });
+    }
+
+    // Allow users to view their own analytics, or admins to view anyone's
+    const isOwnAnalytics = requestingWallet === wallet.toLowerCase();
+    const isAdminUser = requestingWallet ? isAdmin(requestingWallet) : false;
+
+    if (!isOwnAnalytics && !isAdminUser) {
+      return NextResponse.json(
+        { error: 'You can only view your own analytics' },
+        { status: 403 }
+      );
     }
 
     const supabase = createServerClient();

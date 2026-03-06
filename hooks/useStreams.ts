@@ -83,7 +83,11 @@ export function useStreams(options: UseStreamsOptions = {}) {
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Streams subscription error:', err);
+        }
+      });
 
     return () => {
       if (pollTimer) clearInterval(pollTimer);

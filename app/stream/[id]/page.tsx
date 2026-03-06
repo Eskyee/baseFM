@@ -7,6 +7,7 @@ import { usePlayer } from '@/components/AppShell';
 import Link from 'next/link';
 import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
+import { ListenerCount } from '@/components/ListenerCount';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
@@ -214,11 +215,16 @@ export default function StreamPage({ params }: { params: { id: string } }) {
             </svg>
           </Link>
 
-          {/* Live indicator in header */}
+          {/* Live indicator and listener count in header */}
           {isLive && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 backdrop-blur-sm rounded-full">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-red-400 text-xs font-semibold uppercase tracking-wide">Live</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 backdrop-blur-sm rounded-full">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-red-400 text-xs font-semibold uppercase tracking-wide">Live</span>
+              </div>
+              <div className="px-3 py-1.5 bg-[#1A1A1A]/80 backdrop-blur-sm rounded-full">
+                <ListenerCount streamId={stream.id} size="sm" />
+              </div>
             </div>
           )}
 

@@ -153,12 +153,22 @@ export async function recordTicketPurchase(purchase: {
 export async function hasTicketForEvent(
   walletAddress: string,
   eventId: string
-): Promise<boolean> {
+): Promise<{ hasTicket: boolean; ticketType?: string; eventName?: string }> {
   const supabase = createServerClient();
 
+  // Get purchase with ticket and event details
   const { data, error } = await supabase
     .from('ticket_purchases')
-    .select('id')
+    .select(`
+      id,
+      ticket_id,
+      event_tickets!inner (
+        name
+      ),
+      events!inner (
+        title
+      )
+    `)
     .eq('buyer_wallet', walletAddress.toLowerCase())
     .eq('event_id', eventId)
     .eq('status', 'confirmed')
@@ -166,10 +176,26 @@ export async function hasTicketForEvent(
 
   if (error) {
     console.error('Error checking ticket:', error);
-    return false;
+    return { hasTicket: false };
   }
 
-  return (data?.length || 0) > 0;
+  if (!data || data.length === 0) {
+    return { hasTicket: false };
+  }
+
+  // Supabase returns arrays for joined tables
+  const purchase = data[0] as {
+    id: string;
+    ticket_id: string;
+    event_tickets: { name: string }[];
+    events: { title: string }[];
+  };
+
+  return {
+    hasTicket: true,
+    ticketType: purchase.event_tickets?.[0]?.name || 'General Admission',
+    eventName: purchase.events?.[0]?.title,
+  };
 }
 
 // Get purchases for a wallet

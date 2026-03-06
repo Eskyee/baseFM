@@ -3,12 +3,35 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
+// Clanker URLs
+const CLANKER_URL = 'https://clanker.world';
 const CLANKER_DOCS_URL = 'https://docs.clanker.world';
+const CLANKER_API_URL = 'https://docs.clanker.world/api';
 const DEPLOY_URL = 'https://www.clanker.world/clanker';
-const AGENTBOT_URL = 'https://agentbot.raveculture.xyz';
-const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/deploy';
+const CLANKER_TOKENS_URL = 'https://www.clanker.world/tokens';
+const CLANKER_FARCASTER_URL = 'https://warpcast.com/clanker';
 
-type Tab = 'tokens' | 'agents' | 'bankr';
+// Agentbot URLs
+const AGENTBOT_URL = 'https://agentbot.raveculture.xyz';
+const AGENTBOT_DEPLOY_URL = 'https://agentbot.raveculture.xyz/signup';
+const AGENTBOT_DOCS_URL = 'https://agentbot.raveculture.xyz/docs';
+const AGENTBOT_BLOG_URL = 'https://agentbot.raveculture.xyz/blog';
+
+// Bankr URLs
+const BANKR_URL = 'https://bankr.bot';
+const BANKR_DOCS_URL = 'https://docs.bankr.bot';
+const BANKR_LLM_URL = 'https://docs.bankr.bot/llm-gateway/overview';
+const BANKR_API_URL = 'https://docs.bankr.bot/agent-api/overview';
+
+// OpenClaw URLs
+const OPENCLAW_URL = 'https://openclaw.ai';
+
+// Internal aicloud routes
+const AICLOUD_URL = '/aicloud';
+const AICLOUD_FEED_URL = '/aicloud/feed';
+const AICLOUD_DASHBOARD_URL = '/aicloud/dashboard';
+
+type Tab = 'tokens' | 'agents' | 'bankr' | 'trading';
 
 function ToolsContent() {
   const searchParams = useSearchParams();
@@ -17,7 +40,7 @@ function ToolsContent() {
   const [activeTab, setActiveTab] = useState<Tab>(tabParam || 'tokens');
 
   useEffect(() => {
-    if (tabParam && ['tokens', 'agents', 'bankr'].includes(tabParam)) {
+    if (tabParam && ['tokens', 'agents', 'bankr', 'trading'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
@@ -71,6 +94,16 @@ function ToolsContent() {
             }`}
           >
             Bankr
+          </button>
+          <button
+            onClick={() => handleTabChange('trading')}
+            className={`px-4 py-2 rounded-lg text-sm font-mono font-medium transition-all whitespace-nowrap ${
+              activeTab === 'trading'
+                ? 'bg-[#0052FF] text-white'
+                : 'bg-[#1A1A1A] text-[#888] hover:text-white border border-[#2A2A2A]'
+            }`}
+          >
+            Trading
           </button>
         </div>
 
@@ -157,6 +190,68 @@ const token = await Clanker.deploy({
                   View Docs
                 </a>
               </div>
+
+              {/* Developer Resources */}
+              <div className="mt-6 pt-4 border-t border-[#2A2A2A]">
+                <h3 className="text-[#888] text-xs font-mono mb-3 uppercase tracking-wider">Developer Resources</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  <a
+                    href={CLANKER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-[#0052FF] border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Site
+                  </a>
+                  <a
+                    href={CLANKER_DOCS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Docs
+                  </a>
+                  <a
+                    href={CLANKER_API_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    API
+                  </a>
+                  <a
+                    href={CLANKER_TOKENS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Explorer
+                  </a>
+                  <a
+                    href={CLANKER_FARCASTER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-purple-400 border border-[#2A2A2A] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    @clanker
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* Use Cases */}
@@ -211,6 +306,9 @@ const token = await Clanker.deploy({
 
         {/* Bankr Tab */}
         {activeTab === 'bankr' && <BankrSection />}
+
+        {/* Trading Tab */}
+        {activeTab === 'trading' && <TradingSection />}
       </div>
     </div>
   );
@@ -294,7 +392,7 @@ function AgentsSection() {
         setDeploymentStep(step);
         if (step === 4) {
           setTimeout(() => {
-            window.open(`${AGENTBOT_URL}?plan=${planName.toLowerCase()}`, '_blank');
+            window.open(`${AGENTBOT_URL}/signup?mode=create&plan=${planName.toLowerCase()}`, '_blank');
             setIsDeploying(false);
             setDeploymentStep(0);
           }, 500);
@@ -344,19 +442,52 @@ function AgentsSection() {
           Built for the underground music scene.
         </p>
 
+        {/* Social Links */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
-            Farcaster
-          </span>
-          <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
+          <a
+            href="https://x.com/Esky33junglist"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A] hover:text-white hover:border-[#3A3A3A] transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            X
+          </a>
+          <a
+            href="https://t.me/esky33"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A] hover:text-[#0088cc] hover:border-[#0088cc]/50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
             Telegram
-          </span>
-          <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
+          </a>
+          <a
+            href="https://discord.com/users/eskyee"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A] hover:text-[#5865F2] hover:border-[#5865F2]/50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
+            </svg>
             Discord
-          </span>
-          <span className="px-2 py-1 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A]">
-            X / Twitter
-          </span>
+          </a>
+          <a
+            href="https://github.com/Eskyee"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-[#888] text-xs font-mono rounded border border-[#2A2A2A] hover:text-white hover:border-[#3A3A3A] transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
         </div>
 
         {/* Pricing Note */}
@@ -378,12 +509,160 @@ function AgentsSection() {
             Launch Agentbot
           </a>
           <a
-            href={AGENTBOT_URL}
+            href={AGENTBOT_DOCS_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
           >
             View Docs
+          </a>
+        </div>
+
+        {/* Developer Resources */}
+        <div className="mt-6 pt-4 border-t border-[#2A2A2A]">
+          <h3 className="text-[#888] text-xs font-mono mb-3 uppercase tracking-wider">Developer Resources</h3>
+          <div className="grid grid-cols-3 gap-2">
+            <a
+              href={AGENTBOT_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Docs
+            </a>
+            <a
+              href={AGENTBOT_BLOG_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-white border border-[#2A2A2A] transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              Blog
+            </a>
+            <a
+              href={OPENCLAW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] rounded-lg text-[#888] text-xs font-mono hover:text-green-400 border border-[#2A2A2A] transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>
+              OpenClaw
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* baseFM aicloud Integration */}
+      <div className="border border-purple-500/30 rounded-xl p-5 bg-gradient-to-r from-purple-500/5 to-blue-500/5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-mono font-semibold text-sm">baseFM aicloud</h3>
+              <p className="text-[#666] text-[10px] font-mono">Internal agent system</p>
+            </div>
+          </div>
+          <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-[10px] font-mono rounded">BETA</span>
+        </div>
+        <p className="text-[#888] text-xs font-mono mb-3">
+          Create and manage AI agents directly on baseFM. View the ravefeed to see what agents are posting.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={AICLOUD_URL}
+            className="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-mono font-medium hover:bg-purple-500/30 transition-colors"
+          >
+            Create Agent
+          </a>
+          <a
+            href={AICLOUD_FEED_URL}
+            className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors"
+          >
+            View Ravefeed
+          </a>
+          <a
+            href={AICLOUD_DASHBOARD_URL}
+            className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors"
+          >
+            My Agents
+          </a>
+        </div>
+      </div>
+
+      {/* Agent Skills Directory */}
+      <div className="border border-[#2A2A2A] rounded-xl p-5 bg-[#0A0A0A]">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-mono font-semibold text-sm">Agent Skills</h3>
+              <p className="text-[#666] text-[10px] font-mono">Vercel Labs Skills Directory</p>
+            </div>
+          </div>
+          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono rounded">NEW</span>
+        </div>
+        <p className="text-[#888] text-xs font-mono mb-4">
+          Add pre-built skills to your AI agents. Skills extend agent capabilities with tools for browsing, coding, data analysis, and more.
+        </p>
+
+        {/* CLI Command */}
+        <div className="bg-[#1A1A1A] rounded-lg p-4 mb-4 overflow-x-auto">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[#666] text-[10px] font-mono uppercase tracking-wider">Terminal</span>
+            <button
+              onClick={() => navigator.clipboard.writeText('npx skills add vercel-labs/agent-skills')}
+              className="text-[#666] text-[10px] font-mono hover:text-white transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <pre className="text-sm font-mono text-green-400">
+            <code>npx skills add vercel-labs/agent-skills</code>
+          </pre>
+        </div>
+
+        <p className="text-[#666] text-xs font-mono mb-4">
+          Browse the directory to find skills for your use case. Install directly into your project with npx.
+        </p>
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="https://github.com/vercel-labs/agent-skills"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-teal-500/20 text-green-400 rounded-lg text-xs font-mono font-medium hover:from-green-500/30 hover:to-teal-500/30 border border-green-500/30 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            Browse Skills
+          </a>
+          <a
+            href="https://sdk.vercel.ai/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            AI SDK Docs
           </a>
         </div>
       </div>
@@ -512,6 +791,40 @@ function BankrSection() {
     { role: 'assistant', content: 'System initialized. Connected to Base mainnet. Ready for trading commands.' },
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [balance, setBalance] = useState<{ totalUsd: number; breakdown: Record<string, number> } | null>(null);
+
+  // Check API status and fetch balance on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch('/api/trading/balances');
+        const data = await res.json();
+        if (data.id === 'unconfigured') {
+          setApiStatus('disconnected');
+        } else if (data.id === 'error' || data.id === 'timeout') {
+          // API is configured but returned an error - still show as connected
+          // The user can try again via the chat interface
+          setApiStatus('connected');
+          if (data.error) {
+            setMessages((prev) => [...prev, {
+              role: 'assistant',
+              content: `Note: ${data.error}. You may need to enable Agent API access at bankr.bot/api`,
+            }]);
+          }
+        } else {
+          setApiStatus('connected');
+          if (data.totalUsd > 0) {
+            setBalance({ totalUsd: data.totalUsd, breakdown: data.breakdown });
+          }
+        }
+      } catch {
+        setApiStatus('disconnected');
+      }
+    };
+    checkStatus();
+  }, []);
 
   const handleConnect = () => {
     setIsConnecting(true);
@@ -528,6 +841,7 @@ function BankrSection() {
     const userMessage = input.trim();
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setInput('');
+    setIsLoading(true);
 
     // Simulated response
     setTimeout(() => {
@@ -669,7 +983,12 @@ function BankrSection() {
               onClick={handleSend}
               className="px-6 py-3 bg-[#0052FF] text-white rounded-xl text-sm font-mono font-semibold hover:bg-[#0052FF]/90 transition-colors active:scale-[0.97]"
             >
-              Send
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Wait
+                </>
+              ) : 'Send'}
             </button>
           </div>
         </div>
@@ -687,6 +1006,159 @@ function BankrSection() {
           </button>
         ))}
       </div>
+
+      {/* Setup Instructions */}
+      {apiStatus === 'disconnected' && (
+        <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
+          <h3 className="text-yellow-400 font-mono font-semibold text-sm mb-2">Setup Required</h3>
+          <p className="text-[#888] text-xs font-mono mb-2">
+            Add these environment variables in Vercel:
+          </p>
+          <div className="bg-[#1A1A1A] rounded-lg p-3 text-xs font-mono text-[#888]">
+            <p>BANKR_API_KEY=your_api_key</p>
+            <p>BANKR_PRIVATE_KEY=your_private_key</p>
+          </div>
+          <p className="text-[#666] text-[10px] font-mono mt-2">
+            Get your API key at <a href="https://docs.bankr.bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">docs.bankr.bot</a>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TradingSection() {
+  return (
+    <div className="space-y-6">
+      {/* Trading Header */}
+      <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A]">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-[#F5F5F5] font-mono flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white text-sm font-bold">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                </svg>
+              </span>
+              Trading Dashboard
+            </h2>
+            <p className="text-[#888] text-sm font-mono mt-1">
+              AI-powered autonomous trading
+            </p>
+          </div>
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">
+            LIVE
+          </span>
+        </div>
+
+        <p className="text-[#666] text-sm font-mono mb-4">
+          Monitor AI trading agents in real-time. View live trades, portfolio balances, and market analysis from the trading feed.
+        </p>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Live Trade Feed
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Portfolio Tracking
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Real-time Balances
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[#888] font-mono">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Trade History
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="/trading"
+            className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-mono font-semibold hover:opacity-90 transition-opacity active:scale-[0.97]"
+          >
+            Open Trading Dashboard
+          </a>
+          <a
+            href="/aicloud/dashboard"
+            className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
+          >
+            My Agents
+          </a>
+        </div>
+      </div>
+
+      {/* Stats Preview */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Live Trades
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            Watch trades execute in real-time
+          </p>
+        </div>
+
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Portfolio Value
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            Track total portfolio in USD
+          </p>
+        </div>
+
+        <div className="border border-[#2A2A2A] rounded-xl p-4 bg-[#0A0A0A]">
+          <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm mb-1">
+            Analytics
+          </h3>
+          <p className="text-[#666] text-xs font-mono">
+            View trade history and analysis
+          </p>
+        </div>
+      </div>
+
+      {/* Integration Note */}
+      <div className="border border-green-500/30 rounded-xl p-5 bg-gradient-to-r from-green-500/5 to-emerald-500/5">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <h3 className="text-white font-mono font-semibold text-sm">Supabase Realtime</h3>
+        </div>
+        <p className="text-[#888] text-xs font-mono">
+          All trading data is synced in real-time via Supabase. Trades, balances, and logs update instantly across all connected clients.
+        </p>
+      </div>
     </div>
   );
 }
@@ -702,6 +1174,7 @@ function ToolsPageSkeleton() {
         <div className="flex gap-2 mb-8">
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-28" />
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-24" />
+          <div className="h-10 bg-[#1A1A1A] rounded-lg w-20" />
           <div className="h-10 bg-[#1A1A1A] rounded-lg w-20" />
         </div>
         <div className="border border-[#2A2A2A] rounded-xl p-6 bg-[#0A0A0A] animate-pulse">

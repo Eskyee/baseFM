@@ -85,7 +85,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ---- Validate env vars ----
-    const apiKey = process.env.NEXT_PUBLIC_BANKR_API_KEY;
+    // Use BANKR_API_KEY (server-only) for security, NOT NEXT_PUBLIC_ prefix
+    const apiKey = process.env.BANKR_API_KEY;
     const privateKey = process.env.BANKR_PRIVATE_KEY;
 
     if (!apiKey || !privateKey) {

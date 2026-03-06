@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
+import { TransactionHistory } from '@/components/TransactionHistory';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
@@ -130,6 +131,9 @@ export default function WalletPage() {
             </div>
           </div>
         </section>
+
+        {/* Transaction History */}
+        {address && <TransactionHistory walletAddress={address} />}
 
         {/* GBP Conversion Guide for UK Users */}
         <section className="bg-[#1A1A1A] rounded-2xl p-4">
