@@ -109,10 +109,12 @@ export default function AnalyticsPage() {
         const data = await res.json();
         setAnalytics(data);
       }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    fetchAnalytics();
-  }, [address]);
+  };
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);

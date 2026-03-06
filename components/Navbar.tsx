@@ -9,7 +9,7 @@ import { WalletConnect } from './WalletConnect';
 import {
   Home,
   Calendar,
-  Image,
+  Image as ImageIcon,
   Archive,
   ShoppingBag,
   Users,
@@ -66,7 +66,7 @@ export function Navbar() {
         { href: '/schedule', label: 'Schedule', Icon: Calendar },
         { href: '/events', label: 'Events', Icon: Ticket },
         { href: '/djs', label: 'DJs', Icon: Disc3 },
-        { href: '/gallery', label: 'Gallery', Icon: Image },
+        { href: '/gallery', label: 'Gallery', Icon: ImageIcon },
         { href: '/archive', label: 'Archive', Icon: Archive },
       ]
     },
