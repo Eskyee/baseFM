@@ -157,12 +157,13 @@ export default function GalleryPage() {
       <div className="flex flex-col items-center justify-center pt-12 pb-8 px-4">
         <div className="mb-6">
           <Image
-            src="/IMG_raveculture.png"
+            src="/logo.png"
             alt="RaveCulture"
             width={180}
             height={180}
             className="rounded-2xl"
             priority
+            unoptimized
           />
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-3 tracking-tight">
@@ -254,6 +255,7 @@ export default function GalleryPage() {
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITETQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEEEQA/KpZLtdLY7GW7PnPtNqUQG1OKKd4xxjPWKr0UtZSlCBgAYApSnZo0f/2Q=="
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                    unoptimized
                   />
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -344,6 +346,7 @@ export default function GalleryPage() {
               height={selectedImage.height}
               className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
               priority
+              unoptimized
             />
           </div>
         </div>

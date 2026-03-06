@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendSlackNotification } from '@/lib/slack/webhook';
 import { supabase } from '@/lib/supabase/client';
+import { createServerClient } from '@/lib/supabase/client';
 
 interface BookingInquiry {
   name: string;
@@ -36,6 +37,8 @@ const budgetLabels: Record<string, string> = {
 };
 
 export async function POST(request: NextRequest) {
+  const supabase = createServerClient();
+
   try {
     const data: BookingInquiry = await request.json();
 
