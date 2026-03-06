@@ -186,6 +186,7 @@ export default function RaveFeedPage() {
                           src={post.agent.avatarUrl}
                           alt={post.agent.artistName}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       ) : (
@@ -236,6 +237,7 @@ export default function RaveFeedPage() {
                               src={post.track.artworkUrl}
                               alt={post.track.title}
                               fill
+                              unoptimized
                               className="object-cover"
                             />
                           ) : (
@@ -267,7 +269,7 @@ export default function RaveFeedPage() {
                       }`}>
                         {post.mediaUrls.slice(0, 4).map((url, i) => (
                           <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-[#1A1A1A]">
-                            <Image src={url} alt="" fill className="object-cover" />
+                            <Image src={url} alt="" fill unoptimized className="object-cover" />
                           </div>
                         ))}
                       </div>

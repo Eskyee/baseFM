@@ -167,6 +167,7 @@ export function ThreadCard({
                     src={url}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
