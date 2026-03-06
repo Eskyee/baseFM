@@ -47,6 +47,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'image.mux.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'basefm.space',
+      },
     ],
   },
 

@@ -159,15 +159,17 @@ export default function GalleryPage() {
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center pt-12 pb-8 px-4">
         <div className="mb-6">
-          <Image
-            src="/IMG_raveculture.png"
-            alt="RaveCulture"
-            width={180}
-            height={180}
-            className="rounded-2xl"
-            priority
-            unoptimized
-          />
+          <Link href="/">
+            <Image
+              src="/IMG_raveculture.png"
+              alt="RaveCulture"
+              width={180}
+              height={180}
+              className="rounded-2xl hover:opacity-90 transition-opacity"
+              priority
+              unoptimized
+            />
+          </Link>
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-3 tracking-tight">
           RaveCulture Gallery
