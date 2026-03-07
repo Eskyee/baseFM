@@ -9,6 +9,21 @@ const nextConfig = {
   // Compress responses
   compress: true,
 
+  // Force fresh loads
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+        ],
+      },
+    ];
+  },
+
   // Enable experimental features for better performance
   experimental: {
     // Optimize package imports for faster builds
