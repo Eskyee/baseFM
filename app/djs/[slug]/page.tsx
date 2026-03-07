@@ -23,6 +23,8 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const [activeTab, setActiveTab] = useState<TabType>('shows');
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -123,8 +125,8 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const liveStream = streams.find(s => s.status === 'LIVE');
   const pastStreams = streams.filter(s => s.status === 'ENDED').slice(0, 12);
   const upcomingStreams = streams.filter(s => s.status === 'CREATED' || s.status === 'PREPARING');
-  const hasAvatar = !!dj.avatarUrl;
-  const hasCover = !!dj.coverImageUrl;
+  const hasAvatar = !!dj.avatarUrl && !avatarError;
+  const hasCover = !!dj.coverImageUrl && !coverError;
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -153,6 +155,8 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
               src={dj.coverImageUrl || ''}
               alt={`${dj.name} cover`}
               fill
+              unoptimized
+              onError={() => setCoverError(true)}
               className="object-cover object-center"
               style={{ objectPosition: 'center 30%' }}
             />
@@ -217,9 +221,11 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
             <div className="relative flex-shrink-0">
               <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50">
                 <Image
-                  src={dj.avatarUrl || DEFAULT_AVATAR}
+                  src={hasAvatar ? dj.avatarUrl! : DEFAULT_AVATAR}
                   alt={dj.name}
                   fill
+                  unoptimized={hasAvatar}
+                  onError={() => setAvatarError(true)}
                   className={`${hasAvatar ? 'object-cover' : 'object-contain p-6'}`}
                 />
               </div>

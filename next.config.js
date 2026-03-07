@@ -47,6 +47,71 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'image.mux.com',
       },
+      // Avatar and image hosting services
+      {
+        protocol: 'https',
+        hostname: 'effigy.im',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.effigy.im',
+      },
+      {
+        protocol: 'https',
+        hostname: 'euc.li',
+      },
+      {
+        protocol: 'https',
+        hostname: 'metadata.ens.domains',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.ipfs.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ipfs.io',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.pinata.cloud',
+      },
+      {
+        protocol: 'https',
+        hostname: 'gateway.pinata.cloud',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.nftstorage.link',
+      },
+      {
+        protocol: 'https',
+        hostname: 'arweave.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.arweave.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cdninstagram.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.fbcdn.net',
+      },
     ],
   },
 
