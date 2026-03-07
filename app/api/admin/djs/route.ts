@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminWallet } from '@/lib/admin/config';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { createServerClient } from '@/lib/supabase/client';
 import { djFromRow, DJRow } from '@/types/dj';
 import { setDJResident, setDJVerified, setDJBanned } from '@/lib/db/djs';
 
 // GET all DJs (including banned) - admin only
 export async function GET(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
-    const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get('wallet');
-
-    // Server-side admin authorization check
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-
     const supabase = createServerClient();
 
     const { data, error } = await supabase
@@ -38,14 +34,13 @@ export async function GET(request: NextRequest) {
 
 // PATCH - update DJ status (resident, verified, banned)
 export async function PATCH(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, djWalletAddress, action, value } = body;
-
-    // Check admin authorization
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { djWalletAddress, action, value } = body;
 
     if (!djWalletAddress || !action) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

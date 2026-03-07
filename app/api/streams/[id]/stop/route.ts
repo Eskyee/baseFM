@@ -9,6 +9,7 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
+    const { djWalletAddress, signature, message, nonce, timestamp } = body;
 
     // Get stream
     const stream = await getStreamById(params.id);
@@ -20,28 +21,40 @@ export async function POST(
     }
 
     // Verify DJ owns stream
-    if (!body.djWalletAddress ||
-        body.djWalletAddress.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
+    if (!djWalletAddress || djWalletAddress.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
       );
     }
 
-    // Verify signature if provided (recommended for production)
-    if (body.signature && body.message) {
-      const isValidSignature = await verifyWalletSignature(
-        body.djWalletAddress,
-        body.message,
-        body.signature
+    // Require signature verification for stopping stream
+    if (!signature || !message || !nonce || !timestamp) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing signature credentials. Required: signature, message, nonce, timestamp' },
+        { status: 401 }
       );
-      
-      if (!isValidSignature) {
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 403 }
-        );
-      }
+    }
+
+    // Verify the wallet signature
+    const isValidSignature = await verifyWalletSignature(djWalletAddress, message, signature);
+    if (!isValidSignature) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid signature' },
+        { status: 403 }
+      );
+    }
+
+    // Check timestamp to prevent replay attacks (allow 5 minute window)
+    const requestTime = new Date(timestamp).getTime();
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    
+    if (Math.abs(now - requestTime) > fiveMinutes) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
+        { status: 401 }
+      );
     }
 
     // Check stream can be stopped

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminWallet } from '@/lib/admin/config';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 import {
   getAllPromotersAdmin,
   setPromoterVerified,
@@ -9,7 +9,11 @@ import {
 } from '@/lib/db/promoters';
 
 // GET all promoters (including banned) - admin only
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const promoters = await getAllPromotersAdmin();
     return NextResponse.json({ promoters });
@@ -21,14 +25,13 @@ export async function GET() {
 
 // PATCH - update promoter status (verify, feature, ban)
 export async function PATCH(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, promoterId, action, value } = body;
-
-    // Check admin authorization
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { promoterId, action, value } = body;
 
     if (!promoterId || !action) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -59,14 +62,13 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - remove promoter
 export async function DELETE(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, promoterId } = body;
-
-    // Check admin authorization
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { promoterId } = body;
 
     if (!promoterId) {
       return NextResponse.json({ error: 'Missing promoterId' }, { status: 400 });

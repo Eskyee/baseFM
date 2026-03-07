@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminWallet } from '@/lib/admin/config';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { createServerClient } from '@/lib/supabase/client';
 
 // GET - List all members (admin view - no token balance filter)
 export async function GET(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const supabase = createServerClient();
 
@@ -38,14 +42,13 @@ export async function GET(request: NextRequest) {
 
 // POST - Perform admin actions on members
 export async function POST(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, memberId, action } = body;
-
-    // Verify admin
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { memberId, action } = body;
 
     if (!memberId || !action) {
       return NextResponse.json({ error: 'Member ID and action required' }, { status: 400 });

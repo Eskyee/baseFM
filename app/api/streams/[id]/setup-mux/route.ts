@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamWithMuxDetails } from '@/lib/db/streams';
 import { createMuxLiveStream, getMuxPlaybackUrl, isMuxConfigured } from '@/lib/streaming/mux';
+import { verifyWalletSignature } from '@/lib/auth/wallet';
 
 export async function POST(
   request: NextRequest,
@@ -32,12 +33,44 @@ export async function POST(
       );
     }
 
-    // Verify ownership via wallet address (passed in body)
+    // Get request body
     const body = await request.json().catch(() => ({}));
-    if (body.djWalletAddress?.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
+    const { djWalletAddress, signature, message, nonce, timestamp } = body;
+
+    // Verify DJ owns stream
+    if (!djWalletAddress || djWalletAddress.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
       return NextResponse.json(
         { error: 'Unauthorized: you do not own this stream' },
         { status: 403 }
+      );
+    }
+
+    // Require signature verification for ownership confirmation
+    if (!signature || !message || !nonce || !timestamp) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing signature credentials. Required: signature, message, nonce, timestamp' },
+        { status: 401 }
+      );
+    }
+
+    // Verify the wallet signature
+    const isValidSignature = await verifyWalletSignature(djWalletAddress, message, signature);
+    if (!isValidSignature) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid signature' },
+        { status: 403 }
+      );
+    }
+
+    // Check timestamp to prevent replay attacks (allow 5 minute window)
+    const requestTime = new Date(timestamp).getTime();
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    
+    if (Math.abs(now - requestTime) > fiveMinutes) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
+        { status: 401 }
       );
     }
 

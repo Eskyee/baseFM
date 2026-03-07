@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { createServerClient } from '@/lib/supabase/client';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/admin/accounting/tickets - Get ticket sales data
+// GET /api/admin/accounting/tickets - Get ticket sales data (admin only)
 export async function GET(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const supabase = createServerClient();
     const { searchParams } = new URL(request.url);

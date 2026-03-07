@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminWallet } from '@/lib/admin/config';
+import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { getAllEventsAdmin, setEventStatus, setEventFeatured, deleteEvent } from '@/lib/db/events';
 
 // GET all events (including pending) - admin only
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const events = await getAllEventsAdmin();
     return NextResponse.json({ events });
@@ -15,14 +19,13 @@ export async function GET() {
 
 // PATCH - update event status (approve, reject, feature)
 export async function PATCH(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, eventId, action, value } = body;
-
-    // Check admin authorization
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { eventId, action, value } = body;
 
     if (!eventId || !action) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -59,14 +62,13 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE - remove event
 export async function DELETE(request: NextRequest) {
+  // Check admin authorization with signature verification
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
-    const { walletAddress, eventId } = body;
-
-    // Check admin authorization
-    if (!isAdminWallet(walletAddress)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+    const { eventId } = body;
 
     if (!eventId) {
       return NextResponse.json({ error: 'Missing eventId' }, { status: 400 });
