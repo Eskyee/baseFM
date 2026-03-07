@@ -63,6 +63,7 @@ export function Navbar() {
       Icon: Sparkles,
       featured: false,
       links: [
+        { href: '/live', label: 'Live Stream', Icon: Rss },
         { href: '/schedule', label: 'Schedule', Icon: Calendar },
         { href: '/events', label: 'Events', Icon: Ticket },
         { href: '/djs', label: 'DJs', Icon: Disc3 },
