@@ -8,6 +8,9 @@ import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
 import { TransactionHistory } from '@/components/TransactionHistory';
 
+// BASEFM token on Base
+const BASEFM_ADDRESS = '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`;
+
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
 
@@ -21,6 +24,13 @@ export default function WalletPage() {
   const { data: raveBalance, isLoading: raveLoading } = useBalance({
     address,
     token: DJ_TOKEN_CONFIG.address,
+    chainId: base.id,
+  });
+
+  // BASEFM token balance on Base
+  const { data: basefmBalance, isLoading: basefmLoading } = useBalance({
+    address,
+    token: BASEFM_ADDRESS,
     chainId: base.id,
   });
 
@@ -124,6 +134,32 @@ export default function WalletPage() {
                   <span className="inline-block w-16 h-4 bg-[#252525] rounded animate-pulse" />
                 ) : raveBalance ? (
                   parseFloat(raveBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 0 })
+                ) : (
+                  '0'
+                )}
+              </span>
+            </div>
+
+            <div className="border-t border-[#252525]" />
+
+            {/* BASEFM */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-[#0052FF]/15 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-[#0052FF]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[#F5F5F5] text-sm font-medium">BASEFM</p>
+                  <p className="text-[#666] text-[10px]">baseFM</p>
+                </div>
+              </div>
+              <span className="text-[#F5F5F5] text-sm font-semibold tabular-nums">
+                {basefmLoading ? (
+                  <span className="inline-block w-16 h-4 bg-[#252525] rounded animate-pulse" />
+                ) : basefmBalance ? (
+                  parseFloat(basefmBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 0 })
                 ) : (
                   '0'
                 )}
@@ -237,6 +273,31 @@ export default function WalletPage() {
                 <p className="text-xs text-purple-300">{DJ_TOKEN_CONFIG.requiredAmount.toLocaleString()}+ unlocks community</p>
               </div>
               <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        </section>
+
+        {/* View BASEFM */}
+        <section className="bg-gradient-to-r from-[#0052FF]/20 to-blue-900/30 rounded-2xl p-4 border border-[#0052FF]/20 active:scale-[0.98] transition-transform">
+          <Link
+            href={`https://base.app/coin/base-mainnet/${BASEFM_ADDRESS}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-[#0052FF] to-blue-400 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-semibold text-[#F5F5F5]">View BASEFM</h2>
+                <p className="text-xs text-[#0052FF]">Trade on Base.app</p>
+              </div>
+              <svg className="w-5 h-5 text-[#0052FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
