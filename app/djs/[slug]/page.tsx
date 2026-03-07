@@ -219,15 +219,25 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             {/* Avatar - Larger and more prominent */}
             <div className="relative flex-shrink-0">
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50">
-                <Image
-                  src={hasAvatar ? dj.avatarUrl! : DEFAULT_AVATAR}
-                  alt={dj.name}
-                  fill
-                  unoptimized={hasAvatar}
-                  onError={() => setAvatarError(true)}
-                  className={`${hasAvatar ? 'object-cover' : 'object-contain p-6'}`}
-                />
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50 flex items-center justify-center">
+                {hasAvatar ? (
+                  <Image
+                    src={dj.avatarUrl!}
+                    alt={dj.name}
+                    fill
+                    unoptimized
+                    onError={() => setAvatarError(true)}
+                    className="object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={DEFAULT_AVATAR}
+                    alt={dj.name}
+                    width={80}
+                    height={80}
+                    className="object-contain"
+                  />
+                )}
               </div>
               {/* Live indicator on avatar if streaming */}
               {liveStream && (

@@ -153,7 +153,6 @@ function DJsContent() {
 function DJCard({ dj }: { dj: DJ }) {
   const [imgError, setImgError] = useState(false);
   const hasAvatar = !!dj.avatarUrl && !imgError;
-  const imageSrc = hasAvatar ? dj.avatarUrl! : DEFAULT_AVATAR;
 
   return (
     <Link
@@ -161,17 +160,25 @@ function DJCard({ dj }: { dj: DJ }) {
       className="group block"
     >
       {/* Avatar */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3">
-        <Image
-          src={imageSrc}
-          alt={dj.name}
-          fill
-          unoptimized={hasAvatar}
-          onError={() => setImgError(true)}
-          className={`transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
-            hasAvatar ? 'object-cover' : 'object-contain p-8'
-          }`}
-        />
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3 flex items-center justify-center">
+        {hasAvatar ? (
+          <Image
+            src={dj.avatarUrl!}
+            alt={dj.name}
+            fill
+            unoptimized
+            onError={() => setImgError(true)}
+            className="transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 object-cover"
+          />
+        ) : (
+          <Image
+            src={DEFAULT_AVATAR}
+            alt={dj.name}
+            width={64}
+            height={64}
+            className="transition-all duration-300 group-hover:scale-105 object-contain"
+          />
+        )}
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex gap-1">
