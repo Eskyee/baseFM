@@ -3,18 +3,28 @@ import { publicClient } from '@/lib/viem/client';
 import { formatEther, formatUnits } from 'viem';
 
 const BANKR_API_BASE = 'https://api.bankr.bot';
+const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex/tokens';
 
 // Agent wallet address
 const AGENT_WALLET = process.env.NEXT_PUBLIC_TRADING_AGENT_WALLET as `0x${string}` | undefined;
 
-// Common tokens on Base with their addresses and decimals
+// All tokens to track on Base
 const BASE_TOKENS = {
   USDC: {
     address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as `0x${string}`,
     decimals: 6,
+    stablecoin: true,
   },
   WETH: {
     address: '0x4200000000000000000000000000000000000006' as `0x${string}`,
+    decimals: 18,
+  },
+  BASEFM: {
+    address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`,
+    decimals: 18,
+  },
+  RAVE: {
+    address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,
     decimals: 18,
   },
 } as const;
@@ -31,26 +41,78 @@ const ERC20_ABI = [
 ] as const;
 
 /**
+ * Fetch token prices from DexScreener
+ */
+async function fetchTokenPrices(): Promise<Record<string, number>> {
+  const prices: Record<string, number> = { USDC: 1 };
+
+  try {
+    // Fetch ETH price from WETH pairs
+    const wethRes = await fetch(`${DEXSCREENER_API}/${BASE_TOKENS.WETH.address}`);
+    if (wethRes.ok) {
+      const data = await wethRes.json();
+      if (data.pairs?.[0]?.priceUsd) {
+        prices['ETH'] = parseFloat(data.pairs[0].priceUsd);
+        prices['WETH'] = prices['ETH'];
+      }
+    }
+
+    // Fetch BASEFM price
+    const basefmRes = await fetch(`${DEXSCREENER_API}/${BASE_TOKENS.BASEFM.address}`);
+    if (basefmRes.ok) {
+      const data = await basefmRes.json();
+      if (data.pairs?.[0]?.priceUsd) {
+        prices['BASEFM'] = parseFloat(data.pairs[0].priceUsd);
+      }
+    }
+
+    // Fetch RAVE price
+    const raveRes = await fetch(`${DEXSCREENER_API}/${BASE_TOKENS.RAVE.address}`);
+    if (raveRes.ok) {
+      const data = await raveRes.json();
+      if (data.pairs?.[0]?.priceUsd) {
+        prices['RAVE'] = parseFloat(data.pairs[0].priceUsd);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch token prices:', err);
+  }
+
+  // Fallback ETH price if not fetched
+  if (!prices['ETH']) {
+    prices['ETH'] = 2000;
+    prices['WETH'] = 2000;
+  }
+
+  return prices;
+}
+
+/**
  * Fetch on-chain balances for agent wallet
  */
 async function fetchOnChainBalances(): Promise<{
   totalUsd: number;
   breakdown: Record<string, number>;
+  amounts: Record<string, string>;
 }> {
   if (!AGENT_WALLET) {
-    return { totalUsd: 0, breakdown: {} };
+    return { totalUsd: 0, breakdown: {}, amounts: {} };
   }
 
   const breakdown: Record<string, number> = {};
+  const amounts: Record<string, string> = {};
   let totalUsd = 0;
 
   try {
+    // Fetch prices first
+    const prices = await fetchTokenPrices();
+
     // Fetch ETH balance
     const ethBalance = await publicClient.getBalance({ address: AGENT_WALLET });
     const ethAmount = parseFloat(formatEther(ethBalance));
     if (ethAmount > 0.0001) {
-      // Rough ETH price estimate (could use oracle in future)
-      const ethUsd = ethAmount * 3500;
+      const ethUsd = ethAmount * (prices['ETH'] || 2000);
+      amounts['ETH'] = ethAmount.toFixed(4);
       breakdown['ETH'] = ethUsd;
       totalUsd += ethUsd;
     }
@@ -64,6 +126,7 @@ async function fetchOnChainBalances(): Promise<{
     });
     const usdcAmount = parseFloat(formatUnits(usdcBalance, BASE_TOKENS.USDC.decimals));
     if (usdcAmount > 0.01) {
+      amounts['USDC'] = usdcAmount.toFixed(2);
       breakdown['USDC'] = usdcAmount;
       totalUsd += usdcAmount;
     }
@@ -77,15 +140,50 @@ async function fetchOnChainBalances(): Promise<{
     });
     const wethAmount = parseFloat(formatUnits(wethBalance, BASE_TOKENS.WETH.decimals));
     if (wethAmount > 0.0001) {
-      const wethUsd = wethAmount * 3500;
+      const wethUsd = wethAmount * (prices['WETH'] || 2000);
+      amounts['WETH'] = wethAmount.toFixed(4);
       breakdown['WETH'] = wethUsd;
       totalUsd += wethUsd;
+    }
+
+    // Fetch BASEFM balance
+    const basefmBalance = await publicClient.readContract({
+      address: BASE_TOKENS.BASEFM.address,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [AGENT_WALLET],
+    });
+    const basefmAmount = parseFloat(formatUnits(basefmBalance, BASE_TOKENS.BASEFM.decimals));
+    if (basefmAmount > 0) {
+      const basefmUsd = basefmAmount * (prices['BASEFM'] || 0);
+      amounts['BASEFM'] = basefmAmount.toFixed(4);
+      if (basefmUsd > 0) {
+        breakdown['BASEFM'] = basefmUsd;
+        totalUsd += basefmUsd;
+      }
+    }
+
+    // Fetch RAVE balance
+    const raveBalance = await publicClient.readContract({
+      address: BASE_TOKENS.RAVE.address,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [AGENT_WALLET],
+    });
+    const raveAmount = parseFloat(formatUnits(raveBalance, BASE_TOKENS.RAVE.decimals));
+    if (raveAmount > 0) {
+      const raveUsd = raveAmount * (prices['RAVE'] || 0);
+      amounts['RAVE'] = raveAmount.toFixed(4);
+      if (raveUsd > 0) {
+        breakdown['RAVE'] = raveUsd;
+        totalUsd += raveUsd;
+      }
     }
   } catch (err) {
     console.error('Failed to fetch on-chain balances:', err);
   }
 
-  return { totalUsd, breakdown };
+  return { totalUsd, breakdown, amounts };
 }
 
 /**

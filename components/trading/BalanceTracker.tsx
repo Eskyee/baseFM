@@ -36,9 +36,11 @@ export function BalanceTracker() {
     return () => clearInterval(id);
   }, [prevId]);
 
-  // Sort breakdown by value descending
+  // Sort breakdown by value descending, filter assets over $1
   const sortedBreakdown = balance?.breakdown
-    ? Object.entries(balance.breakdown).sort(([, a], [, b]) => b - a)
+    ? Object.entries(balance.breakdown)
+        .filter(([, value]) => value >= 1)
+        .sort(([, a], [, b]) => b - a)
     : [];
 
   return (
