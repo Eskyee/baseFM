@@ -10,6 +10,9 @@ import {
 } from '@/lib/bankr';
 import { isAdminWallet } from '@/lib/admin/config';
 
+// Never statically pre-render — this route calls the Bankr API at runtime
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/trading/agent
  *

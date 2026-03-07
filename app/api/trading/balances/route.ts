@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Never statically pre-render — this route calls the Bankr API at runtime
+export const dynamic = 'force-dynamic';
+
 const BANKR_API_BASE = 'https://api.bankr.bot';
 
 /**
