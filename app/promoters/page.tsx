@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase/client';
+import { createServerClient } from '@/lib/supabase/client';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Promoter Dashboard | baseFM',
@@ -9,6 +11,7 @@ export const metadata = {
 
 // Get DJ stats and info
 async function getDJs() {
+  const supabase = createServerClient();
   const { data: djs } = await supabase
     .from('djs')
     .select('*')

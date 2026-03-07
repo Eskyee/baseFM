@@ -3,8 +3,10 @@ import {
   verifyMuxWebhookSignature,
   parseMuxWebhookEvent,
 } from '@/lib/streaming/mux';
-import { updateStreamStatus } from '@/lib/db/streams';
+import { updateStreamStatus, getStreamById } from '@/lib/db/streams';
 import { STREAM_STATUS } from '@/lib/constants/stream';
+import { getDJByWallet } from '@/lib/db/djs';
+import { notifySubscribedAgents } from '@/lib/notifications/agent-stream';
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +38,11 @@ export async function POST(request: NextRequest) {
         // Stream is now receiving data and is live
         await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.LIVE);
         console.log(`Stream ${event.baseFmStreamId} is now LIVE`);
+
+        // Notify agents subscribed to this DJ (non-blocking)
+        notifySubscribedAgents(event.baseFmStreamId).catch((err) =>
+          console.error('Failed to notify subscribed agents:', err)
+        );
         break;
 
       case 'stream_idle':

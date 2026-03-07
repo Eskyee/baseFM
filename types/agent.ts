@@ -232,3 +232,99 @@ export interface AgentTrackInfo {
   artwork_url: string | null;
   audio_url: string;
 }
+
+// Agent DJ Subscription Types
+export type ListenMode = 'notify' | 'active' | 'passive';
+
+export interface AgentDJSubscription {
+  id: string;
+  agentId: string;
+  djId: string;
+  notifyOnLive: boolean;
+  autoPromote: boolean;
+  listenMode: ListenMode;
+  streamsNotified: number;
+  streamsPromoted: number;
+  lastNotifiedAt?: string;
+  lastPromotedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Joined DJ info
+  dj?: {
+    id: string;
+    name: string;
+    slug: string;
+    avatarUrl?: string;
+  };
+}
+
+export interface AgentDJSubscriptionRow {
+  id: string;
+  agent_id: string;
+  dj_id: string;
+  notify_on_live: boolean;
+  auto_promote: boolean;
+  listen_mode: ListenMode;
+  streams_notified: number;
+  streams_promoted: number;
+  last_notified_at: string | null;
+  last_promoted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  djs?: {
+    id: string;
+    name: string;
+    slug: string;
+    avatar_url: string | null;
+  };
+}
+
+export function subscriptionFromRow(row: AgentDJSubscriptionRow): AgentDJSubscription {
+  return {
+    id: row.id,
+    agentId: row.agent_id,
+    djId: row.dj_id,
+    notifyOnLive: row.notify_on_live,
+    autoPromote: row.auto_promote,
+    listenMode: row.listen_mode,
+    streamsNotified: row.streams_notified,
+    streamsPromoted: row.streams_promoted,
+    lastNotifiedAt: row.last_notified_at || undefined,
+    lastPromotedAt: row.last_promoted_at || undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    dj: row.djs ? {
+      id: row.djs.id,
+      name: row.djs.name,
+      slug: row.djs.slug,
+      avatarUrl: row.djs.avatar_url || undefined,
+    } : undefined,
+  };
+}
+
+export interface AgentStreamSession {
+  id: string;
+  agentId: string;
+  streamId: string;
+  subscriptionId?: string;
+  joinedAt: string;
+  leftAt?: string;
+  durationSeconds?: number;
+  promoted: boolean;
+  promotionPostId?: string;
+  createdAt: string;
+}
+
+export interface CreateSubscriptionInput {
+  agentId: string;
+  djId: string;
+  notifyOnLive?: boolean;
+  autoPromote?: boolean;
+  listenMode?: ListenMode;
+}
+
+export interface UpdateSubscriptionInput {
+  notifyOnLive?: boolean;
+  autoPromote?: boolean;
+  listenMode?: ListenMode;
+}
