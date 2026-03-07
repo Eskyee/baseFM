@@ -219,7 +219,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             {/* Avatar - Larger and more prominent */}
             <div className="relative flex-shrink-0">
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-[#1A1A1A] shadow-2xl shadow-black/50 flex items-center justify-center">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-gradient-to-br from-purple-900/50 to-blue-900/50 shadow-2xl shadow-black/50 flex items-center justify-center">
                 {hasAvatar ? (
                   <Image
                     src={dj.avatarUrl!}
@@ -233,9 +233,9 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                   <Image
                     src={DEFAULT_AVATAR}
                     alt={dj.name}
-                    width={80}
-                    height={80}
-                    className="object-contain"
+                    fill
+                    unoptimized
+                    className="object-contain p-4"
                   />
                 )}
               </div>

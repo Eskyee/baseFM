@@ -160,7 +160,7 @@ function DJCard({ dj }: { dj: DJ }) {
       className="group block"
     >
       {/* Avatar */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3 flex items-center justify-center">
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/50 to-blue-900/50 mb-3 flex items-center justify-center">
         {hasAvatar ? (
           <Image
             src={dj.avatarUrl!}
@@ -174,9 +174,9 @@ function DJCard({ dj }: { dj: DJ }) {
           <Image
             src={DEFAULT_AVATAR}
             alt={dj.name}
-            width={64}
-            height={64}
-            className="transition-all duration-300 group-hover:scale-105 object-contain"
+            fill
+            unoptimized
+            className="transition-all duration-300 group-hover:scale-105 object-contain p-6"
           />
         )}
 
