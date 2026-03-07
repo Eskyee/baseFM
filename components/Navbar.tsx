@@ -154,6 +154,8 @@ export function Navbar() {
                 alt="baseFM"
                 width={32}
                 height={32}
+                unoptimized
+                priority
                 className="rounded-lg transition-transform group-hover:scale-105"
               />
               <span className="text-[#F5F5F5] font-bold text-lg hidden sm:block">
