@@ -9,6 +9,7 @@ export function BalanceTracker() {
   const [balance, setBalance] = useState<TradingBalance | null>(null);
   const [flash, setFlash] = useState(false);
   const [prevId, setPrevId] = useState<string | null>(null);
+  const [status, setStatus] = useState<'loading' | 'configured' | 'unconfigured'>('loading');
 
   useEffect(() => {
     async function poll() {
@@ -17,8 +18,9 @@ export function BalanceTracker() {
         const data = await res.json();
         if (data && data.id) {
           setBalance(data);
+          setStatus(data.id === 'unconfigured' ? 'unconfigured' : 'configured');
           // Flash effect when balance changes
-          if (prevId && data.id !== prevId) {
+          if (prevId && data.id !== prevId && data.id !== 'unconfigured') {
             setFlash(true);
             setTimeout(() => setFlash(false), 1500);
           }
@@ -49,6 +51,12 @@ export function BalanceTracker() {
         <p className="text-3xl font-bold text-white font-mono tabular-nums">
           {balance ? `$${balance.totalUsd.toFixed(2)}` : '\u2014'}
         </p>
+        {status === 'loading' && (
+          <p className="text-xs text-[#555] font-mono mt-1">Loading...</p>
+        )}
+        {status === 'unconfigured' && (
+          <p className="text-xs text-yellow-500 font-mono mt-1">API not configured</p>
+        )}
       </div>
 
       {sortedBreakdown.length > 0 && (

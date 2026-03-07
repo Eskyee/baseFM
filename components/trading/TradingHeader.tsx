@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 interface TradingHeaderProps {
   startedAt: Date;
   walletAddress?: string;
+  isConfigured?: boolean;
 }
 
-export function TradingHeader({ startedAt, walletAddress }: TradingHeaderProps) {
+export function TradingHeader({ startedAt, walletAddress, isConfigured }: TradingHeaderProps) {
   const [uptime, setUptime] = useState('00:00');
   const [copied, setCopied] = useState(false);
 
@@ -43,13 +44,17 @@ export function TradingHeader({ startedAt, walletAddress }: TradingHeaderProps) 
     <header className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A] bg-[#111113]/80 backdrop-blur-sm">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <div className={`w-2 h-2 rounded-full ${isConfigured === false ? 'bg-yellow-500' : 'bg-green-500 animate-pulse'}`} />
           <span className="text-sm font-bold tracking-wider uppercase text-white font-mono">
             Trading Agent
           </span>
         </div>
-        <span className="text-xs text-green-400 px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 font-mono">
-          Live
+        <span className={`text-xs px-2 py-0.5 rounded font-mono ${
+          isConfigured === false
+            ? 'text-yellow-400 bg-yellow-500/10 border border-yellow-500/20'
+            : 'text-green-400 bg-green-500/10 border border-green-500/20'
+        }`}>
+          {isConfigured === false ? 'Not Configured' : 'Live'}
         </span>
         <span className="text-xs text-blue-400 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 font-mono">
           Base Network

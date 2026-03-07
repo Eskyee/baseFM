@@ -118,9 +118,15 @@ export function TradingFeed() {
         className="flex-1 overflow-y-auto px-4 py-2 space-y-1"
       >
         {logs.length === 0 && (
-          <p className="text-[#555] text-sm font-mono py-4 text-center">
-            Waiting for agent activity...
-          </p>
+          <div className="text-center py-8">
+            <div className="w-12 h-12 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-3">
+              <svg className="w-6 h-6 text-[#555]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <p className="text-[#555] text-sm font-mono">Waiting for agent activity...</p>
+            <p className="text-[#444] text-xs font-mono mt-1">Agent runs every 5 minutes via cron</p>
+          </div>
         )}
 
         {logs.map((log, index) => (
