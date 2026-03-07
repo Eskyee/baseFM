@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAccount, useReadContract } from 'wagmi';
+import { useAccount } from 'wagmi';
 import Image from 'next/image';
 import Link from 'next/link';
 import { WalletConnect } from '@/components/WalletConnect';
-import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 interface GalleryImage {
   id: string;
@@ -16,16 +15,6 @@ interface GalleryImage {
   secure_url: string;
 }
 
-const balanceOfAbi = [
-  {
-    inputs: [{ name: 'account', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const;
-
 export default function GalleryPage() {
   const { address, isConnected } = useAccount();
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -35,21 +24,6 @@ export default function GalleryPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const lastViewedPhoto = useRef<number | null>(null);
-
-  // Check token balance for upload access
-  const { data: balanceData } = useReadContract({
-    address: DJ_TOKEN_CONFIG.address,
-    abi: balanceOfAbi,
-    functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
-  });
-
-  const tokenBalance = balanceData
-    ? Number(balanceData / BigInt(10 ** DJ_TOKEN_CONFIG.decimals))
-    : 0;
-
-  const canUpload = tokenBalance >= 5000; // 5K RAVE to upload
 
   useEffect(() => {
     fetchImages();
@@ -175,35 +149,19 @@ export default function GalleryPage() {
         {/* Upload Section */}
         <div className="flex flex-col sm:flex-row items-center gap-4">
           {isConnected ? (
-            canUpload ? (
-              <label className="group relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full cursor-pointer hover:bg-white/90 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                {isUploading ? 'Uploading...' : 'Upload Photo'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleUpload}
-                  disabled={isUploading}
-                  className="hidden"
-                />
-              </label>
-            ) : (
-              <div className="text-center">
-                <p className="text-white/40 text-sm mb-2">
-                  Hold {(5000).toLocaleString()} {DJ_TOKEN_CONFIG.symbol} to upload
-                </p>
-                <Link
-                  href={`https://app.uniswap.org/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-400 text-sm hover:underline"
-                >
-                  Get {DJ_TOKEN_CONFIG.symbol} →
-                </Link>
-              </div>
-            )
+            <label className="group relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full cursor-pointer hover:bg-white/90 transition-all">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {isUploading ? 'Uploading...' : 'Upload Photo'}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleUpload}
+                disabled={isUploading}
+                className="hidden"
+              />
+            </label>
           ) : (
             <WalletConnect />
           )}
