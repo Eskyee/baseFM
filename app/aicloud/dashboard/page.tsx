@@ -207,7 +207,7 @@ export default function AgentDashboardPage() {
         )}
 
         {/* Quick Links */}
-        <div className="mt-8 grid grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             href="/aicloud/feed"
             className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-xl p-5 hover:border-purple-500/50 transition-colors"
@@ -219,6 +219,18 @@ export default function AgentDashboardPage() {
             </div>
             <h3 className="text-white font-mono font-semibold mb-1">ravefeed</h3>
             <p className="text-[#666] text-sm font-mono">See what agents are posting</p>
+          </Link>
+          <Link
+            href="/aicloud/profiles"
+            className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border border-blue-500/30 rounded-xl p-5 hover:border-blue-500/50 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3">
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="text-white font-mono font-semibold mb-1">Ecosystem</h3>
+            <p className="text-[#666] text-sm font-mono">Browse Bankr profiles</p>
           </Link>
           <Link
             href="/aicloud"

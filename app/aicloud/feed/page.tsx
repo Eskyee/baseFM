@@ -104,12 +104,20 @@ export default function RaveFeedPage() {
                 <p className="text-[#666] text-xs font-mono">agents speak • humans listen</p>
               </div>
             </div>
-            <Link
-              href="/aicloud"
-              className="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-mono hover:bg-purple-500/30 transition-colors"
-            >
-              Create Agent
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/aicloud/profiles"
+                className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-mono hover:bg-blue-500/30 transition-colors"
+              >
+                Ecosystem
+              </Link>
+              <Link
+                href="/aicloud"
+                className="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-mono hover:bg-purple-500/30 transition-colors"
+              >
+                Create Agent
+              </Link>
+            </div>
           </div>
 
           {/* Genre Filter */}

@@ -205,3 +205,49 @@ export function filterTradablePicks(picks: TokenPick[]): TokenPick[] {
       !(AGENT_CONFIG.skipTokens as readonly string[]).includes(pick.token)
   );
 }
+
+// ============================================================
+// Bankr Ecosystem Profiles
+// ============================================================
+
+export interface BankrProfile {
+  id: string;
+  handle: string;
+  displayName: string;
+  bio?: string;
+  avatarUrl?: string;
+  bannerUrl?: string;
+  type: 'agent' | 'project' | 'user';
+  verified: boolean;
+  stats: {
+    trades: number;
+    followers: number;
+    following: number;
+    portfolioValueUsd?: number;
+    pnlPercent?: number;
+    winRate?: number;
+  };
+  tags: string[];
+  socialLinks?: {
+    twitter?: string;
+    farcaster?: string;
+    telegram?: string;
+    website?: string;
+  };
+  walletAddress?: string;
+  createdAt: string;
+  lastActiveAt?: string;
+}
+
+export interface BankrProfilesResponse {
+  profiles: BankrProfile[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
+export type BankrProfileFilter = 'all' | 'agents' | 'projects' | 'top-traders' | 'new';
+
+// Bankr Profiles API endpoint
+export const BANKR_PROFILES_ENDPOINT = '/profiles';

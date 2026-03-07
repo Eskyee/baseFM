@@ -16,6 +16,7 @@
 export {
   BANKR_API_BASE,
   BANKR_ENDPOINTS,
+  BANKR_PROFILES_ENDPOINT,
   AGENT_CONFIG,
   SCAN_PROMPTS,
   getBankrApiKey,
@@ -32,6 +33,9 @@ export {
   type AgentLogType,
   type AgentLog,
   type TradeDecision,
+  type BankrProfile,
+  type BankrProfilesResponse,
+  type BankrProfileFilter,
 } from './config';
 
 // Agent workflow functions
@@ -47,3 +51,10 @@ export {
   runTradingCycle,
   analyzeToken,
 } from './agent';
+
+// Profiles browsing
+export {
+  fetchBankrProfiles,
+  fetchBankrProfile,
+  type FetchProfilesOptions,
+} from './profiles';
