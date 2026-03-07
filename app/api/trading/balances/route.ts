@@ -1,15 +1,110 @@
 import { NextResponse } from 'next/server';
+import { publicClient } from '@/lib/viem/client';
+import { formatEther, formatUnits } from 'viem';
 
 const BANKR_API_BASE = 'https://api.bankr.bot';
 
+// Agent wallet address
+const AGENT_WALLET = process.env.NEXT_PUBLIC_TRADING_AGENT_WALLET as `0x${string}` | undefined;
+
+// Common tokens on Base with their addresses and decimals
+const BASE_TOKENS = {
+  USDC: {
+    address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as `0x${string}`,
+    decimals: 6,
+  },
+  WETH: {
+    address: '0x4200000000000000000000000000000000000006' as `0x${string}`,
+    decimals: 18,
+  },
+} as const;
+
+// Simple ERC20 balanceOf ABI
+const ERC20_ABI = [
+  {
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
+
+/**
+ * Fetch on-chain balances for agent wallet
+ */
+async function fetchOnChainBalances(): Promise<{
+  totalUsd: number;
+  breakdown: Record<string, number>;
+}> {
+  if (!AGENT_WALLET) {
+    return { totalUsd: 0, breakdown: {} };
+  }
+
+  const breakdown: Record<string, number> = {};
+  let totalUsd = 0;
+
+  try {
+    // Fetch ETH balance
+    const ethBalance = await publicClient.getBalance({ address: AGENT_WALLET });
+    const ethAmount = parseFloat(formatEther(ethBalance));
+    if (ethAmount > 0.0001) {
+      // Rough ETH price estimate (could use oracle in future)
+      const ethUsd = ethAmount * 3500;
+      breakdown['ETH'] = ethUsd;
+      totalUsd += ethUsd;
+    }
+
+    // Fetch USDC balance
+    const usdcBalance = await publicClient.readContract({
+      address: BASE_TOKENS.USDC.address,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [AGENT_WALLET],
+    });
+    const usdcAmount = parseFloat(formatUnits(usdcBalance, BASE_TOKENS.USDC.decimals));
+    if (usdcAmount > 0.01) {
+      breakdown['USDC'] = usdcAmount;
+      totalUsd += usdcAmount;
+    }
+
+    // Fetch WETH balance
+    const wethBalance = await publicClient.readContract({
+      address: BASE_TOKENS.WETH.address,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [AGENT_WALLET],
+    });
+    const wethAmount = parseFloat(formatUnits(wethBalance, BASE_TOKENS.WETH.decimals));
+    if (wethAmount > 0.0001) {
+      const wethUsd = wethAmount * 3500;
+      breakdown['WETH'] = wethUsd;
+      totalUsd += wethUsd;
+    }
+  } catch (err) {
+    console.error('Failed to fetch on-chain balances:', err);
+  }
+
+  return { totalUsd, breakdown };
+}
+
 /**
  * GET /api/trading/balances
- * Fetches trading agent balance from Bankr API using prompt system
+ * Fetches trading agent balance from Bankr API or on-chain
  */
 export async function GET() {
   const apiKey = process.env.BANKR_API_KEY;
 
+  // If no API key, try to fetch on-chain balances directly
   if (!apiKey) {
+    if (AGENT_WALLET) {
+      const onChainData = await fetchOnChainBalances();
+      return NextResponse.json({
+        id: Date.now().toString(),
+        source: 'onchain',
+        ...onChainData,
+      });
+    }
     return NextResponse.json({
       id: 'unconfigured',
       totalUsd: 0,
@@ -66,6 +161,7 @@ export async function GET() {
         const { totalUsd, breakdown } = parseBalanceResponse(job.response || '');
         return NextResponse.json({
           id: Date.now().toString(),
+          source: 'bankr',
           totalUsd,
           breakdown,
         });
@@ -93,6 +189,15 @@ export async function GET() {
     });
   } catch (err) {
     console.error('Failed to fetch Bankr balances:', err);
+    // Fall back to on-chain balances
+    if (AGENT_WALLET) {
+      const onChainData = await fetchOnChainBalances();
+      return NextResponse.json({
+        id: Date.now().toString(),
+        source: 'onchain-fallback',
+        ...onChainData,
+      });
+    }
     return NextResponse.json({
       id: 'error',
       totalUsd: 0,
