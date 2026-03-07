@@ -289,6 +289,7 @@ export default function HomePage() {
                       src={djOfTheDay.dj.avatarUrl}
                       alt={djOfTheDay.dj.name}
                       fill
+                      unoptimized
                       className="object-cover"
                     />
                   ) : (

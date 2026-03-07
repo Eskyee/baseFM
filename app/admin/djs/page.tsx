@@ -212,13 +212,24 @@ export default function AdminDJsPage() {
               >
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[#0A0A0A] flex-shrink-0">
-                    <Image
-                      src={dj.avatarUrl || DEFAULT_AVATAR}
-                      alt={dj.name}
-                      fill
-                      className={dj.avatarUrl ? 'object-cover' : 'object-contain p-2'}
-                    />
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[#0A0A0A] flex-shrink-0 flex items-center justify-center">
+                    {dj.avatarUrl ? (
+                      <Image
+                        src={dj.avatarUrl}
+                        alt={dj.name}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={DEFAULT_AVATAR}
+                        alt={dj.name}
+                        width={40}
+                        height={40}
+                        className="object-contain"
+                      />
+                    )}
                   </div>
 
                   {/* Info */}

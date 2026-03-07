@@ -216,14 +216,25 @@ function ScheduleContent() {
 
                     {/* DJ Avatar */}
                     {slot.dj && (
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-[#0A0A0A] flex-shrink-0">
-                        <Image
-                          src={slot.dj.avatarUrl || DEFAULT_AVATAR}
-                          alt={slot.dj.name}
-                          width={40}
-                          height={40}
-                          className={slot.dj.avatarUrl ? 'object-cover' : 'object-contain p-1.5'}
-                        />
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-[#0A0A0A] flex-shrink-0 flex items-center justify-center">
+                        {slot.dj.avatarUrl ? (
+                          <Image
+                            src={slot.dj.avatarUrl}
+                            alt={slot.dj.name}
+                            width={40}
+                            height={40}
+                            unoptimized
+                            className="object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={DEFAULT_AVATAR}
+                            alt={slot.dj.name}
+                            width={28}
+                            height={28}
+                            className="object-contain"
+                          />
+                        )}
                       </div>
                     )}
                   </div>

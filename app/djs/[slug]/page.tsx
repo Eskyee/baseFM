@@ -454,12 +454,13 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                       key={stream.id}
                       className="bg-[#1A1A1A] rounded-xl overflow-hidden hover:ring-1 hover:ring-[#333] transition-all"
                     >
-                      <div className="aspect-square bg-[#0A0A0A] relative">
+                      <div className="aspect-square bg-[#0A0A0A] relative flex items-center justify-center">
                         {stream.coverImageUrl ? (
                           <Image
                             src={stream.coverImageUrl}
                             alt={stream.title}
                             fill
+                            unoptimized
                             className="object-cover"
                           />
                         ) : (
