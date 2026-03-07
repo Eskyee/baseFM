@@ -8,13 +8,14 @@ export async function GET() {
   try {
     const folderName = process.env.CLOUDINARY_FOLDER || 'raveculture';
 
+    // Use folder: prefix without wildcard for Cloudinary search
     const results = await cloudinary.search
-      .expression(`folder:${folderName}/*`)
+      .expression(`folder:${folderName}`)
       .sort_by('created_at', 'desc')
       .max_results(100)
       .execute();
 
-    const images = results.resources.map((resource: {
+    const images = (results.resources || []).map((resource: {
       asset_id: string;
       public_id: string;
       format: string;
@@ -35,7 +36,7 @@ export async function GET() {
     return NextResponse.json({ images });
   } catch (error) {
     console.error('Cloudinary fetch error:', error);
-    return NextResponse.json({ error: 'Failed to fetch images' }, { status: 500 });
+    return NextResponse.json({ images: [], error: 'Failed to fetch images' }, { status: 200 });
   }
 }
 
