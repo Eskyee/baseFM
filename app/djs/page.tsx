@@ -176,7 +176,7 @@ function DJCard({ dj }: { dj: DJ }) {
             alt={dj.name}
             fill
             unoptimized
-            className="transition-all duration-300 group-hover:scale-105 object-contain p-6"
+            className="transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 object-contain p-6"
           />
         )}
 
