@@ -6,8 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { DJ } from '@/types/dj';
 
-const DEFAULT_AVATAR = '/logo.png';
-
 type Filter = 'all' | 'residents';
 
 function DJsContent() {
@@ -154,13 +152,21 @@ function DJCard({ dj }: { dj: DJ }) {
   const [imgError, setImgError] = useState(false);
   const hasAvatar = !!dj.avatarUrl && !imgError;
 
+  // Get initials from DJ name
+  const initials = dj.name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <Link
       href={`/djs/${dj.slug}`}
       className="group block"
     >
       {/* Avatar */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/50 to-blue-900/50 mb-3 flex items-center justify-center">
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-purple-600 to-blue-600 mb-3 flex items-center justify-center">
         {hasAvatar ? (
           <Image
             src={dj.avatarUrl!}
@@ -171,13 +177,9 @@ function DJCard({ dj }: { dj: DJ }) {
             className="transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 object-cover"
           />
         ) : (
-          <Image
-            src={DEFAULT_AVATAR}
-            alt={dj.name}
-            fill
-            unoptimized
-            className="transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 object-contain p-6"
-          />
+          <span className="text-white text-4xl md:text-5xl font-bold transition-all duration-300 group-hover:scale-110">
+            {initials}
+          </span>
         )}
 
         {/* Badges */}

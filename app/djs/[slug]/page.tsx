@@ -9,8 +9,6 @@ import { Stream } from '@/types/stream';
 import { DJStats } from '@/lib/db/dj-stats';
 import { TipButton } from '@/components/TipButton';
 
-const DEFAULT_AVATAR = '/logo.png';
-
 type TabType = 'shows' | 'about';
 
 export default function DJProfilePage({ params }: { params: { slug: string } }) {
@@ -128,6 +126,14 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const hasAvatar = !!dj.avatarUrl && !avatarError;
   const hasCover = !!dj.coverImageUrl && !coverError;
 
+  // Get initials from DJ name
+  const initials = dj.name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
@@ -219,7 +225,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             {/* Avatar - Larger and more prominent */}
             <div className="relative flex-shrink-0">
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-gradient-to-br from-purple-900/50 to-blue-900/50 shadow-2xl shadow-black/50 flex items-center justify-center">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden border-4 border-[#0A0A0A] bg-gradient-to-br from-purple-600 to-blue-600 shadow-2xl shadow-black/50 flex items-center justify-center">
                 {hasAvatar ? (
                   <Image
                     src={dj.avatarUrl!}
@@ -230,13 +236,9 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                     className="object-cover"
                   />
                 ) : (
-                  <Image
-                    src={DEFAULT_AVATAR}
-                    alt={dj.name}
-                    fill
-                    unoptimized
-                    className="object-contain p-4"
-                  />
+                  <span className="text-white text-4xl sm:text-5xl font-bold">
+                    {initials}
+                  </span>
                 )}
               </div>
               {/* Live indicator on avatar if streaming */}
