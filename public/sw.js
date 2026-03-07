@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const STATIC_CACHE = `basefm-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `basefm-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `basefm-images-${CACHE_VERSION}`;
@@ -20,6 +20,9 @@ const STATIC_ASSETS = [
   '/events',
   '/wallet',
   '/guide',
+  '/guide/beginner',
+  '/guide/advanced',
+  '/djs',
 ];
 
 // Install - cache static assets
