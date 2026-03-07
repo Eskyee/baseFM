@@ -26,8 +26,6 @@ const nextConfig = {
   },
 
   images: {
-    // Use modern formats
-    formats: ['image/avif', 'image/webp'],
     // Optimize image loading
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
     remotePatterns: [

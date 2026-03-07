@@ -34,7 +34,8 @@ import {
   Cloud,
   Rss,
   TrendingUp,
-  Wrench
+  Wrench,
+  Palette
 } from 'lucide-react';
 
 export function Navbar() {
@@ -101,6 +102,7 @@ export function Navbar() {
       featured: false,
       links: [
         { href: '/agency', label: 'Agency', Icon: Briefcase },
+        { href: '/agency/web-design', label: 'Web Design', Icon: Palette },
         { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
       ]
     },

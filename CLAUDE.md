@@ -330,7 +330,7 @@ ADMIN_WALLET_ADDRESS=              # Comma-separated admin wallets
 - CSS var `--navbar-height` + `.navbar-spacer` div in AppShell for content offset
 - Always design mobile-first, test at iPhone width
 - Service worker (`public/sw.js`) caches aggressively - bump `CACHE_VERSION` after big UI changes
-- Current cache version: v4
+- Current cache version: v6
 - UpdateBanner component shows when new version available
 - useServiceWorker hook for cache management
 

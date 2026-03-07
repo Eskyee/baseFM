@@ -250,6 +250,7 @@ export default function GalleryPage() {
                     alt=""
                     width={image.width}
                     height={image.height}
+                    unoptimized
                     className="transform transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITETQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEEEQA/KpZLtdLY7GW7PnPtNqUQG1OKKd4xxjPWKr0UtZSlCBgAYApSnZo0f/2Q=="
@@ -342,6 +343,7 @@ export default function GalleryPage() {
               alt=""
               width={selectedImage.width}
               height={selectedImage.height}
+              unoptimized
               className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
               priority
             />
