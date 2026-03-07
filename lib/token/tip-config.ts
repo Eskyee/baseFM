@@ -42,6 +42,14 @@ export const TIP_TOKENS: TipToken[] = [
     icon: '₿',
     color: '#F7931A',
   },
+  {
+    symbol: 'BASEFM',
+    name: 'baseFM',
+    address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3',
+    decimals: 18,
+    icon: '📻',
+    color: '#0052FF',
+  },
 ];
 
 // Preset tip amounts (in USD equivalent for display)

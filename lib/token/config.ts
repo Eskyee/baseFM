@@ -1,6 +1,15 @@
 // baseFM Token Configuration
 // RaveCulture token for DJ access gating
 
+// baseFM native token on Base
+export const BASEFM_TOKEN_CONFIG = {
+  address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`,
+  decimals: 18,
+  symbol: 'BASEFM',
+  name: 'baseFM',
+  chainId: 8453, // Base mainnet
+};
+
 export const DJ_TOKEN_CONFIG = {
   // RaveCulture token on Base
   address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,

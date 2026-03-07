@@ -37,6 +37,18 @@ Name:     RaveCulture
 - **1B RAVE** = premium tier (custom token gating)
 - Config: `lib/token/config.ts`
 
+### BASEFM (Platform Token)
+```
+Address:  0x9a4376bab717ac0a3901eeed8308a420c59c0ba3
+Chain:    Base (8453)
+Decimals: 18
+Symbol:   BASEFM
+Name:     baseFM
+```
+- Native platform token
+- Used for tipping DJs
+- Config: `lib/token/config.ts`
+
 ### USDC (Payments)
 ```
 Address:  0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
