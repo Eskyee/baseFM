@@ -16,6 +16,7 @@ export default function AdminDJsPage() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [failedAvatars, setFailedAvatars] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function fetchDJs() {
@@ -213,12 +214,13 @@ export default function AdminDJsPage() {
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-[#0A0A0A] flex-shrink-0 flex items-center justify-center">
-                    {dj.avatarUrl ? (
+                    {dj.avatarUrl && !failedAvatars.has(dj.id) ? (
                       <Image
                         src={dj.avatarUrl}
                         alt={dj.name}
                         fill
                         unoptimized
+                        onError={() => setFailedAvatars(prev => new Set(prev).add(dj.id))}
                         className="object-cover"
                       />
                     ) : (

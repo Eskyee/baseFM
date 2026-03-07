@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/shopify/storefront';
@@ -11,6 +12,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false);
   const price = product.priceRange.minVariantPrice;
   const hasOnchainPerks = parseOnchainTags(product.tags).length > 0;
 
@@ -21,11 +23,12 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       {/* Image */}
       <div className="aspect-square bg-[#0A0A0A] relative overflow-hidden">
-        {product.featuredImage ? (
+        {product.featuredImage && !imgError ? (
           <Image
             src={product.featuredImage.url}
             alt={product.featuredImage.altText || product.title}
             fill
+            onError={() => setImgError(true)}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

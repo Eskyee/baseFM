@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Stream } from '@/types/stream';
@@ -14,6 +15,7 @@ interface StreamCardProps {
 }
 
 export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dashboard' }: StreamCardProps) {
+  const [imgError, setImgError] = useState(false);
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
 
@@ -34,8 +36,8 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
   };
 
   // Use provided cover image or fall back to logo
-  const coverImage = stream.coverImageUrl || DEFAULT_COVER;
-  const hasCustomImage = !!stream.coverImageUrl;
+  const coverImage = stream.coverImageUrl && !imgError ? stream.coverImageUrl : DEFAULT_COVER;
+  const hasCustomImage = !!stream.coverImageUrl && !imgError;
 
   return (
     <div className="bg-[#1C1C1E] rounded-2xl overflow-hidden hover:bg-[#2C2C2E] transition-all active:scale-[0.98]">
@@ -45,6 +47,7 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
           src={coverImage}
           alt={stream.title}
           fill
+          onError={() => setImgError(true)}
           className={`${
             hasCustomImage ? 'object-cover' : 'object-contain p-8'
           }`}

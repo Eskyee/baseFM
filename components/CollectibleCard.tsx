@@ -18,6 +18,7 @@ export function CollectibleCard({ nft, djName }: CollectibleCardProps) {
   const [isMinting, setIsMinting] = useState(false);
   const [mintSuccess, setMintSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
 
   const { data: hash, sendTransaction, isPending } = useSendTransaction();
 
@@ -109,10 +110,11 @@ export function CollectibleCard({ nft, djName }: CollectibleCardProps) {
           />
         ) : (
           <Image
-            src={nft.imageUrl || DEFAULT_IMAGE}
+            src={nft.imageUrl && !imgError ? nft.imageUrl : DEFAULT_IMAGE}
             alt={nft.title}
             fill
-            className={nft.imageUrl ? 'object-cover' : 'object-contain p-8 opacity-50'}
+            onError={() => setImgError(true)}
+            className={nft.imageUrl && !imgError ? 'object-cover' : 'object-contain p-8 opacity-50'}
           />
         )}
 

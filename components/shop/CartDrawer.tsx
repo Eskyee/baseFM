@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { useCart } from '@/lib/shopify/cart-context';
 import { formatPrice } from '@/lib/shopify/storefront';
 import Image from 'next/image';
 
 export function CartDrawer() {
   const { cart, isOpen, closeCart, updateItem, removeItem, isLoading } = useCart();
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   if (!isOpen) return null;
 
@@ -60,12 +62,13 @@ export function CartDrawer() {
                 >
                   {/* Image */}
                   <div className="w-20 h-20 rounded-lg bg-[#252525] overflow-hidden flex-shrink-0">
-                    {line.merchandise.product.featuredImage ? (
+                    {line.merchandise.product.featuredImage && !failedImages.has(line.id) ? (
                       <Image
                         src={line.merchandise.product.featuredImage.url}
                         alt={line.merchandise.product.featuredImage.altText || line.merchandise.product.title}
                         width={80}
                         height={80}
+                        onError={() => setFailedImages(prev => new Set(prev).add(line.id))}
                         className="w-full h-full object-cover"
                       />
                     ) : (

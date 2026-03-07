@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePlayer, CurrentStream } from '@/contexts/PlayerContext';
@@ -42,10 +43,11 @@ export function LiveShowCard({
   useGlobalPlayer = false,
 }: LiveShowCardProps) {
   const { playStream } = usePlayer();
+  const [imgError, setImgError] = useState(false);
 
   // Use provided artwork or fall back to logo
-  const imageUrl = artwork || DEFAULT_ARTWORK;
-  const hasCustomArtwork = !!artwork;
+  const imageUrl = artwork && !imgError ? artwork : DEFAULT_ARTWORK;
+  const hasCustomArtwork = !!artwork && !imgError;
 
   const handlePlay = () => {
     if (onClick) {
@@ -86,6 +88,7 @@ export function LiveShowCard({
           src={imageUrl}
           alt={title}
           fill
+          onError={() => setImgError(true)}
           className={`transition-transform duration-300 group-hover:scale-105 ${
             hasCustomArtwork ? 'object-cover' : 'object-contain p-8 bg-[#0A0A0A]'
           }`}
