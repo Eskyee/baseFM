@@ -168,7 +168,7 @@ function DJCard({ dj }: { dj: DJ }) {
           fill
           unoptimized={hasAvatar}
           onError={() => setImgError(true)}
-          className={`transition-all duration-300 group-hover:scale-105 ${
+          className={`transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
             hasAvatar ? 'object-cover' : 'object-contain p-8'
           }`}
         />
