@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
+import Image from 'next/image';
 import { DJ } from '@/types/dj';
 
 const GENRE_OPTIONS = [
@@ -41,6 +42,8 @@ export default function DJProfileEditorPage() {
     bandcampUrl: '',
     websiteUrl: '',
   });
+  const [avatarError, setAvatarError] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     if (!isConnected || !address) {
@@ -255,35 +258,95 @@ export default function DJProfileEditorPage() {
           </div>
 
           {/* Images */}
-          <div className="bg-[#1A1A1A] rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Images</h2>
+          <div className="bg-[#1A1A1A] rounded-2xl p-4 space-y-4">
+            <h2 className="text-sm font-semibold text-[#888]">IMAGES</h2>
 
+            {/* Avatar */}
             <div>
               <label className="block text-sm font-medium text-[#888] mb-2">
                 Avatar URL
               </label>
-              <input
-                type="url"
-                name="avatarUrl"
-                value={formData.avatarUrl}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
-                placeholder="https://example.com/avatar.jpg"
-              />
+              <div className="flex gap-4 items-start">
+                {/* Avatar Preview */}
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-[#0A0A0A] border border-[#333] flex-shrink-0">
+                  {formData.avatarUrl && !avatarError ? (
+                    <Image
+                      src={formData.avatarUrl}
+                      alt="Avatar preview"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                      onError={() => setAvatarError(true)}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Image
+                        src="/logo.png"
+                        alt="Default"
+                        width={32}
+                        height={32}
+                        className="opacity-30"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="url"
+                    name="avatarUrl"
+                    value={formData.avatarUrl}
+                    onChange={(e) => {
+                      setAvatarError(false);
+                      handleChange(e);
+                    }}
+                    className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                    placeholder="https://example.com/avatar.jpg"
+                  />
+                  {avatarError && formData.avatarUrl && (
+                    <p className="text-red-400 text-xs mt-1">Failed to load image</p>
+                  )}
+                  <p className="text-[#666] text-xs mt-1">Square image works best (1:1)</p>
+                </div>
+              </div>
             </div>
 
+            {/* Cover Image */}
             <div>
               <label className="block text-sm font-medium text-[#888] mb-2">
                 Cover Image URL
               </label>
+              {/* Cover Preview */}
+              <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden bg-[#0A0A0A] border border-[#333] mb-2">
+                {formData.coverImageUrl && !coverError ? (
+                  <Image
+                    src={formData.coverImageUrl}
+                    alt="Cover preview"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    onError={() => setCoverError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/30 via-[#0A0A0A] to-blue-900/30">
+                    <span className="text-[#666] text-xs">Cover image preview</span>
+                  </div>
+                )}
+              </div>
               <input
                 type="url"
                 name="coverImageUrl"
                 value={formData.coverImageUrl}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setCoverError(false);
+                  handleChange(e);
+                }}
                 className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
                 placeholder="https://example.com/cover.jpg"
               />
+              {coverError && formData.coverImageUrl && (
+                <p className="text-red-400 text-xs mt-1">Failed to load image</p>
+              )}
+              <p className="text-[#666] text-xs mt-1">Wide image works best (3:1 or 16:9)</p>
             </div>
           </div>
 
