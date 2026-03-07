@@ -36,10 +36,13 @@ export function BalanceTracker() {
     return () => clearInterval(id);
   }, [prevId]);
 
-  // Sort breakdown by value descending, filter assets over $1
+  // Always show these tokens regardless of value
+  const alwaysShowTokens = ['USDC', 'RAVE', 'BASEFM'];
+
+  // Sort breakdown by value descending, filter assets over $1 (except always-show tokens)
   const sortedBreakdown = balance?.breakdown
     ? Object.entries(balance.breakdown)
-        .filter(([, value]) => value >= 1)
+        .filter(([token, value]) => value >= 1 || alwaysShowTokens.includes(token))
         .sort(([, a], [, b]) => b - a)
     : [];
 
