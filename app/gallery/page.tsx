@@ -202,16 +202,20 @@ export default function GalleryPage() {
                 className="group mb-4 break-inside-avoid cursor-zoom-in"
                 onClick={() => openModal(image, index)}
               >
-                <div className="relative overflow-hidden rounded-lg bg-white/5">
+                <div
+                  className="relative overflow-hidden rounded-lg bg-white/5"
+                  style={{
+                    aspectRatio: image.width && image.height
+                      ? `${image.width} / ${image.height}`
+                      : '4 / 3'
+                  }}
+                >
                   <Image
                     src={image.secure_url}
                     alt=""
-                    width={image.width}
-                    height={image.height}
+                    fill
                     unoptimized
-                    className="transform transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITETQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEEEQA/KpZLtdLY7GW7PnPtNqUQG1OKKd4xxjPWKr0UtZSlCBgAYApSnZo0f/2Q=="
+                    className="object-cover transform transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                   />
                   {/* Hover overlay */}
