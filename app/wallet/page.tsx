@@ -3,6 +3,7 @@
 import { useAccount, useBalance } from 'wagmi';
 import { base } from 'wagmi/chains';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
@@ -10,6 +11,13 @@ import { TransactionHistory } from '@/components/TransactionHistory';
 
 // BASEFM token on Base
 const BASEFM_ADDRESS = '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`;
+
+// Token prices interface
+interface TokenPrices {
+  eth: number;
+  rave: number;
+  basefm: number;
+}
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
