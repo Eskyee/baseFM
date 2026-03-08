@@ -396,21 +396,6 @@ export function Navbar() {
               </Link>
             </div>
 
-            {/* Mobile Footer */}
-            <div 
-              className="absolute bottom-0 left-0 right-0 p-3 bg-black"
-              style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}
-            >
-              <div className="flex items-center justify-center gap-3 text-xs text-[#737373]">
-                <a href="https://talent.app/raveculture.base.eth" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">
-                  RaveCulture
-                </a>
-                <span>·</span>
-                <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">
-                  Base
-                </a>
-              </div>
-            </div>
           </nav>
         </>
       )}
