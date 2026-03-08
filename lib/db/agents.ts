@@ -196,6 +196,20 @@ export async function pauseAgent(handle: string, ownerWalletAddress: string): Pr
   return agentFromRow(data as AgentRow);
 }
 
+export async function deleteAgent(handle: string, ownerWalletAddress: string): Promise<void> {
+  const supabase = createServerClient();
+
+  // Delete only if owner matches (CASCADE handles related tables)
+  const { error, count } = await supabase
+    .from('agents')
+    .delete({ count: 'exact' })
+    .eq('handle', handle.toLowerCase())
+    .eq('owner_wallet_address', ownerWalletAddress.toLowerCase());
+
+  if (error) throw new Error(error.message);
+  if (count === 0) throw new Error('Agent not found or not authorized');
+}
+
 export async function verifyApiKey(apiKey: string): Promise<Agent | null> {
   const supabase = createServerClient();
 

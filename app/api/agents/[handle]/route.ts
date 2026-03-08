@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAgentByHandle, updateAgent, getMusicSources, getSocialPlatforms } from '@/lib/db/agents';
+import { getAgentByHandle, updateAgent, deleteAgent, getMusicSources, getSocialPlatforms } from '@/lib/db/agents';
 
 // GET /api/agents/[handle] - Get agent details
 export async function GET(
@@ -64,6 +64,34 @@ export async function PATCH(
   } catch (error) {
     console.error('Error updating agent:', error);
     const message = error instanceof Error ? error.message : 'Failed to update agent';
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
+
+// DELETE /api/agents/[handle] - Delete agent (owner only)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ handle: string }> }
+) {
+  const { handle } = await params;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const walletAddress = searchParams.get('walletAddress');
+
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: 'Wallet address required for authentication' },
+        { status: 401 }
+      );
+    }
+
+    await deleteAgent(handle, walletAddress);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting agent:', error);
+    const message = error instanceof Error ? error.message : 'Failed to delete agent';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
