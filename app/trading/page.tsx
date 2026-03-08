@@ -48,18 +48,6 @@ export default function TradingPage() {
         isConfigured={agentStatus?.configured}
       />
 
-      {/* Configuration Warning */}
-      {agentStatus && !agentStatus.configured && (
-        <div className="px-4 py-3 bg-yellow-500/10 border-b border-yellow-500/20">
-          <div className="flex items-center gap-2 text-yellow-400 text-sm font-mono">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-            </svg>
-            <span>Bankr API not configured. Set BANKR_API_KEY to enable trading.</span>
-          </div>
-        </div>
-      )}
-
       {/* Mobile Tab Selector */}
       <div className="md:hidden flex border-b border-[#2A2A2A]">
         <button

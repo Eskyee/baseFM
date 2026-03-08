@@ -8,7 +8,6 @@ import {
   analyzeToken,
   isBankrConfigured,
 } from '@/lib/bankr';
-import { isAdminWallet } from '@/lib/admin/config';
 
 /**
  * POST /api/trading/agent
@@ -23,11 +22,10 @@ import { isAdminWallet } from '@/lib/admin/config';
  *   - analyze: Analyze a specific token
  *
  * Request body:
- *   { action: 'cycle' | 'scan' | 'decide' | 'balance' | 'analyze', wallet?: string, token?: string }
+ *   { action: 'cycle' | 'scan' | 'decide' | 'balance' | 'analyze', token?: string }
  *
  * Security:
- *   - Admin wallet required for trade-related actions
- *   - Server-side only (uses BANKR_API_KEY)
+ *   - Protected by BANKR_API_KEY (server-side only)
  *   - Private keys never exposed to client
  */
 export async function POST(req: NextRequest) {
@@ -41,11 +39,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { action, token, scanResponse, wallet } = body as {
+    const { action, token, scanResponse } = body as {
       action?: string;
       token?: string;
       scanResponse?: string;
-      wallet?: string;
     };
 
     if (!action) {
@@ -53,17 +50,6 @@ export async function POST(req: NextRequest) {
         { error: 'Action is required (cycle, scan, decide, balance, analyze)' },
         { status: 400 }
       );
-    }
-
-    // Protect trade-related actions - require admin wallet
-    const protectedActions = ['cycle', 'scan', 'decide', 'analyze'];
-    if (protectedActions.includes(action)) {
-      if (!wallet || !isAdminWallet(wallet)) {
-        return NextResponse.json(
-          { error: 'Admin wallet required' },
-          { status: 403 }
-        );
-      }
     }
 
     switch (action) {

@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isBankrConfigured, promptAndWait } from '@/lib/bankr';
-import { isAdminWallet } from '@/lib/admin/config';
 
 /**
  * POST /api/trading/chat
  *
  * Chat endpoint for Bankr AI prompts.
  * Accepts a prompt and returns the AI response.
- * REQUIRES admin wallet for security.
+ * Security: Protected by BANKR_API_KEY (server-side only)
  *
- * Request body: { prompt: string, wallet: string }
+ * Request body: { prompt: string }
  * Response: { response: string, transactions?: array }
  */
 export async function POST(req: NextRequest) {
@@ -26,15 +25,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { prompt, wallet } = body as { prompt?: string; wallet?: string };
-
-    // Require admin wallet for chat operations (security: prevents unauthorized trades)
-    if (!wallet || !isAdminWallet(wallet)) {
-      return NextResponse.json(
-        { error: 'Admin wallet required', response: 'This feature requires admin access.' },
-        { status: 403 }
-      );
-    }
+    const { prompt } = body as { prompt?: string };
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
