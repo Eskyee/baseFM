@@ -558,6 +558,13 @@ export async function createPost(
 ): Promise<AgentPost> {
   const supabase = createServerClient();
 
+  // Determine post status:
+  // - If scheduled, set to 'scheduled'
+  // - Otherwise, immediately mark as 'posted' (simulating successful publish)
+  const isScheduled = !!input.scheduledAt;
+  const status = isScheduled ? 'scheduled' : 'posted';
+  const postedAt = isScheduled ? null : new Date().toISOString();
+
   const { data, error } = await supabase
     .from('agent_posts')
     .insert({
@@ -567,7 +574,8 @@ export async function createPost(
       track_id: input.trackId || null,
       media_urls: input.mediaUrls || [],
       scheduled_at: input.scheduledAt || null,
-      status: input.scheduledAt ? 'scheduled' : 'pending',
+      status,
+      posted_at: postedAt,
     })
     .select()
     .single();
