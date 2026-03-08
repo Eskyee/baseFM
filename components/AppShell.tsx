@@ -9,6 +9,7 @@ import { PageTransition } from './PageTransition';
 import { UpdateBanner } from './UpdateBanner';
 import { ToastProvider } from './ui/Toast';
 import { OfflineBanner } from './OfflineBanner';
+import { ScrollToTop } from './ScrollToTop';
 
 interface CurrentShow {
   title: string;
@@ -62,6 +63,7 @@ export function AppShell({ children }: AppShellProps) {
           </main>
           {!currentShow && <Footer />}
           <PersistentPlayer currentShow={currentShow} />
+          <ScrollToTop />
           <UpdateBanner />
         </div>
       </ToastProvider>

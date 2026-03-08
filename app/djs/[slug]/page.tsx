@@ -8,6 +8,8 @@ import { DJ } from '@/types/dj';
 import { Stream } from '@/types/stream';
 import { DJStats } from '@/lib/db/dj-stats';
 import { TipButton } from '@/components/TipButton';
+import { DJBreadcrumb } from '@/components/Breadcrumb';
+import { useToast } from '@/components/ui/Toast';
 
 type TabType = 'shows' | 'about';
 
@@ -23,6 +25,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const [coverError, setCoverError] = useState(false);
+  const { addToast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -80,6 +83,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
             followerCount: isFollowing ? stats.followerCount - 1 : stats.followerCount + 1,
           });
         }
+        addToast(isFollowing ? `Unfollowed ${dj.name}` : `Following ${dj.name}`, 'success');
       }
     } finally {
       setIsFollowLoading(false);
@@ -89,17 +93,28 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   if (isLoading) {
     return (
       <div className="min-h-screen pb-20">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-48 bg-[#1A1A1A] rounded-xl mb-6" />
-            <div className="flex gap-6">
-              <div className="w-32 h-32 bg-[#1A1A1A] rounded-full" />
-              <div className="flex-1 space-y-4">
-                <div className="h-8 bg-[#1A1A1A] rounded w-48" />
-                <div className="h-4 bg-[#1A1A1A] rounded w-full" />
-                <div className="h-4 bg-[#1A1A1A] rounded w-3/4" />
+        {/* Cover skeleton */}
+        <div className="w-full aspect-[3/1] sm:aspect-[4/1] md:aspect-[5/1] max-h-80 skeleton" />
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Profile header skeleton */}
+          <div className="relative -mt-16 sm:-mt-20 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl skeleton border-4 border-[#0A0A0A]" />
+              <div className="flex-1 pt-2 sm:pt-6 space-y-4">
+                <div className="h-8 skeleton rounded-lg w-48" />
+                <div className="flex gap-2">
+                  <div className="h-8 skeleton rounded-lg w-20" />
+                  <div className="h-8 skeleton rounded-lg w-24" />
+                </div>
+                <div className="h-10 skeleton rounded-xl w-32" />
               </div>
             </div>
+          </div>
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-4 gap-3 mb-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-20 skeleton rounded-xl" />
+            ))}
           </div>
         </div>
       </div>
@@ -189,26 +204,23 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
         </div>
 
-        {/* Back button - always visible */}
-        <Link
-          href="/djs"
-          className="absolute top-4 left-4 z-10 p-2.5 bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-colors border border-white/10"
-        >
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </Link>
 
         {/* Share button */}
         <button
-          onClick={() => {
+          onClick={async () => {
             if (navigator.share) {
-              navigator.share({
-                title: `${dj.name} on baseFM`,
-                url: window.location.href,
-              });
+              try {
+                await navigator.share({
+                  title: `${dj.name} on baseFM`,
+                  url: window.location.href,
+                });
+                addToast('Shared successfully', 'success');
+              } catch {
+                // User cancelled share
+              }
             } else {
-              navigator.clipboard.writeText(window.location.href);
+              await navigator.clipboard.writeText(window.location.href);
+              addToast('Link copied to clipboard', 'success');
             }
           }}
           className="absolute top-4 right-4 z-10 p-2.5 bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-colors border border-white/10"
@@ -220,6 +232,11 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
       </div>
 
       <div className="max-w-4xl mx-auto px-4">
+        {/* Breadcrumb Navigation */}
+        <div className="pt-4 -mb-12 relative z-20">
+          <DJBreadcrumb djName={dj.name} />
+        </div>
+
         {/* Profile Header - Professional Layout */}
         <div className="relative -mt-16 sm:-mt-20 mb-6">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">

@@ -8,10 +8,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
 import { ListenerCount } from '@/components/ListenerCount';
+import { StreamBreadcrumb } from '@/components/Breadcrumb';
+import { useToast } from '@/components/ui/Toast';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
   const { currentShow, setCurrentShow } = usePlayer();
+  const { addToast } = useToast();
 
   if (isLoading) {
     return (
@@ -82,11 +85,13 @@ export default function StreamPage({ params }: { params: { id: string } }) {
       hlsUrl: hlsUrl || undefined,
       streamId: stream.id,
     });
+    addToast(`Now playing: ${stream.title}`, 'success');
   };
 
   // Stop persistent playback
   const stopPersistentPlayback = () => {
     setCurrentShow(null);
+    addToast('Stopped background playback', 'info');
   };
 
   const renderPlayer = () => {
@@ -203,19 +208,12 @@ export default function StreamPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen pb-24 safe-area-all bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A] to-purple-950/20">
       <div className="max-w-3xl mx-auto px-4 py-4 sm:py-6">
-        {/* iOS-style header with back button */}
+        {/* Navigation & Status Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link
-            href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1A1A1A]/80 backdrop-blur-sm text-[#888] hover:text-white transition-colors active:scale-[0.95] touch-target"
-            aria-label="Back to Discover"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
+          {/* Breadcrumb Navigation */}
+          <StreamBreadcrumb streamTitle={stream.title} />
 
-          {/* Live indicator and listener count in header */}
+          {/* Live indicator and listener count */}
           {isLive && (
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 backdrop-blur-sm rounded-full">
@@ -227,9 +225,6 @@ export default function StreamPage({ params }: { params: { id: string } }) {
               </div>
             </div>
           )}
-
-          {/* Spacer for centering */}
-          <div className="w-10" />
         </div>
 
         {/* Player Section - Full width, prominent */}

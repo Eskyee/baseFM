@@ -57,6 +57,12 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Auto-close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setOpenDropdown(null);
+  }, [pathname]);
+
   // Organized menu structure
   const menuGroups = [
     {
@@ -182,7 +188,11 @@ export function Navbar() {
               {/* Dropdown Groups */}
               {allGroups.map((group) => {
                 const isOpen = openDropdown === group.id;
-                const isActive = group.links.some(link => pathname === link.href);
+                // Check if current path matches any link OR starts with any link path
+                const isActive = group.links.some(link =>
+                  pathname === link.href ||
+                  (link.href !== '/' && pathname.startsWith(link.href))
+                );
                 const isFeatured = group.featured;
 
                 return (
@@ -212,7 +222,9 @@ export function Navbar() {
                         }}
                       >                        {group.links.map((link) => {
                           const Icon = link.Icon;
-                          const isLinkActive = pathname === link.href;
+                          // Check exact match OR if path starts with link href (for nested routes)
+                          const isLinkActive = pathname === link.href ||
+                            (link.href !== '/' && pathname.startsWith(link.href));
                           const isExternal = 'external' in link && link.external;
 
                           const linkClasses = `flex items-center gap-2.5 px-3 py-2 text-sm transition-all duration-150 ${
@@ -331,12 +343,14 @@ export function Navbar() {
                   </div>
                   {group.links.map((link) => {
                     const Icon = link.Icon;
-                    const isActive = pathname === link.href;
+                    // Check exact match OR if path starts with link href (for nested routes)
+                    const isActive = pathname === link.href ||
+                      (link.href !== '/' && pathname.startsWith(link.href));
                     const isExternal = 'external' in link && link.external;
 
                     const linkClasses = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
-                      isActive 
-                        ? 'text-white bg-[#171717]' 
+                      isActive
+                        ? 'text-white bg-[#171717]'
                         : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
                     }`;
 

@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Event } from '@/types/event';
 import { TicketPurchase } from '@/components/TicketPurchase';
 import { EVENTS } from '@/lib/events/config';
+import { EventBreadcrumb } from '@/components/Breadcrumb';
+import { useToast } from '@/components/ui/Toast';
 
 export default function EventDetailPage({
   params,
@@ -16,6 +18,7 @@ export default function EventDetailPage({
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     async function loadEvent() {
@@ -71,11 +74,15 @@ export default function EventDetailPage({
   if (isLoading) {
     return (
       <div className="min-h-screen pb-20">
-        <div className="h-64 bg-[#1A1A1A] animate-pulse" />
+        <div className="h-64 skeleton" />
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="h-8 bg-[#1A1A1A] rounded w-3/4 mb-4 animate-pulse" />
-          <div className="h-4 bg-[#1A1A1A] rounded w-1/2 mb-8 animate-pulse" />
-          <div className="h-32 bg-[#1A1A1A] rounded animate-pulse" />
+          <div className="h-8 skeleton rounded-lg w-3/4 mb-4" />
+          <div className="h-4 skeleton rounded w-1/2 mb-8" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <div className="h-24 skeleton rounded-xl" />
+            <div className="h-24 skeleton rounded-xl" />
+          </div>
+          <div className="h-32 skeleton rounded-xl" />
         </div>
       </div>
     );
@@ -133,16 +140,13 @@ export default function EventDetailPage({
           )}
         </div>
 
-        {/* Back Button */}
-        <Link
-          href="/events"
-          className="absolute top-4 right-4 px-4 py-2 bg-black/60 backdrop-blur rounded-full text-white text-sm hover:bg-black/80 transition-colors"
-        >
-          Back
-        </Link>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 -mt-24 relative z-10">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-4">
+          <EventBreadcrumb eventName={event.title ?? event.name} />
+        </div>
         {/* Event Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">{event.title}</h1>
@@ -331,15 +335,21 @@ export default function EventDetailPage({
         <div className="text-center py-8 border-t border-[#1A1A1A]">
           <p className="text-[#666] text-sm mb-3">Share this event</p>
           <button
-            onClick={() => {
+            onClick={async () => {
               if (navigator.share) {
-                navigator.share({
-                  title: event.title,
-                  text: event.subtitle || `Check out ${event.title}`,
-                  url: window.location.href,
-                });
+                try {
+                  await navigator.share({
+                    title: event.title,
+                    text: event.subtitle || `Check out ${event.title}`,
+                    url: window.location.href,
+                  });
+                  addToast('Shared successfully', 'success');
+                } catch {
+                  // User cancelled share
+                }
               } else {
-                navigator.clipboard.writeText(window.location.href);
+                await navigator.clipboard.writeText(window.location.href);
+                addToast('Link copied to clipboard', 'success');
               }
             }}
             className="px-6 py-2 bg-[#1A1A1A] text-[#888] rounded-full text-sm hover:bg-[#222] hover:text-[#F5F5F5] transition-colors"
