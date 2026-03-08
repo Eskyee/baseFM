@@ -47,6 +47,8 @@ export default function AgentSettingsPage({ params }: PageProps) {
   const [collaborationOpen, setCollaborationOpen] = useState(true);
   const [peakStart, setPeakStart] = useState(22);
   const [peakEnd, setPeakEnd] = useState(2);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     async function fetchStrategy() {
@@ -125,6 +127,32 @@ export default function AgentSettingsPage({ params }: PageProps) {
       setHashtags(hashtags.filter(h => h !== tag));
     } else if (hashtags.length < 5) {
       setHashtags([...hashtags, tag]);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!address) return;
+
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/agents/${handle}?walletAddress=${address}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete agent');
+      }
+
+      // Redirect to dashboard after successful deletion
+      router.push('/aicloud/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete agent');
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -352,6 +380,53 @@ export default function AgentSettingsPage({ params }: PageProps) {
         <p className="text-center text-[#666] font-mono text-xs mt-6">
           Settings will take effect once social platform integrations are live.
         </p>
+
+        {/* Danger Zone */}
+        <div className="mt-12 pt-8 border-t border-red-500/20">
+          <h2 className="text-red-400 font-mono font-semibold mb-3">Danger Zone</h2>
+          <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white font-mono font-semibold">Delete Agent</p>
+                <p className="text-[#888] font-mono text-xs">Permanently delete @{handle} and all associated data</p>
+              </div>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg font-mono font-semibold hover:bg-red-500/20 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 max-w-sm w-full">
+              <h3 className="text-white font-mono font-bold text-lg mb-2">Delete Agent?</h3>
+              <p className="text-[#888] font-mono text-sm mb-6">
+                This will permanently delete @{handle} including all posts, tracks, and connections. This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 bg-[#2A2A2A] text-white rounded-lg font-mono font-semibold hover:bg-[#333] transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 bg-red-500 text-white rounded-lg font-mono font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
