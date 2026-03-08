@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useAccount } from 'wagmi';
 
 // Clanker URLs
 const CLANKER_URL = 'https://clanker.world';
@@ -785,7 +786,8 @@ function AgentsSection() {
 }
 
 function BankrSection() {
-  const [isConnected, setIsConnected] = useState(false);
+  const { address: walletAddress, isConnected: walletConnected } = useAccount();
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
     { role: 'assistant', content: 'System initialized. Connected to Base mainnet. Ready for trading commands.' },
@@ -831,12 +833,16 @@ function BankrSection() {
     setIsConnecting(true);
     // Simulate connection delay
     setTimeout(() => {
-      setIsConnected(true);
+      setIsTerminalOpen(true);
       setIsConnecting(false);
     }, 1500);
   };
 
-  const handleSend = () => {
+  const truncatedAddress = walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : null;
+
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = input.trim();
@@ -844,42 +850,61 @@ function BankrSection() {
     setInput('');
     setIsLoading(true);
 
-    // Simulated response
-    setTimeout(() => {
-      let response = 'Command received. Processing...';
+    try {
+      const res = await fetch('/api/trading/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userMessage }),
+      });
 
-      if (userMessage.toLowerCase().includes('rave') || userMessage.toLowerCase().includes('price')) {
-        response = 'RAVE Token Analysis:\nPrice: $0.0042\n24h Vol: $125K\nTrend: Bullish ↗\n\nSignal: ACCUMULATE';
-      } else if (userMessage.toLowerCase().includes('eth')) {
-        response = 'ETH/USD: $2,450.50\nSupport: $2,400\nResistance: $2,550\n\nMarket Sentiment: Neutral';
-      } else if (userMessage.toLowerCase().includes('portfolio')) {
-        response = 'Portfolio Value: $1,240.50\n\nAssets:\n- ETH: 0.45 ($1,102.50)\n- RAVE: 50,000 ($138.00)\n\nPnL (24h): +5.2%';
-      }
+      const data = await res.json();
+      const response = data.response || 'No response received.';
 
       setMessages((prev) => [...prev, { role: 'assistant', content: response }]);
-    }, 800);
+
+      // If we got transaction data, mention it
+      if (data.transactions?.length > 0) {
+        const txMsg = `Transaction: ${data.transactions[0].hash}`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: txMsg }]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: 'Connection error. Please check your internet and try again.'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (!isConnected) {
+  if (!isTerminalOpen) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="border border-[#2A2A2A] rounded-xl p-8 bg-[#0A0A0A] text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#0052FF]/5 to-transparent pointer-events-none" />
-          
+
           <div className="relative z-10">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0052FF] to-[#0035A0] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-900/20">
               <span className="text-white font-bold text-3xl font-mono">B</span>
             </div>
-            
+
             <h2 className="text-3xl font-bold text-[#F5F5F5] font-mono mb-2">
               Trading App
             </h2>
-            <div className="flex items-center justify-center gap-2 mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-[#888] font-mono">AI-powered crypto trading assistant</span>
               <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] font-mono font-bold rounded border border-green-500/20">
                 LIVE
               </span>
             </div>
+
+            {/* Show connected wallet */}
+            {walletConnected && truncatedAddress && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-[#888] text-xs font-mono">{truncatedAddress}</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-10 max-w-lg mx-auto">
               {[
@@ -913,9 +938,9 @@ function BankrSection() {
                 'Open Trading App'
               )}
             </button>
-            
+
             <p className="text-[#666] text-xs font-mono mt-4">
-              Connect your wallet to access automated trading strategies
+              {walletConnected ? 'Ready to start trading' : 'Connect your wallet to access automated trading strategies'}
             </p>
           </div>
         </div>
@@ -936,14 +961,16 @@ function BankrSection() {
               Bankr Terminal
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             </h2>
-            <p className="text-[#888] text-xs font-mono">v1.0.4 • Base Mainnet</p>
+            <p className="text-[#888] text-xs font-mono">
+              {walletConnected && truncatedAddress ? truncatedAddress : 'Base Mainnet'}
+            </p>
           </div>
         </div>
-        <button 
-          onClick={() => setIsConnected(false)}
+        <button
+          onClick={() => setIsTerminalOpen(false)}
           className="px-3 py-1.5 text-xs font-mono text-[#666] hover:text-white transition-colors"
         >
-          Disconnect
+          Close
         </button>
       </div>
 

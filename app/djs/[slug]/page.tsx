@@ -8,12 +8,13 @@ import { DJ } from '@/types/dj';
 import { Stream } from '@/types/stream';
 import { DJStats } from '@/lib/db/dj-stats';
 import { TipButton } from '@/components/TipButton';
-import { DJBreadcrumb } from '@/components/Breadcrumb';
 import { useToast } from '@/components/ui/Toast';
+import { useRouter } from 'next/navigation';
 
 type TabType = 'shows' | 'about';
 
 export default function DJProfilePage({ params }: { params: { slug: string } }) {
+  const router = useRouter();
   const { address } = useAccount();
   const [dj, setDJ] = useState<DJ | null>(null);
   const [streams, setStreams] = useState<Stream[]>([]);
@@ -205,6 +206,17 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         </div>
 
 
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 left-4 z-10 p-2.5 bg-black/60 backdrop-blur-md rounded-full hover:bg-black/80 transition-colors border border-white/10"
+          aria-label="Go back"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
         {/* Share button */}
         <button
           onClick={async () => {
@@ -232,11 +244,6 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
       </div>
 
       <div className="max-w-4xl mx-auto px-4">
-        {/* Breadcrumb Navigation */}
-        <div className="pt-4 -mb-12 relative z-20">
-          <DJBreadcrumb djName={dj.name} />
-        </div>
-
         {/* Profile Header - Professional Layout */}
         <div className="relative -mt-16 sm:-mt-20 mb-6">
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
