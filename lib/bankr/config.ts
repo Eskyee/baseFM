@@ -147,7 +147,8 @@ export const SCAN_PROMPTS = {
 // ============================================================
 
 export function getBankrApiKey(): string {
-  const key = process.env.BANKR_API_KEY;
+  // Server-side key takes priority, fall back to public key
+  const key = process.env.BANKR_API_KEY || process.env.NEXT_PUBLIC_BANKR_API_KEY;
   if (!key) {
     throw new Error('BANKR_API_KEY environment variable is not set');
   }
@@ -155,7 +156,7 @@ export function getBankrApiKey(): string {
 }
 
 export function isBankrConfigured(): boolean {
-  return Boolean(process.env.BANKR_API_KEY);
+  return Boolean(process.env.BANKR_API_KEY || process.env.NEXT_PUBLIC_BANKR_API_KEY);
 }
 
 // ============================================================
