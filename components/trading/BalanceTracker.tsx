@@ -5,12 +5,16 @@ import type { TradingBalance } from '@/types/trading';
 
 const POLL_INTERVAL = 5000;
 
+interface ExtendedBalance extends TradingBalance {
+  amounts?: Record<string, string>;
+}
+
 interface BalanceTrackerProps {
   walletAddress?: string;
 }
 
 export function BalanceTracker({ walletAddress }: BalanceTrackerProps = {}) {
-  const [balance, setBalance] = useState<TradingBalance | null>(null);
+  const [balance, setBalance] = useState<ExtendedBalance | null>(null);
   const [flash, setFlash] = useState(false);
   const [prevId, setPrevId] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'configured' | 'unconfigured'>('loading');
@@ -43,15 +47,27 @@ export function BalanceTracker({ walletAddress }: BalanceTrackerProps = {}) {
     return () => clearInterval(id);
   }, [prevId, walletAddress]);
 
-  // Always show these tokens regardless of value
-  const alwaysShowTokens = ['USDC', 'RAVE', 'BASEFM'];
-
-  // Sort breakdown by value descending, filter assets over $1 (except always-show tokens)
+  // Show ALL assets sorted by value descending (no filtering)
   const sortedBreakdown = balance?.breakdown
     ? Object.entries(balance.breakdown)
-        .filter(([token, value]) => value >= 1 || alwaysShowTokens.includes(token))
+        .filter(([, value]) => value > 0)
         .sort(([, a], [, b]) => b - a)
     : [];
+
+  // Format large token amounts nicely
+  const formatAmount = (amount: string | number): string => {
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (num >= 1_000_000) {
+      return `${(num / 1_000_000).toFixed(2)}M`;
+    }
+    if (num >= 1_000) {
+      return `${(num / 1_000).toFixed(2)}K`;
+    }
+    if (num < 0.0001) {
+      return num.toExponential(2);
+    }
+    return num.toFixed(4);
+  };
 
   return (
     <div className="flex flex-col gap-3 px-4">
@@ -73,13 +89,21 @@ export function BalanceTracker({ walletAddress }: BalanceTrackerProps = {}) {
 
       {sortedBreakdown.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-[#2A2A2A]">
-          <h3 className="text-xs text-[#666] font-mono">Holdings</h3>
-          {sortedBreakdown.map(([token, value]) => (
-            <div key={token} className="flex items-center justify-between text-sm font-mono">
-              <span className="text-[#888]">{token}</span>
-              <span className="text-white tabular-nums">${value.toFixed(2)}</span>
-            </div>
-          ))}
+          <h3 className="text-xs text-[#666] font-mono">Assets</h3>
+          {sortedBreakdown.map(([token, value]) => {
+            const amount = balance?.amounts?.[token];
+            return (
+              <div key={token} className="flex items-center justify-between text-sm font-mono">
+                <div className="flex flex-col">
+                  <span className="text-white">{token}</span>
+                  {amount && (
+                    <span className="text-xs text-[#555]">{formatAmount(amount)}</span>
+                  )}
+                </div>
+                <span className="text-[#888] tabular-nums">${value.toFixed(2)}</span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

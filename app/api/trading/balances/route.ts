@@ -27,6 +27,10 @@ const BASE_TOKENS = {
     address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,
     decimals: 18,
   },
+  AGENTBOT: {
+    address: '0x986b41C76aB8B7350079613340ee692773B34bA3' as `0x${string}`,
+    decimals: 18,
+  },
 } as const;
 
 // Simple ERC20 balanceOf ABI
@@ -72,6 +76,15 @@ async function fetchTokenPrices(): Promise<Record<string, number>> {
       const data = await raveRes.json();
       if (data.pairs?.[0]?.priceUsd) {
         prices['RAVE'] = parseFloat(data.pairs[0].priceUsd);
+      }
+    }
+
+    // Fetch AGENTBOT price
+    const agentbotRes = await fetch(`${DEXSCREENER_API}/${BASE_TOKENS.AGENTBOT.address}`);
+    if (agentbotRes.ok) {
+      const data = await agentbotRes.json();
+      if (data.pairs?.[0]?.priceUsd) {
+        prices['AGENTBOT'] = parseFloat(data.pairs[0].priceUsd);
       }
     }
   } catch (err) {
@@ -166,18 +179,18 @@ async function fetchOnChainBalancesForWallet(wallet: `0x${string}`): Promise<{
   // Fetch prices first
   const prices = await fetchTokenPrices();
 
-  // Fetch ETH balance
+  // Fetch ETH balance (always show)
   const ethBalance = await publicClient.getBalance({ address: wallet });
   const ethAmount = parseFloat(formatEther(ethBalance));
-  if (ethAmount > 0.0001) {
+  if (ethAmount > 0) {
     const ethUsd = ethAmount * (prices['ETH'] || 2000);
-    amounts['ETH'] = ethAmount.toFixed(4);
+    amounts['ETH'] = ethAmount.toFixed(6);
     breakdown['ETH'] = ethUsd;
     totalUsd += ethUsd;
   }
 
   // Fetch ERC20 balances in parallel
-  const [usdcBalance, wethBalance, basefmBalance, raveBalance] = await Promise.all([
+  const [usdcBalance, wethBalance, basefmBalance, raveBalance, agentbotBalance] = await Promise.all([
     publicClient.readContract({
       address: BASE_TOKENS.USDC.address,
       abi: ERC20_ABI,
@@ -202,45 +215,56 @@ async function fetchOnChainBalancesForWallet(wallet: `0x${string}`): Promise<{
       functionName: 'balanceOf',
       args: [wallet],
     }),
+    publicClient.readContract({
+      address: BASE_TOKENS.AGENTBOT.address,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [wallet],
+    }),
   ]);
 
-  // Process USDC
+  // Process USDC (always show)
   const usdcAmount = parseFloat(formatUnits(usdcBalance, BASE_TOKENS.USDC.decimals));
-  if (usdcAmount > 0.01) {
+  if (usdcAmount > 0) {
     amounts['USDC'] = usdcAmount.toFixed(2);
     breakdown['USDC'] = usdcAmount;
     totalUsd += usdcAmount;
   }
 
-  // Process WETH
+  // Process WETH (always show)
   const wethAmount = parseFloat(formatUnits(wethBalance, BASE_TOKENS.WETH.decimals));
-  if (wethAmount > 0.0001) {
+  if (wethAmount > 0) {
     const wethUsd = wethAmount * (prices['WETH'] || 2000);
-    amounts['WETH'] = wethAmount.toFixed(4);
+    amounts['WETH'] = wethAmount.toFixed(6);
     breakdown['WETH'] = wethUsd;
     totalUsd += wethUsd;
   }
 
-  // Process BASEFM
+  // Process BASEFM (always include if holding any)
   const basefmAmount = parseFloat(formatUnits(basefmBalance, BASE_TOKENS.BASEFM.decimals));
   if (basefmAmount > 0) {
     const basefmUsd = basefmAmount * (prices['BASEFM'] || 0);
-    amounts['BASEFM'] = basefmAmount.toFixed(4);
-    if (basefmUsd > 0) {
-      breakdown['BASEFM'] = basefmUsd;
-      totalUsd += basefmUsd;
-    }
+    amounts['BASEFM'] = basefmAmount.toString();
+    breakdown['BASEFM'] = basefmUsd;
+    totalUsd += basefmUsd;
   }
 
-  // Process RAVE
+  // Process RAVE (always include if holding any)
   const raveAmount = parseFloat(formatUnits(raveBalance, BASE_TOKENS.RAVE.decimals));
   if (raveAmount > 0) {
     const raveUsd = raveAmount * (prices['RAVE'] || 0);
-    amounts['RAVE'] = raveAmount.toFixed(4);
-    if (raveUsd > 0) {
-      breakdown['RAVE'] = raveUsd;
-      totalUsd += raveUsd;
-    }
+    amounts['RAVE'] = raveAmount.toString();
+    breakdown['RAVE'] = raveUsd;
+    totalUsd += raveUsd;
+  }
+
+  // Process AGENTBOT (always include if holding any)
+  const agentbotAmount = parseFloat(formatUnits(agentbotBalance, BASE_TOKENS.AGENTBOT.decimals));
+  if (agentbotAmount > 0) {
+    const agentbotUsd = agentbotAmount * (prices['AGENTBOT'] || 0);
+    amounts['AGENTBOT'] = agentbotAmount.toString();
+    breakdown['AGENTBOT'] = agentbotUsd;
+    totalUsd += agentbotUsd;
   }
 
   return { totalUsd, breakdown, amounts };
