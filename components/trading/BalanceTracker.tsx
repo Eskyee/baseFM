@@ -5,7 +5,11 @@ import type { TradingBalance } from '@/types/trading';
 
 const POLL_INTERVAL = 5000;
 
-export function BalanceTracker() {
+interface BalanceTrackerProps {
+  walletAddress?: string;
+}
+
+export function BalanceTracker({ walletAddress }: BalanceTrackerProps = {}) {
   const [balance, setBalance] = useState<TradingBalance | null>(null);
   const [flash, setFlash] = useState(false);
   const [prevId, setPrevId] = useState<string | null>(null);
@@ -14,7 +18,10 @@ export function BalanceTracker() {
   useEffect(() => {
     async function poll() {
       try {
-        const res = await fetch('/api/trading/balances');
+        const url = walletAddress
+          ? `/api/trading/balances?wallet=${walletAddress}`
+          : '/api/trading/balances';
+        const res = await fetch(url);
         const data = await res.json();
         if (data && data.id) {
           setBalance(data);
@@ -34,7 +41,7 @@ export function BalanceTracker() {
     poll();
     const id = setInterval(poll, POLL_INTERVAL);
     return () => clearInterval(id);
-  }, [prevId]);
+  }, [prevId, walletAddress]);
 
   // Always show these tokens regardless of value
   const alwaysShowTokens = ['USDC', 'RAVE', 'BASEFM'];

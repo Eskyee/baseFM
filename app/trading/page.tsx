@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
 import {
   TradingHeader,
   TradingFeed,
   RecentTrades,
+  BalanceTracker,
 } from '@/components/trading';
 
 // Agent started at page load
@@ -21,8 +23,12 @@ interface AgentStatus {
 }
 
 export default function TradingPage() {
+  const { address: connectedWallet } = useAccount();
   const [activeTab, setActiveTab] = useState<'feed' | 'stats'>('feed');
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
+
+  // Use connected wallet, fall back to env var
+  const walletAddress = connectedWallet || AGENT_WALLET;
 
   useEffect(() => {
     async function fetchStatus() {
@@ -44,7 +50,7 @@ export default function TradingPage() {
       {/* Header */}
       <TradingHeader
         startedAt={AGENT_STARTED_AT}
-        walletAddress={AGENT_WALLET}
+        walletAddress={walletAddress}
         isConfigured={agentStatus?.configured}
       />
 
@@ -89,6 +95,10 @@ export default function TradingPage() {
             activeTab === 'stats' ? 'block' : 'hidden md:flex'
           }`}
         >
+          {/* Balance Section */}
+          <div className="py-4 border-b border-[#2A2A2A]">
+            <BalanceTracker walletAddress={walletAddress} />
+          </div>
           {/* Trades Section */}
           <div className="py-4 flex-1">
             <RecentTrades />

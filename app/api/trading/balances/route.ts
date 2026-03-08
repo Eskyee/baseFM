@@ -88,221 +88,210 @@ async function fetchTokenPrices(): Promise<Record<string, number>> {
 }
 
 /**
- * Fetch on-chain balances for agent wallet
+ * GET /api/trading/balances
+ * Fetches trading agent balance - prioritizes on-chain for reliability
  */
-async function fetchOnChainBalances(): Promise<{
+export async function GET(request: Request) {
+  // Allow passing wallet address via query param or use env var
+  const url = new URL(request.url);
+  const walletParam = url.searchParams.get('wallet');
+  const wallet = (walletParam || AGENT_WALLET) as `0x${string}` | undefined;
+
+  // Prioritize on-chain balances (direct, reliable)
+  if (wallet) {
+    try {
+      const onChainData = await fetchOnChainBalancesForWallet(wallet);
+      if (onChainData.totalUsd > 0 || Object.keys(onChainData.breakdown).length > 0) {
+        return NextResponse.json({
+          id: Date.now().toString(),
+          source: 'onchain',
+          wallet,
+          ...onChainData,
+        });
+      }
+    } catch (err) {
+      console.error('On-chain balance fetch failed:', err);
+    }
+  }
+
+  // Try Bankr as fallback
+  const apiKey = process.env.BANKR_API_KEY;
+  if (apiKey) {
+    try {
+      const bankrData = await fetchBankrBalances(apiKey);
+      if (bankrData && (bankrData.totalUsd > 0 || Object.keys(bankrData.breakdown).length > 0)) {
+        return NextResponse.json({
+          id: Date.now().toString(),
+          source: 'bankr',
+          ...bankrData,
+        });
+      }
+    } catch (err) {
+      console.error('Bankr balance fetch failed:', err);
+    }
+  }
+
+  // No wallet configured
+  if (!wallet && !apiKey) {
+    return NextResponse.json({
+      id: 'unconfigured',
+      totalUsd: 0,
+      breakdown: {},
+      error: 'No wallet or API key configured',
+    });
+  }
+
+  // Return empty but configured
+  return NextResponse.json({
+    id: Date.now().toString(),
+    source: wallet ? 'onchain' : 'bankr',
+    totalUsd: 0,
+    breakdown: {},
+    amounts: {},
+  });
+}
+
+/**
+ * Fetch on-chain balances for a specific wallet
+ */
+async function fetchOnChainBalancesForWallet(wallet: `0x${string}`): Promise<{
   totalUsd: number;
   breakdown: Record<string, number>;
   amounts: Record<string, string>;
 }> {
-  if (!AGENT_WALLET) {
-    return { totalUsd: 0, breakdown: {}, amounts: {} };
-  }
-
   const breakdown: Record<string, number> = {};
   const amounts: Record<string, string> = {};
   let totalUsd = 0;
 
-  try {
-    // Fetch prices first
-    const prices = await fetchTokenPrices();
+  // Fetch prices first
+  const prices = await fetchTokenPrices();
 
-    // Fetch ETH balance
-    const ethBalance = await publicClient.getBalance({ address: AGENT_WALLET });
-    const ethAmount = parseFloat(formatEther(ethBalance));
-    if (ethAmount > 0.0001) {
-      const ethUsd = ethAmount * (prices['ETH'] || 2000);
-      amounts['ETH'] = ethAmount.toFixed(4);
-      breakdown['ETH'] = ethUsd;
-      totalUsd += ethUsd;
-    }
+  // Fetch ETH balance
+  const ethBalance = await publicClient.getBalance({ address: wallet });
+  const ethAmount = parseFloat(formatEther(ethBalance));
+  if (ethAmount > 0.0001) {
+    const ethUsd = ethAmount * (prices['ETH'] || 2000);
+    amounts['ETH'] = ethAmount.toFixed(4);
+    breakdown['ETH'] = ethUsd;
+    totalUsd += ethUsd;
+  }
 
-    // Fetch USDC balance
-    const usdcBalance = await publicClient.readContract({
+  // Fetch ERC20 balances in parallel
+  const [usdcBalance, wethBalance, basefmBalance, raveBalance] = await Promise.all([
+    publicClient.readContract({
       address: BASE_TOKENS.USDC.address,
       abi: ERC20_ABI,
       functionName: 'balanceOf',
-      args: [AGENT_WALLET],
-    });
-    const usdcAmount = parseFloat(formatUnits(usdcBalance, BASE_TOKENS.USDC.decimals));
-    if (usdcAmount > 0.01) {
-      amounts['USDC'] = usdcAmount.toFixed(2);
-      breakdown['USDC'] = usdcAmount;
-      totalUsd += usdcAmount;
-    }
-
-    // Fetch WETH balance
-    const wethBalance = await publicClient.readContract({
+      args: [wallet],
+    }),
+    publicClient.readContract({
       address: BASE_TOKENS.WETH.address,
       abi: ERC20_ABI,
       functionName: 'balanceOf',
-      args: [AGENT_WALLET],
-    });
-    const wethAmount = parseFloat(formatUnits(wethBalance, BASE_TOKENS.WETH.decimals));
-    if (wethAmount > 0.0001) {
-      const wethUsd = wethAmount * (prices['WETH'] || 2000);
-      amounts['WETH'] = wethAmount.toFixed(4);
-      breakdown['WETH'] = wethUsd;
-      totalUsd += wethUsd;
-    }
-
-    // Fetch BASEFM balance
-    const basefmBalance = await publicClient.readContract({
+      args: [wallet],
+    }),
+    publicClient.readContract({
       address: BASE_TOKENS.BASEFM.address,
       abi: ERC20_ABI,
       functionName: 'balanceOf',
-      args: [AGENT_WALLET],
-    });
-    const basefmAmount = parseFloat(formatUnits(basefmBalance, BASE_TOKENS.BASEFM.decimals));
-    if (basefmAmount > 0) {
-      const basefmUsd = basefmAmount * (prices['BASEFM'] || 0);
-      amounts['BASEFM'] = basefmAmount.toFixed(4);
-      if (basefmUsd > 0) {
-        breakdown['BASEFM'] = basefmUsd;
-        totalUsd += basefmUsd;
-      }
-    }
-
-    // Fetch RAVE balance
-    const raveBalance = await publicClient.readContract({
+      args: [wallet],
+    }),
+    publicClient.readContract({
       address: BASE_TOKENS.RAVE.address,
       abi: ERC20_ABI,
       functionName: 'balanceOf',
-      args: [AGENT_WALLET],
-    });
-    const raveAmount = parseFloat(formatUnits(raveBalance, BASE_TOKENS.RAVE.decimals));
-    if (raveAmount > 0) {
-      const raveUsd = raveAmount * (prices['RAVE'] || 0);
-      amounts['RAVE'] = raveAmount.toFixed(4);
-      if (raveUsd > 0) {
-        breakdown['RAVE'] = raveUsd;
-        totalUsd += raveUsd;
-      }
+      args: [wallet],
+    }),
+  ]);
+
+  // Process USDC
+  const usdcAmount = parseFloat(formatUnits(usdcBalance, BASE_TOKENS.USDC.decimals));
+  if (usdcAmount > 0.01) {
+    amounts['USDC'] = usdcAmount.toFixed(2);
+    breakdown['USDC'] = usdcAmount;
+    totalUsd += usdcAmount;
+  }
+
+  // Process WETH
+  const wethAmount = parseFloat(formatUnits(wethBalance, BASE_TOKENS.WETH.decimals));
+  if (wethAmount > 0.0001) {
+    const wethUsd = wethAmount * (prices['WETH'] || 2000);
+    amounts['WETH'] = wethAmount.toFixed(4);
+    breakdown['WETH'] = wethUsd;
+    totalUsd += wethUsd;
+  }
+
+  // Process BASEFM
+  const basefmAmount = parseFloat(formatUnits(basefmBalance, BASE_TOKENS.BASEFM.decimals));
+  if (basefmAmount > 0) {
+    const basefmUsd = basefmAmount * (prices['BASEFM'] || 0);
+    amounts['BASEFM'] = basefmAmount.toFixed(4);
+    if (basefmUsd > 0) {
+      breakdown['BASEFM'] = basefmUsd;
+      totalUsd += basefmUsd;
     }
-  } catch (err) {
-    console.error('Failed to fetch on-chain balances:', err);
+  }
+
+  // Process RAVE
+  const raveAmount = parseFloat(formatUnits(raveBalance, BASE_TOKENS.RAVE.decimals));
+  if (raveAmount > 0) {
+    const raveUsd = raveAmount * (prices['RAVE'] || 0);
+    amounts['RAVE'] = raveAmount.toFixed(4);
+    if (raveUsd > 0) {
+      breakdown['RAVE'] = raveUsd;
+      totalUsd += raveUsd;
+    }
   }
 
   return { totalUsd, breakdown, amounts };
 }
 
 /**
- * GET /api/trading/balances
- * Fetches trading agent balance from Bankr API or on-chain
+ * Fetch balances from Bankr API
  */
-export async function GET() {
-  const apiKey = process.env.BANKR_API_KEY;
+async function fetchBankrBalances(apiKey: string): Promise<{
+  totalUsd: number;
+  breakdown: Record<string, number>;
+} | null> {
+  const promptRes = await fetch(`${BANKR_API_BASE}/agent/prompt`, {
+    method: 'POST',
+    headers: {
+      'X-API-Key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt: 'Show my portfolio balance on Base' }),
+  });
 
-  // If no API key, try to fetch on-chain balances directly
-  if (!apiKey) {
-    if (AGENT_WALLET) {
-      const onChainData = await fetchOnChainBalances();
-      return NextResponse.json({
-        id: Date.now().toString(),
-        source: 'onchain',
-        ...onChainData,
-      });
-    }
-    return NextResponse.json({
-      id: 'unconfigured',
-      totalUsd: 0,
-      breakdown: {},
-    });
+  if (!promptRes.ok) {
+    console.error('Bankr prompt error:', promptRes.status);
+    return null;
   }
 
-  try {
-    // Submit balance check prompt
-    const promptRes = await fetch(`${BANKR_API_BASE}/agent/prompt`, {
-      method: 'POST',
-      headers: {
-        'X-API-Key': apiKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ prompt: 'Show my portfolio balance on Base' }),
+  const { jobId } = await promptRes.json();
+
+  // Poll for job completion (max 20 seconds)
+  for (let i = 0; i < 10; i++) {
+    const jobRes = await fetch(`${BANKR_API_BASE}/agent/job/${jobId}`, {
+      headers: { 'X-API-Key': apiKey },
     });
 
-    if (!promptRes.ok) {
-      const errorText = await promptRes.text();
-      console.error('Bankr prompt error:', promptRes.status, errorText);
-      return NextResponse.json({
-        id: 'error',
-        totalUsd: 0,
-        breakdown: {},
-        error: promptRes.status === 403 ? 'API key lacks Agent API access' : 'API error',
-      });
+    if (!jobRes.ok) return null;
+
+    const job = await jobRes.json();
+
+    if (job.status === 'completed') {
+      return parseBalanceResponse(job.response || '');
     }
 
-    const { jobId } = await promptRes.json();
-
-    // Poll for job completion (max 30 seconds)
-    let attempts = 0;
-    const maxAttempts = 15;
-
-    while (attempts < maxAttempts) {
-      const jobRes = await fetch(`${BANKR_API_BASE}/agent/job/${jobId}`, {
-        headers: { 'X-API-Key': apiKey },
-      });
-
-      if (!jobRes.ok) {
-        console.error('Bankr job poll error:', jobRes.status);
-        return NextResponse.json({
-          id: 'error',
-          totalUsd: 0,
-          breakdown: {},
-        });
-      }
-
-      const job = await jobRes.json();
-
-      if (job.status === 'completed') {
-        // Parse balance from response text
-        const { totalUsd, breakdown } = parseBalanceResponse(job.response || '');
-        return NextResponse.json({
-          id: Date.now().toString(),
-          source: 'bankr',
-          totalUsd,
-          breakdown,
-        });
-      }
-
-      if (job.status === 'failed') {
-        console.error('Bankr job failed:', job.error);
-        return NextResponse.json({
-          id: 'error',
-          totalUsd: 0,
-          breakdown: {},
-        });
-      }
-
-      // Wait 2 seconds before next poll
-      await new Promise((r) => setTimeout(r, 2000));
-      attempts++;
+    if (job.status === 'failed') {
+      console.error('Bankr job failed:', job.error);
+      return null;
     }
 
-    // Timeout
-    return NextResponse.json({
-      id: 'timeout',
-      totalUsd: 0,
-      breakdown: {},
-    });
-  } catch (err) {
-    console.error('Failed to fetch Bankr balances:', err);
-    // Fall back to on-chain balances
-    if (AGENT_WALLET) {
-      const onChainData = await fetchOnChainBalances();
-      return NextResponse.json({
-        id: Date.now().toString(),
-        source: 'onchain-fallback',
-        ...onChainData,
-      });
-    }
-    return NextResponse.json({
-      id: 'error',
-      totalUsd: 0,
-      breakdown: {},
-      error: 'Network error connecting to Bankr API',
-    });
+    await new Promise((r) => setTimeout(r, 2000));
   }
+
+  return null;
 }
 
 /**
