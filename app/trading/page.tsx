@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   TradingHeader,
   TradingFeed,
-  BalanceTracker,
   RecentTrades,
 } from '@/components/trading';
 
@@ -102,11 +101,6 @@ export default function TradingPage() {
             activeTab === 'stats' ? 'block' : 'hidden md:flex'
           }`}
         >
-          {/* Balance Section */}
-          <div className="py-4 border-b border-[#2A2A2A]">
-            <BalanceTracker />
-          </div>
-
           {/* Trades Section */}
           <div className="py-4 flex-1">
             <RecentTrades />
