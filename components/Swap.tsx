@@ -8,13 +8,14 @@ import {
   SwapMessage, 
   SwapToast 
 } from '@coinbase/onchainkit/swap'; 
+import type { Token } from '@coinbase/onchainkit/token';
 import { useAccount } from 'wagmi';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 export function StationSwap() {
   const { address } = useAccount();
 
-  const ETHToken = {
+  const ETHToken: Token = {
     address: '',
     chainId: 8453,
     decimals: 18,
@@ -23,8 +24,8 @@ export function StationSwap() {
     image: 'https://raw.githubusercontent.com/base-org/brand-kit/main/logo/symbol/chain/base-symbol-color.svg',
   };
 
-  const RAVEToken = {
-    address: DJ_TOKEN_CONFIG.address,
+  const RAVEToken: Token = {
+    address: DJ_TOKEN_CONFIG.address as `0x${string}`,
     chainId: 8453,
     decimals: 18,
     name: DJ_TOKEN_CONFIG.name,
