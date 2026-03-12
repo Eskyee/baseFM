@@ -133,7 +133,7 @@ export default function WebDesignPage() {
               We Build Websites That <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Actually Work</span>
             </h1>
             <p className="text-[#888] text-lg mb-8 max-w-2xl mx-auto">
-              Fast, modern websites built with Next.js. From concept to launch — we handle everything so you can focus on your business.
+              Fast, modern websites built with Next.js. From concept to launch &mdash; we handle everything so you can focus on your business.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
@@ -211,7 +211,7 @@ export default function WebDesignPage() {
       {/* Services & Pricing */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-[#0A0A0A]/30">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-3">Services & Pricing</h2>
+          <h2 className="text-3xl font-bold text-[#F5F5F5] mb-3">Services &amp; Pricing</h2>
           <p className="text-[#888] max-w-xl mx-auto">
             Clear pricing with no hidden costs. Everything you need to get online.
           </p>

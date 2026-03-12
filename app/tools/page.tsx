@@ -1056,17 +1056,13 @@ function BankrSection() {
 
       {/* Setup Instructions */}
       {apiStatus === 'disconnected' && (
-        <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
-          <h3 className="text-yellow-400 font-mono font-semibold text-sm mb-2">Setup Required</h3>
-          <p className="text-[#888] text-xs font-mono mb-2">
-            Add these environment variables in Vercel:
+        <div className="border border-purple-500/30 rounded-xl p-4 bg-purple-500/5">
+          <h3 className="text-purple-400 font-mono font-semibold text-sm mb-2">Service Note</h3>
+          <p className="text-[#888] text-xs font-mono">
+            The Trading Terminal is currently in maintenance mode or requires additional platform configuration.
           </p>
-          <div className="bg-[#1A1A1A] rounded-lg p-3 text-xs font-mono text-[#888]">
-            <p>BANKR_API_KEY=your_api_key</p>
-            <p>BANKR_PRIVATE_KEY=your_private_key</p>
-          </div>
           <p className="text-[#666] text-[10px] font-mono mt-2">
-            Get your API key at <a href="https://docs.bankr.bot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">docs.bankr.bot</a>
+            Contact <span className="text-purple-400">rbasefm@icloud.com</span> for access inquiries.
           </p>
         </div>
       )}

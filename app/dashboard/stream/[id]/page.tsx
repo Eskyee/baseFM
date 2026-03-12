@@ -225,18 +225,18 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
 
       {/* Setup Mux Section - Show if stream doesn't have Mux credentials */}
       {needsMuxSetup && (
-        <div className="bg-yellow-900/20 border border-yellow-500 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-semibold text-yellow-400 mb-2">Streaming Setup Required</h2>
-          <p className="text-yellow-200/80 text-sm mb-4">
-            This stream needs to be connected to the streaming service to get your RTMP credentials.
-            Click the button below to generate your streaming credentials.
+        <div className="bg-purple-900/20 border border-purple-500 rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold text-purple-400 mb-2">Streaming Credentials Required</h2>
+          <p className="text-purple-200/80 text-sm mb-4">
+            This stream session needs to be provisioned with RTMP credentials. 
+            Generating these will allow you to connect OBS or mobile streaming apps.
           </p>
           <button
             onClick={handleSetupMux}
             disabled={isSettingUpMux}
-            className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSettingUpMux ? 'Setting up...' : 'Generate Streaming Credentials'}
+            {isSettingUpMux ? 'Provisioning...' : 'Generate Streaming Credentials'}
           </button>
         </div>
       )}

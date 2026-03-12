@@ -69,6 +69,12 @@ export default function RootLayout({
         <meta property="fc:frame:button:1" content="Listen Live 📻" />
         <meta property="fc:frame:button:1:action" content="link" />
         <meta property="fc:frame:button:1:target" content="https://basefm.space" />
+        {/* Farcaster Miniapp Meta Tags */}
+        <meta property="fc:miniapp" content="vNext" />
+        <meta property="fc:miniapp:name" content="baseFM" />
+        <meta property="fc:miniapp:icon" content="https://basefm.space/logo.png" />
+        <meta property="fc:miniapp:description" content="Onchain Radio on Base" />
+        <meta property="fc:miniapp:url" content="https://basefm.space" />
         {/* Talent App Verification */}
         <meta name="talentapp:project_verification" content="a79f1e817a75ee8e911c978328c32206b924c443f37bb86b03531a16184e7812e0401fdcbd768942068e5e414ddd58353327fdaa8e890d85776c969467a33466" />
       </head>
