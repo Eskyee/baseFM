@@ -46,6 +46,8 @@ export default function CreateStreamPage() {
     genre: '',
     tags: '',
     coverImageUrl: '',
+    xHandle: '',
+    farcasterFid: '',
     isGated: false,
     requiredTokenAddress: '',
     requiredTokenAmount: '',
@@ -87,6 +89,8 @@ export default function CreateStreamPage() {
           genre: formData.genre || undefined,
           tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()) : undefined,
           coverImageUrl: formData.coverImageUrl || undefined,
+          xHandle: formData.xHandle || undefined,
+          farcasterFid: formData.farcasterFid || undefined,
           isGated: formData.isGated,
           requiredTokenAddress: formData.isGated ? tokenAddress : undefined,
           requiredTokenAmount: formData.isGated ? parseInt(formData.requiredTokenAmount, 10) : undefined,
@@ -200,10 +204,14 @@ export default function CreateStreamPage() {
                   className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
                 >
                   <option value="">Select genre</option>
+                  <option value="Jungle">Jungle</option>
+                  <option value="Dub">Dub</option>
+                  <option value="Roots">Roots</option>
+                  <option value="Sound System">Sound System</option>
+                  <option value="UK Garage">UK Garage</option>
                   <option value="House">House</option>
                   <option value="Techno">Techno</option>
                   <option value="Drum & Bass">Drum & Bass</option>
-                  <option value="Trance">Trance</option>
                   <option value="Hip Hop">Hip Hop</option>
                   <option value="Lo-Fi">Lo-Fi</option>
                   <option value="Ambient">Ambient</option>
@@ -238,6 +246,36 @@ export default function CreateStreamPage() {
                 className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
                 placeholder="https://example.com/image.jpg"
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  X (Twitter) Handle
+                </label>
+                <input
+                  type="text"
+                  name="xHandle"
+                  value={formData.xHandle}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="@yourname"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#888] mb-2">
+                  Farcaster FID
+                </label>
+                <input
+                  type="text"
+                  name="farcasterFid"
+                  value={formData.farcasterFid}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
+                  placeholder="12345"
+                />
+              </div>
             </div>
           </div>
 

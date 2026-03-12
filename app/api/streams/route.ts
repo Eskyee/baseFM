@@ -71,6 +71,8 @@ export async function POST(request: NextRequest) {
       coverImageUrl: body.coverImageUrl,
       genre: body.genre,
       tags: body.tags,
+      xHandle: body.xHandle,
+      farcasterFid: body.farcasterFid,
     });
 
     streamId = stream.id;

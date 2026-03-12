@@ -26,6 +26,8 @@ export async function createStream(input: CreateStreamInput): Promise<Stream> {
       cover_image_url: input.coverImageUrl,
       genre: input.genre,
       tags: input.tags,
+      x_handle: input.xHandle,
+      farcaster_fid: input.farcasterFid,
     })
     .select()
     .single();

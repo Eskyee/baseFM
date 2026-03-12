@@ -5,8 +5,8 @@ export const DJ_TOKEN_CONFIG = {
   // RaveCulture token on Base
   address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,
 
-  // Minimum tokens required to DJ (5000 tokens)
-  requiredAmount: 5000,
+  // Minimum tokens required to DJ (1.25M tokens ≈ $5.00 overhead coverage)
+  requiredAmount: 1250000,
 
   // Premium tier - 1 billion tokens to use custom token gating
   premiumAmount: 1_000_000_000,

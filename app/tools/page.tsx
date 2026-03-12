@@ -815,6 +815,7 @@ function BankrSection() {
           }
         } else {
           setApiStatus('connected');
+          setIsConnected(true); // Auto-connect if API is healthy
           if (data.totalUsd > 0) {
             setBalance({ totalUsd: data.totalUsd, breakdown: data.breakdown });
           }

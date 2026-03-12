@@ -31,6 +31,8 @@ export interface Stream {
   coverImageUrl?: string;
   genre?: string;
   tags?: string[];
+  xHandle?: string;
+  farcasterFid?: string;
 
   // Timestamps
   createdAt: string;
@@ -49,6 +51,8 @@ export interface CreateStreamInput {
   coverImageUrl?: string;
   genre?: string;
   tags?: string[];
+  xHandle?: string;
+  farcasterFid?: string;
 }
 
 export interface UpdateStreamInput {
@@ -62,6 +66,8 @@ export interface UpdateStreamInput {
   coverImageUrl?: string;
   genre?: string;
   tags?: string[];
+  xHandle?: string;
+  farcasterFid?: string;
 }
 
 export interface StreamActivity {
@@ -94,6 +100,8 @@ export interface StreamRow {
   cover_image_url: string | null;
   genre: string | null;
   tags: string[] | null;
+  x_handle: string | null;
+  farcaster_fid: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -121,6 +129,8 @@ export function streamFromRow(row: StreamRow): Stream {
     coverImageUrl: row.cover_image_url ?? undefined,
     genre: row.genre ?? undefined,
     tags: row.tags ?? undefined,
+    xHandle: row.x_handle ?? undefined,
+    farcasterFid: row.farcaster_fid ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
