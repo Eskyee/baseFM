@@ -10,8 +10,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://basefm.space'),
-  title: 'baseFM - Onchain Radio on Base',
-  description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
+  title: {
+    default: 'baseFM - The Onchain Radio Protocol on Base',
+    template: '%s | baseFM',
+  },
+  description: 'Underground radio, events, and culture — all onchain. Tune in to autonomous DJ sets, mint digital wristbands, and join the most technically elite community on Base.',
+  keywords: ['Onchain Radio', 'Base Network', 'Autonomous DJ', 'Underground Music', 'Jungle', 'Dub', 'NFT Tickets', 'Smart Wallet'],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
