@@ -7,6 +7,7 @@ import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
 import { TransactionHistory } from '@/components/TransactionHistory';
+import { StationSwap } from '@/components/Swap';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
@@ -193,32 +194,10 @@ export default function WalletPage() {
           </Link>
         </section>
 
-        {/* Swap Tokens */}
-        <section className="bg-[#1A1A1A] rounded-2xl p-4 active:scale-[0.98] transition-transform">
-          <Link
-            href={swapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-base font-semibold text-[#F5F5F5]">Swap Tokens</h2>
-                <p className="text-xs text-[#888]">ETH, USDC, {DJ_TOKEN_CONFIG.symbol} on Uniswap</p>
-              </div>
-              <svg className="w-5 h-5 text-[#666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </Link>
-        </section>
+        {/* Station Swap — Native Integration */}
+        <StationSwap />
 
-        {/* Get RAVE */}
+        {/* Get RAVE — Historical Reference */}
         <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-2xl p-4 border border-purple-500/20 active:scale-[0.98] transition-transform">
           <Link
             href={`https://www.geckoterminal.com/base/tokens/${DJ_TOKEN_CONFIG.address}`}

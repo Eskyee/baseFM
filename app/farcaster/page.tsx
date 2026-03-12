@@ -20,9 +20,10 @@ export default function FarcasterPage() {
 
   const generateCastText = () => {
     if (currentStream) {
-      return `Listening to ${currentStream.title} by ${currentStream.djName} on @basefm\n\nTune in: basefm.space`;
+      const genreSuffix = currentStream.genre ? ` playing some ${currentStream.genre}` : '';
+      return `Listening to ${currentStream.title} by ${currentStream.djName}${genreSuffix} on @basefm\n\nTune in: basefm.space`;
     }
-    return 'Check out @basefm - onchain radio on Base\n\nbasefm.space';
+    return 'Check out @basefm - onchain radio on Base. The home of Jungle, Dub, and Sound System culture.\n\nbasefm.space';
   };
 
   const openComposer = (text?: string) => {

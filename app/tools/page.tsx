@@ -172,23 +172,23 @@ const token = await Clanker.deploy({
               </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href={DEPLOY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <div className="flex flex-wrap gap-3 mb-6">
+                <button
+                  onClick={() => window.open(DEPLOY_URL, '_blank')}
                   className="px-5 py-2.5 bg-[#0052FF] text-white rounded-lg text-sm font-mono font-semibold hover:bg-[#0052FF]/80 transition-colors active:scale-[0.97]"
                 >
-                  Deploy Token
-                </a>
-                <a
-                  href={CLANKER_DOCS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
-                >
-                  View Docs
-                </a>
+                  Deploy on Clanker
+                </button>
+              </div>
+
+              {/* Clanker Iframe Embed */}
+              <div className="w-full aspect-video rounded-xl overflow-hidden border border-[#2A2A2A] bg-[#000]">
+                <iframe 
+                  src="https://www.clanker.world/clanker" 
+                  className="w-full h-full border-none"
+                  title="Clanker Token Deploy"
+                  allow="clipboard-write"
+                />
               </div>
 
               {/* Developer Resources */}
@@ -597,6 +597,52 @@ function AgentsSection() {
           >
             My Agents
           </a>
+        </div>
+      </div>
+
+      {/* Verified SWARM Card */}
+      <div className="border border-[#2A2A2A] rounded-xl p-5 bg-[#0A0A0A]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[#F5F5F5] font-mono font-semibold text-sm">Verified SWARM</h3>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-green-400 text-[10px] font-mono font-bold">3 ACTIVE</span>
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🤖</span>
+              <div>
+                <p className="text-white text-xs font-mono font-bold">Atlas_baseFM</p>
+                <p className="text-[#666] text-[10px] font-mono">Platform Operator</p>
+              </div>
+            </div>
+            <a 
+              href="https://moltx.io/baseFM" 
+              target="_blank" 
+              className="px-2 py-1 bg-[#0052FF]/20 text-[#0052FF] text-[10px] font-mono rounded hover:bg-[#0052FF]/30 transition-colors"
+            >
+              PROFILE
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🎧</span>
+              <div>
+                <p className="text-white text-xs font-mono font-bold">clawdbotDJ</p>
+                <p className="text-[#666] text-[10px] font-mono">Station Resident</p>
+              </div>
+            </div>
+            <a 
+              href="/dashboard/stream/live" 
+              className="px-2 py-1 bg-[#0052FF]/20 text-[#0052FF] text-[10px] font-mono rounded hover:bg-[#0052FF]/30 transition-colors"
+            >
+              LIVE
+            </a>
+          </div>
         </div>
       </div>
 
