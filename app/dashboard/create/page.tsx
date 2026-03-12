@@ -43,6 +43,7 @@ export default function CreateStreamPage() {
     title: '',
     description: '',
     djName: '',
+    djWalletAddress: '',
     genre: '',
     tags: '',
     coverImageUrl: '',
@@ -85,7 +86,7 @@ export default function CreateStreamPage() {
           title: formData.title,
           description: formData.description || undefined,
           djName: formData.djName,
-          djWalletAddress: address,
+          djWalletAddress: formData.djWalletAddress || address,
           genre: formData.genre || undefined,
           tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()) : undefined,
           coverImageUrl: formData.coverImageUrl || undefined,
@@ -176,6 +177,23 @@ export default function CreateStreamPage() {
                 className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] text-sm"
                 placeholder="DJ Awesome"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#888] mb-2">
+                DJ Wallet Address (Optional)
+              </label>
+              <input
+                type="text"
+                name="djWalletAddress"
+                value={formData.djWalletAddress || ''}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, djWalletAddress: e.target.value }));
+                }}
+                className="w-full px-4 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-lg text-[#F5F5F5] focus:outline-none focus:border-[#3B82F6] font-mono text-sm"
+                placeholder="0x..."
+              />
+              <p className="text-[#666] text-[10px] mt-1">If different from your connected wallet.</p>
             </div>
 
             <div>
