@@ -152,11 +152,23 @@ export function CollectibleCard({ nft, djName }: CollectibleCardProps) {
           </div>
 
           {mintSuccess ? (
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-lg">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-              </svg>
-              Collected!
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-lg justify-center">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+                Collected!
+              </div>
+              <div className="flex gap-2">
+                <a
+                  href={`https://warpcast.com/~/compose?text=I%20just%20minted%20the%20${encodeURIComponent(nft.title)}%20on%20@basefm!%20See%20you%20at%20the%20rave.%20📻⛓️&embeds[]=https://basefm.space/collect`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 px-3 py-1.5 bg-[#0052FF]/10 text-[#0052FF] rounded-md text-xs font-bold text-center border border-[#0052FF]/20 hover:bg-[#0052FF]/20 transition-all"
+                >
+                  Share to Feed
+                </a>
+              </div>
             </div>
           ) : (
             <button
