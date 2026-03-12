@@ -42,12 +42,14 @@ export function StationSwap() {
       </h3>
       
       <Swap>
+        {/* @ts-ignore */}
         <SwapAmountInput
           label="Sell"
           swappableTokens={[ETHToken]}
           type="from"
         />
         <SwapToggleButton />
+        {/* @ts-ignore */}
         <SwapAmountInput
           label="Buy"
           swappableTokens={[RAVEToken]}
