@@ -7,7 +7,6 @@ import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
 import { TransactionHistory } from '@/components/TransactionHistory';
-import { StationSwap } from '@/components/Swap';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
