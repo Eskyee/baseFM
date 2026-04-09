@@ -1,11 +1,23 @@
-# baseFM - Onchain Radio Platform
+<div align="center">
 
-Production-ready streaming platform for Base-native radio. Built by [Eskyee](https://github.com/Eskyee) / [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
+# 📻 baseFM
 
-**Live:** [basefm.space](https://basefm.space) | 
-**Shop:** [shop.basefm.space](https://shop.basefm.space) | **Guide:** [/guide](https://basefm.space/guide)
+**Onchain Radio for the Base Ecosystem**
+
+Live DJs · Crypto Tipping · Token-Gated Access · Onchain Events
+
+![baseFM Banner](https://raw.githubusercontent.com/Eskyee/baseFM/main/public/og-image.png)
 
 [![CI](https://github.com/Eskyee/baseFM/actions/workflows/ci.yml/badge.svg)](https://github.com/Eskyee/baseFM/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
+**Live:** [basefm.space](https://basefm.space) · **Shop:** [shop.basefm.space](https://shop.basefm.space) · **Guide:** [/guide](https://basefm.space/guide)
+
+Built by [Eskyee](https://github.com/Eskyee) / [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
+
+</div>
+
+---
 
 ## Features
 
