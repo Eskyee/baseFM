@@ -13,120 +13,150 @@ Live DJs · Crypto Tipping · Token-Gated Access · Onchain Events
 
 **Live:** [basefm.space](https://basefm.space) · **Shop:** [shop.basefm.space](https://shop.basefm.space) · **Guide:** [/guide](https://basefm.space/guide)
 
-Built by [Eskyee](https://github.com/Eskyee) / [RaveCulture](https://base.app/profile/raveculture) for Base Builders.
-
 </div>
 
 ---
 
-## Features
+## 🎤 Join the Community
 
+baseFM is a community-owned radio station built on Base. DJs stream live, listeners tip in crypto, and everyone owns a piece of the culture.
 
-### Core Streaming
-- **Live DJ Streaming** - RTMP to HLS via Mux
-- **Show Archives** - Automatic recording and playback
-- **Weekly Schedule** - Recurring DJ timeslots
-- **DJ Profiles** - Professional profiles with stats, followers, banners
-- **DJ of the Day** - Featured artist spotlight
+**We're not a platform. We're a scene.**
 
-### Engagement
-- **Live Chat** - Real-time chat during streams (Supabase Realtime)
-- **Multi-Token Tipping** - ETH, USDC, RAVE, cbBTC direct to DJ wallets
-- **Follow System** - Follow DJs and track favorites
-- **Push Notifications** - Browser notifications for live shows
-- **Community Threads** - Discussions and posts
+### 🎧 Listen
 
-### Events & Tickets
-- **Event Listings** - Community events and parties
-- **Onchain Tickets** - Buy with USDC, pay promoters directly
-- **Promoter Profiles** - Collectives, venues, labels
-- **Ticket Verification** - Wallet-based entry check
-- **POS System** - QR payment generation + ticket scanner for door staff
-- **Crew Management** - 35+ production roles for festival organizers
+- **Tune in live** at [basefm.space](https://basefm.space) — jungle, dub, drum & bass, electronic
+- **Push notifications** — get alerted when your favourite DJ goes live
+- **Chat in real-time** during streams
+- **Tip your DJ** — ETH, USDC, RAVE, cbBTC straight to their wallet
 
-### Promoter Tools (NEW)
-- **Crew Dashboard** - Manage event staff and production crew
-- **Role Categories** - Management, Front of House, Safety, Technical, Production, Artists, Vendors
-- **Check-in System** - Track crew arrivals at events
-- **Crew Notifications** - Slack integration for team updates
-- **Accounting** - Revenue tracking with GBP conversion guide
+### 🎚️ DJ
 
-### Onchain
-- **Wallet Auth** - Base Wallet (no seed phrases!)
-- **Token-Gated Community** - 5000+ RAVE token holders
-- **Show NFTs** - Mint recordings as collectibles
-- **OnchainKit Integration** - Base names, avatars, identity
-- **Direct Payments** - Tips and tickets go straight to wallets
+- **Stream live** from OBS — RTMP in, HLS out, global CDN
+- **Your own profile** — stats, followers, banner, bio
+- **Get paid directly** — tips go straight to your wallet, no middleman
+- **Show archives** — automatic recording and playback
+- **Weekly schedule** — lock in your recurring timeslot
 
-### Mobile
-- **PWA Support** - Install as app on iOS/Android
-- **Responsive Design** - Mobile-first UI
-- **Offline Support** - Service worker caching
+[Apply to DJ →](https://basefm.space/guide)
 
-### Performance (Vercel Pro Optimized)
-- **Loading States** - Page-specific skeleton loaders
-- **Page Transitions** - Smooth fade animations between pages
-- **Smart Caching** - Service worker v4 with cache management
-- **Update Notifications** - Banner prompts for new versions
-- **Optimized Imports** - Tree-shaking for lucide-react, wagmi, viem
-- **Image Optimization** - AVIF/WebP with 30-day cache
+### 🏗️ Build
 
-### Developer Experience
-- **CI/CD Pipeline** - GitHub Actions with lint, test, build
-- **Unit Tests** - 55+ tests with Vitest
-- **TypeScript** - Full type safety
-- **Documentation** - CLAUDE.md, SOUL.md, guides
-
-## Tech Stack
-
-- **Framework**: Next.js 14 (App Router)
-- **Database**: Supabase (Postgres + Realtime)
-- **Streaming**: Mux (RTMP → HLS)
-- **Blockchain**: Base (via wagmi, viem, OnchainKit)
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
-
-## Quick Start
-
-### 1. Clone and Install
+baseFM is open source. We welcome contributors of all levels.
 
 ```bash
 git clone https://github.com/Eskyee/baseFM.git
 cd baseFM
 npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-### 2. Environment Setup
+See the [Developer Guide](#-developer-guide) below for setup details.
+
+### 🎫 Events
+
+- **Community events** — listings, parties, and shows
+- **Onchain tickets** — buy with USDC, verify with your wallet
+- **Promoter tools** — crew management, POS, check-in, Slack notifications
+- **35+ production roles** — from stage manager to sound engineer
+
+### 🪙 Token
+
+- **$RAVE** — 5,000+ tokens for DJ-gated community access
+- **Show NFTs** — mint recordings as collectibles
+- **Direct payments** — tips and tickets go straight to wallets
+
+[Get $RAVE →](https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888)
+
+---
+
+## 🤝 Contributing
+
+We want your help. Seriously.
+
+**Good first issues** — check the [issues tab](https://github.com/Eskyee/baseFM/issues) for beginner-friendly tasks.
+
+**How to contribute:**
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/amazing`
+3. Make your changes
+4. Push and open a PR
+
+**What we need help with:**
+- UI/UX improvements
+- Mobile experience
+- Chat moderation tools
+- Genre filtering and search
+- Analytics dashboards
+- Documentation
+- Testing
+
+**Code style:** TypeScript, Tailwind CSS, Next.js App Router. Check [CLAUDE.md](./CLAUDE.md) for full conventions.
+
+---
+
+## 📖 What's Inside
+
+### For Listeners
+| Feature | Description |
+|---------|-------------|
+| Live Streaming | RTMP → HLS via Mux, global CDN |
+| Show Archives | Automatic recording and playback |
+| Live Chat | Real-time during streams (Supabase) |
+| Multi-Token Tips | ETH, USDC, RAVE, cbBTC |
+| Follow System | Track your favourite DJs |
+| Push Notifications | Never miss a live show |
+| PWA | Install as app on iOS/Android |
+
+### For DJs
+| Feature | Description |
+|---------|-------------|
+| Streaming Dashboard | Start/stop, OBS credentials, stats |
+| DJ Profiles | Bio, banner, socials, follower count |
+| Weekly Schedule | Lock in recurring timeslots |
+| DJ of the Day | Featured artist spotlight |
+| Direct Wallet | Tips arrive in your wallet instantly |
+
+### For Promoters
+| Feature | Description |
+|---------|-------------|
+| Event Management | Create events, sell tickets, manage attendees |
+| Onchain Tickets | USDC payments, wallet verification |
+| Crew Dashboard | 35+ roles, check-in, notifications |
+| POS System | QR payment generation + ticket scanner |
+| Accounting | Revenue tracking with GBP conversion |
+
+### For Developers
+| Feature | Description |
+|---------|-------------|
+| CI/CD | GitHub Actions (lint, test, build) |
+| Tests | 55+ unit tests with Vitest |
+| TypeScript | Full type safety |
+| OnchainKit | Base names, avatars, wallet auth |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 14 (App Router) |
+| Database | Supabase (Postgres + Realtime) |
+| Streaming | Mux (RTMP → HLS) |
+| Blockchain | Base (wagmi, viem, OnchainKit) |
+| Styling | Tailwind CSS |
+| Language | TypeScript |
+
+---
+
+## 🔧 Developer Guide
+
+### Environment Setup
 
 ```bash
 cp .env.example .env.local
 ```
-
-Fill in your values (see [Environment Variables](#environment-variables)).
-
-### 3. Database Setup
-
-Run these SQL files in Supabase SQL Editor (in order):
-
-1. `supabase/schema-djs.sql` - DJ profiles
-2. `supabase/schema-schedule.sql` - Weekly schedule
-3. `supabase/schema-members.sql` - Community directory
-4. `supabase/schema-chat.sql` - Live chat
-5. `supabase/schema-notifications.sql` - Favorites + push
-6. `supabase/schema-tips.sql` - Tips tracking
-7. `supabase/schema-nfts.sql` - NFT collectibles
-
-**Important**: Enable Realtime for `chat_messages` table in Supabase dashboard.
-
-### 4. Run Development
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000
-
-## Environment Variables
 
 ```env
 # Supabase
@@ -154,248 +184,71 @@ VAPID_PRIVATE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## Pages
+### Database Setup
 
-| Page | URL | Description |
-|------|-----|-------------|
-| Home | `/` | Live streams + featured content |
-| Guide | `/guide` | Beginner-friendly user guide |
-| Schedule | `/schedule` | Weekly DJ schedule |
-| Archive | `/archive` | Past broadcasts |
-| Collect | `/collect` | NFT collectibles |
-| Community | `/community` | Token-gated member directory |
-| DJs | `/djs` | DJ profiles listing |
-| DJ Profile | `/djs/[slug]` | Individual DJ with stats |
-| Events | `/events` | Community events |
-| Event Detail | `/events/[slug]` | Event info + tickets |
-| Dashboard | `/dashboard` | DJ streaming controls |
-| Wallet | `/wallet` | Balances + swap + GBP guide |
-| POS | `/pos` | Payment QR + ticket scanner |
-| Promoter | `/promoter` | Crew management dashboard |
-| Admin Accounting | `/admin/accounting` | Revenue tracking |
-| Admin Crew | `/admin/crew` | Full crew management |
+Run these SQL files in Supabase SQL Editor (in order):
 
-## API Routes
+1. `supabase/schema-djs.sql` - DJ profiles
+2. `supabase/schema-schedule.sql` - Weekly schedule
+3. `supabase/schema-members.sql` - Community directory
+4. `supabase/schema-chat.sql` - Live chat
+5. `supabase/schema-notifications.sql` - Favorites + push
+6. `supabase/schema-tips.sql` - Tips tracking
+7. `supabase/schema-nfts.sql` - NFT collectibles
 
-### Streams
-- `GET /api/streams` - List streams
-- `POST /api/streams` - Create stream
-- `GET /api/streams/live` - Get live streams
-- `POST /api/streams/[id]/start` - Start streaming
-- `POST /api/streams/[id]/stop` - Stop streaming
+Enable Realtime for `chat_messages` table in Supabase dashboard.
 
-### DJs
-- `GET /api/djs` - List all DJs
-- `GET /api/djs/[slug]` - Get DJ by slug
-- `GET /api/djs/me` - Get current DJ profile
-- `PUT /api/djs/me` - Update profile
+### Project Structure
 
-### Engagement
-- `GET/POST /api/chat` - Chat messages
-- `GET/POST/DELETE /api/favorites` - Follow DJs
-- `GET/POST /api/tips` - Tips
-- `GET/POST /api/nfts` - Show NFTs
-- `POST /api/nfts/mint` - Record mint
+```
+baseFM/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── dashboard/         # DJ dashboard
+│   ├── djs/               # DJ profiles
+│   ├── events/            # Community events
+│   └── community/         # Token-gated directory
+├── components/            # React components
+├── lib/                   # Utilities
+│   ├── db/               # Database functions
+│   ├── mux/              # Mux API client
+│   └── supabase/         # Supabase client
+├── supabase/             # SQL schema files
+└── public/               # Static assets + PWA
+```
 
-### Community
-- `GET/POST /api/community` - Member directory
-
-### Events & Tickets
-- `GET /api/events` - List events (upcoming/past)
-- `GET /api/events/[slug]` - Event details
-- `POST /api/events` - Submit event
-- `GET /api/tickets?eventId=xxx` - Get tickets for event
-- `POST /api/tickets` - Create ticket tier
-- `POST /api/tickets/purchase` - Record purchase after USDC payment
-- `GET /api/tickets/purchase?wallet=xxx&eventId=xxx` - Check ticket ownership
-
-### Crew Management
-- `GET /api/crew?eventId=xxx` - Get crew for event
-- `POST /api/crew` - Add crew member
-- `DELETE /api/crew?id=xxx` - Remove crew member
-- `PATCH /api/crew` - Update crew (check-in, role change)
-- `POST /api/crew/notify` - Send crew notifications via Slack
-
-## DJ Workflow
-
-1. **Connect wallet** on `/dashboard`
-2. **Create profile** at `/dashboard/profile`
-3. **Create stream** with title and description
-4. **Get RTMP credentials** (URL + stream key)
-5. **Connect OBS/streaming software**
-6. **Go live** - status updates automatically
-7. **End stream** - recording saved to archive
-
-## Architecture
+### Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
 │                Vercel (Next.js)                 │
 │  ┌─────────────┐         ┌─────────────────┐   │
 │  │  API Routes │────────▶│    Supabase     │   │
-│  │             │         │ Postgres+Realtime│   │
 │  └──────┬──────┘         └─────────────────┘   │
-│         │                                       │
 │         │ RTMP                                  │
 │         ▼                                       │
 │  ┌─────────────┐     ┌──────────────┐          │
 │  │     Mux     │────▶│   Webhooks   │          │
-│  │  RTMP→HLS   │     │ Status Sync  │          │
 │  └──────┬──────┘     └──────────────┘          │
-│         │                                       │
 │         ▼ HLS                                   │
 │  ┌─────────────┐                               │
 │  │  Listeners  │                               │
-│  │ (HLS Player)│                               │
 │  └─────────────┘                               │
-│                                                 │
 │  ┌─────────────┐         ┌─────────────┐       │
 │  │    Base     │◀───────▶│  OnchainKit │       │
-│  │  Mainnet    │         │ Wallet/Auth │       │
 │  └─────────────┘         └─────────────┘       │
 └─────────────────────────────────────────────────┘
 ```
 
-## Deployment
-
-### Vercel
-
-1. Push to GitHub
-2. Import to Vercel
-3. Add environment variables
-4. Deploy
-
-**Post-deploy**: Update Mux webhook URL to `https://your-domain.com/api/webhooks/mux`
-
 ---
 
-# Developer Guide
+## 📬 Links
 
-## Project Structure
-
-```
-baseFM/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes
-│   ├── archive/           # Show archives
-│   ├── collect/           # NFT collectibles
-│   ├── community/         # Token-gated community
-│   ├── dashboard/         # DJ dashboard
-│   ├── djs/               # DJ profiles
-│   └── schedule/          # Weekly schedule
-├── components/            # React components
-├── lib/                   # Utilities
-│   ├── db/               # Database functions
-│   ├── mux/              # Mux API client
-│   ├── supabase/         # Supabase client
-│   └── viem/             # Viem client
-├── types/                 # TypeScript types
-├── supabase/             # SQL schema files
-└── public/               # Static assets + PWA
-```
-
-## Adding New Features
-
-### New Database Table
-
-1. Create schema file: `supabase/schema-[feature].sql`
-2. Create types: `types/[feature].ts`
-3. Create DB functions: `lib/db/[feature].ts`
-4. Create API route: `app/api/[feature]/route.ts`
-5. Create page: `app/[feature]/page.tsx`
-
-### New DJ Profile Field
-
-1. Update `types/dj.ts` (DJ, DJRow, CreateDJInput, UpdateDJInput)
-2. Update `supabase/schema-djs.sql`
-3. Update `lib/db/djs.ts` (createDJ, updateDJ)
-4. Update `app/dashboard/profile/page.tsx` (form)
-5. Update `app/djs/[slug]/page.tsx` (display)
-
-### New Component
-
-```tsx
-// components/MyComponent.tsx
-'use client';
-
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
-
-interface MyComponentProps {
-  // props
-}
-
-export function MyComponent({ }: MyComponentProps) {
-  const { address, isConnected } = useAccount();
-
-  return (
-    <div className="bg-[#1A1A1A] rounded-xl p-4">
-      {/* content */}
-    </div>
-  );
-}
-```
-
-## Future Feature Ideas
-
-### Phase 1: Enhanced Streaming
-- [ ] Multi-bitrate streaming (ABR)
-- [ ] Low-latency mode
-- [ ] Screen sharing support
-- [ ] Co-streaming (multiple DJs)
-
-### Phase 2: Community
-- [ ] User profiles (non-DJ listeners)
-- [ ] Chat reactions/emotes
-- [ ] Chat moderation tools
-- [ ] Private messaging
-
-### Phase 3: Monetization
-- [ ] Subscription tiers
-- [ ] Paid shows (token gate specific streams)
-- [ ] Merchandise integration
-- [ ] Sponsorship slots
-
-### Phase 4: Discovery
-- [ ] Search functionality
-- [ ] Genre filtering
-- [ ] Recommendations
-- [ ] Trending shows
-- [ ] Featured DJs
-
-### Phase 5: Analytics
-- [ ] DJ analytics dashboard
-- [ ] Listener stats
-- [ ] Revenue tracking
-- [ ] Show performance metrics
-
-### Phase 6: Integrations
-- [ ] External podcast RSS feeds
-- [ ] YouTube/Twitch simulcast
-- [ ] Calendar sync (Google, Apple)
-- [ ] Discord bot notifications
-- [ ] Farcaster frames
-
-### Phase 7: Advanced Onchain
-- [ ] On-chain DJ reputation
-- [ ] Governance (DAO voting)
-- [ ] Revenue sharing contracts
-- [ ] Dynamic NFT artwork
-- [ ] Loyalty rewards (POAP-style)
-
-## Contributing
-
-1. Fork the repo
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
-
-## Support
-
-- GitHub Issues: https://github.com/Eskyee/baseFM/issues
-- RaveCulture: https://base.app/profile/raveculture
-- Support Token: https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888
+- **Live:** [basefm.space](https://basefm.space)
+- **Shop:** [shop.basefm.space](https://shop.basefm.space)
+- **GitHub:** [Eskyee/baseFM](https://github.com/Eskyee/baseFM)
+- **Issues:** [github.com/Eskyee/baseFM/issues](https://github.com/Eskyee/baseFM/issues)
+- **RaveCulture:** [base.app/profile/raveculture](https://base.app/profile/raveculture)
 
 ## License
 
@@ -403,4 +256,10 @@ MIT
 
 ---
 
-Built with love by RaveCulture for Base Builders
+<div align="center">
+
+Built with love by [RaveCulture](https://base.app/profile/raveculture) for Base Builders
+
+📻 Keep the signal alive
+
+</div>
