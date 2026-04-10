@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   other: {
     'mobile-web-app-capable': 'yes',
     'base:app_id': '697ce5a2c0622780c63f66b9',
+    'talentapp:project_verification': 'c2bedbde2c894be1a7d670de82f091081cb229241b464b0e23d1898bc264611bfe56ed0325995c811affaaaea88ec699697e09e23a0b4b4ed0f75f1fd993b42f',
   },
   openGraph: {
     title: 'baseFM - Onchain Radio on Base',
