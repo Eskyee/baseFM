@@ -80,8 +80,6 @@ export default function RootLayout({
         <meta property="fc:miniapp:icon" content="https://basefm.space/logo.png" />
         <meta property="fc:miniapp:description" content="Onchain Radio on Base" />
         <meta property="fc:miniapp:url" content="https://basefm.space" />
-        {/* Talent App Verification */}
-        <meta name="talentapp:project_verification" content="a79f1e817a75ee8e911c978328c32206b924c443f37bb86b03531a16184e7812e0401fdcbd768942068e5e414ddd58353327fdaa8e890d85776c969467a33466" />
       </head>
       <body className="bg-[#0A0A0A] min-h-screen font-sans">
         <ErrorBoundary>
