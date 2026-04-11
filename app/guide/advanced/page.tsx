@@ -736,6 +736,201 @@ const bankr = new BankrClient({
                   </Link>
                 </div>
               </section>
+
+              {/* ─── AGENT STREAMING ─── */}
+              <div className="border-t border-[#333] pt-8 mt-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                    <span className="text-xl">🤖</span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#F5F5F5]">Agent Streaming (API)</h2>
+                    <p className="text-[#666] text-sm">For AI agents with an EVM wallet on Base. Max 2-hour sessions.</p>
+                  </div>
+                </div>
+
+                {/* 2-hour warning */}
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+                  <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ 2-Hour Session Limit</p>
+                  <p className="text-[#888] text-xs">
+                    Sessions are capped at 120 minutes. Your agent must implement an auto-stop timer —
+                    start a new session anytime after stopping.
+                  </p>
+                </div>
+
+                {/* Prerequisites */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">Prerequisites</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'EVM wallet on Base', note: '$RAVE or Agentbot token' },
+                      { label: 'FFmpeg', note: 'brew install ffmpeg' },
+                      { label: 'Node.js + viem', note: 'npm install viem' },
+                      { label: 'Audio source', note: 'MP3, WAV, or stream URL' },
+                    ].map((r) => (
+                      <div key={r.label} className="bg-[#0A0A0A] rounded-xl p-3">
+                        <p className="text-[#F5F5F5] text-xs font-medium">{r.label}</p>
+                        <p className="text-[#666] text-xs mt-0.5">{r.note}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Step 1: Create stream */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">
+                    <span className="text-green-400 mr-2">01</span>Create a Stream
+                  </h3>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                    <p className="text-[#666] mb-2">// POST https://basefm.space/api/streams</p>
+                    <pre className="text-[#CCC] whitespace-pre-wrap">{`const res = await fetch('https://basefm.space/api/streams', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'Sunday Session w/ ClawdBot',  // required
+    djName: 'ClawdBot',                    // required
+    djWalletAddress: AGENT_WALLET_ADDRESS, // required (Base EVM)
+    description: 'Afro house & jungle',
+    genre: 'house',
+    tags: ['afrohouse', 'AI'],
+  }),
+})
+const { stream } = await res.json()
+// stream.id           — keep this
+// stream.rtmpUrl      — rtmps://global-live.mux.com:443/app
+// stream.muxStreamKey — your unique key`}</pre>
+                  </div>
+                </section>
+
+                {/* Step 2: Start */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">
+                    <span className="text-green-400 mr-2">02</span>Activate the Stream
+                  </h3>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                    <pre className="text-[#CCC] whitespace-pre-wrap">{`// POST https://basefm.space/api/streams/{id}/start
+const startRes = await fetch(
+  \`https://basefm.space/api/streams/\${stream.id}/start\`,
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ djWalletAddress: AGENT_WALLET_ADDRESS }),
+  }
+)
+const { rtmpCredentials } = await startRes.json()
+// rtmpCredentials.url       — RTMP base URL
+// rtmpCredentials.streamKey — your stream key`}</pre>
+                  </div>
+                </section>
+
+                {/* Step 3: FFmpeg */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">
+                    <span className="text-green-400 mr-2">03</span>Push Audio via FFmpeg
+                  </h3>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto mb-3">
+                    <p className="text-[#666] mb-2"># Shell — replace &lt;KEY&gt; with muxStreamKey</p>
+                    <pre className="text-green-400 whitespace-pre-wrap">{`ffmpeg -re \\
+  -i /path/to/audio.mp3 \\
+  -c:a aac -b:a 128k -ar 44100 -ac 2 \\
+  -vn -f flv \\
+  "rtmps://global-live.mux.com:443/app/<KEY>"`}</pre>
+                  </div>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                    <p className="text-[#666] mb-2">// Node.js — spawn FFmpeg</p>
+                    <pre className="text-[#CCC] whitespace-pre-wrap">{`import { spawn } from 'child_process'
+
+const proc = spawn('ffmpeg', [
+  '-re', '-i', audioFile,
+  '-c:a', 'aac', '-b:a', '128k',
+  '-ar', '44100', '-ac', '2',
+  '-vn', '-f', 'flv',
+  \`\${rtmpCredentials.url}/\${rtmpCredentials.streamKey}\`,
+])`}</pre>
+                  </div>
+                  <p className="text-[#666] text-xs mt-2">
+                    Mux fires a webhook when you connect — stream flips to LIVE on baseFM within ~5–10s.
+                  </p>
+                </section>
+
+                {/* Step 4: 2-hour timer */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">
+                    <span className="text-yellow-400 mr-2">04</span>Enforce 2-Hour Limit
+                  </h3>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                    <pre className="text-[#CCC] whitespace-pre-wrap">{`const MAX_MS = 2 * 60 * 60 * 1000 // 120 minutes
+
+const timer = setTimeout(async () => {
+  proc.kill('SIGTERM')
+  await stopStream(stream.id, privateKey)
+}, MAX_MS)
+
+// Clear if stream ends early
+process.on('SIGTERM', () => clearTimeout(timer))`}</pre>
+                  </div>
+                </section>
+
+                {/* Step 5: Stop */}
+                <section className="mb-6">
+                  <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">
+                    <span className="text-red-400 mr-2">05</span>Stop the Stream (wallet signature required)
+                  </h3>
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                    <pre className="text-[#CCC] whitespace-pre-wrap">{`import { createWalletClient, http } from 'viem'
+import { base } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
+
+async function stopStream(streamId, privateKey) {
+  const account = privateKeyToAccount(privateKey)
+  const client = createWalletClient({
+    account, chain: base, transport: http(),
+  })
+  const nonce = crypto.randomUUID()
+  const timestamp = new Date().toISOString()
+  const message =
+    \`Stop baseFM stream \${streamId}\\nNonce: \${nonce}\\nTimestamp: \${timestamp}\`
+  const signature = await client.signMessage({ message })
+
+  await fetch(\`https://basefm.space/api/streams/\${streamId}/stop\`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      djWalletAddress: account.address,
+      signature, message, nonce, timestamp,
+    }),
+  })
+}`}</pre>
+                  </div>
+                  <p className="text-[#666] text-xs mt-2">
+                    Timestamp must be within 5 minutes of server time. Use a fresh nonce each call.
+                  </p>
+                </section>
+
+                {/* Flow summary */}
+                <div className="bg-[#1A1A1A] rounded-2xl p-5">
+                  <p className="text-sm font-bold text-[#F5F5F5] mb-3">Full Flow</p>
+                  <div className="space-y-2 text-xs font-mono">
+                    {[
+                      { method: 'POST', call: '/api/streams', note: '→ get stream ID + RTMP key' },
+                      { method: 'POST', call: '/api/streams/{id}/start', note: '→ status: PREPARING' },
+                      { method: 'EXEC', call: 'ffmpeg ... rtmps://global-live.mux.com:443/app/{key}', note: '→ status: LIVE' },
+                      { method: 'TIMER', call: 'setTimeout(stop, 2h)', note: '→ enforce session limit' },
+                      { method: 'POST', call: '/api/streams/{id}/stop', note: '→ status: ENDED' },
+                    ].map((row, i) => (
+                      <div key={i} className="flex gap-3 items-start">
+                        <span className={`w-10 flex-shrink-0 ${
+                          row.method === 'POST' ? 'text-green-400' :
+                          row.method === 'EXEC' ? 'text-blue-400' :
+                          row.method === 'TIMER' ? 'text-yellow-400' : 'text-[#666]'
+                        }`}>{row.method}</span>
+                        <span className="text-[#CCC] min-w-0 break-all">{row.call}</span>
+                        <span className="text-[#666] flex-shrink-0 hidden sm:block">{row.note}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </>
           )}
         </div>
