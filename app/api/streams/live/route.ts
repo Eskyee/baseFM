@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getLiveStreams } from '@/lib/db/streams';
 
+// Live streams change in real-time — never cache this route
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const streams = await getLiveStreams();
