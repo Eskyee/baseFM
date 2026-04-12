@@ -62,6 +62,16 @@ function formatDate(timestamp: number): string {
   });
 }
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminEventsPage() {
   const { address, isConnected } = useAccount();
   const [events, setEvents] = useState<Event[]>([]);
@@ -127,7 +137,7 @@ export default function AdminEventsPage() {
 
       const res = await fetch('/api/events/admin-list', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           name: form.name.trim(),

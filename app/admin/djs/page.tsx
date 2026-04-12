@@ -9,6 +9,16 @@ import { DJ } from '@/types/dj';
 
 const DEFAULT_AVATAR = '/logo.png';
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminDJsPage() {
   const { address, isConnected } = useAccount();
   const [djs, setDJs] = useState<DJ[]>([]);
@@ -57,7 +67,7 @@ export default function AdminDJsPage() {
     try {
       const res = await fetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,
@@ -92,7 +102,7 @@ export default function AdminDJsPage() {
     try {
       const res = await fetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,
@@ -130,7 +140,7 @@ export default function AdminDJsPage() {
     try {
       const res = await fetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,

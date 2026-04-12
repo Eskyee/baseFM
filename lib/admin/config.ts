@@ -4,12 +4,17 @@
 import { verifyMessage } from 'viem';
 
 export function getAdminWallets(): string[] {
-  const adminWallet = process.env.ADMIN_WALLET_ADDRESS;
-  if (!adminWallet) return [];
+  const raw =
+    process.env.ADMIN_WALLET_ADDRESS ||
+    process.env.ADMIN_WALLET_ADDRESSES ||
+    process.env.ADMIN_WALLETS ||
+    '';
 
-  // Support multiple admin wallets separated by comma
-  return adminWallet
-    .split(',')
+  if (!raw) return [];
+
+  // Support comma or newline separated wallet lists
+  return raw
+    .split(/[\n,]/)
     .map(addr => addr.trim().toLowerCase())
     .filter(addr => addr.length > 0);
 }
@@ -19,7 +24,7 @@ export function isAdminWallet(walletAddress: string | null | undefined): boolean
 
   const adminWallets = getAdminWallets();
   if (adminWallets.length === 0) {
-    console.warn('No admin wallets configured. Set ADMIN_WALLET_ADDRESS env var.');
+    console.warn('No admin wallets configured. Set ADMIN_WALLET_ADDRESS, ADMIN_WALLET_ADDRESSES, or ADMIN_WALLETS.');
     return false;
   }
 

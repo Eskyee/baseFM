@@ -17,6 +17,16 @@ const TYPE_LABELS: Record<string, string> = {
 
 const DEFAULT_LOGO = '/logo.png';
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminPromotersPage() {
   const { address, isConnected } = useAccount();
   const [promoters, setPromoters] = useState<Promoter[]>([]);
@@ -65,7 +75,7 @@ export default function AdminPromotersPage() {
     try {
       const res = await fetch('/api/admin/promoters', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           promoterId,
@@ -110,7 +120,7 @@ export default function AdminPromotersPage() {
     try {
       const res = await fetch('/api/admin/promoters', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           promoterId: promoter.id,

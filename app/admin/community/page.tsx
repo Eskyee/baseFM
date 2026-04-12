@@ -29,6 +29,16 @@ function formatBalance(balance: number): string {
   return balance.toLocaleString();
 }
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminCommunityPage() {
   const { address, isConnected } = useAccount();
   const [members, setMembers] = useState<Member[]>([]);
@@ -42,7 +52,9 @@ export default function AdminCommunityPage() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch('/api/admin/community');
+      const res = await fetch('/api/admin/community', {
+        headers: adminHeaders(address),
+      });
       if (res.ok) {
         const data = await res.json();
         setMembers(data.members || []);
@@ -61,7 +73,7 @@ export default function AdminCommunityPage() {
     try {
       const res = await fetch('/api/admin/community', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           memberId,

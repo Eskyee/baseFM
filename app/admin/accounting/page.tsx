@@ -56,6 +56,14 @@ interface AccountingSummary {
   recentTips: TipRecord[];
 }
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {}
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminAccountingPage() {
   const { address, isConnected } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
@@ -96,8 +104,8 @@ export default function AdminAccountingPage() {
         ticketsParams.set('dateRange', dateRange);
 
         const [ticketsRes, tipsRes] = await Promise.all([
-          fetch(`/api/admin/accounting/tickets?${ticketsParams}`),
-          fetch(`/api/admin/accounting/tips?dateRange=${dateRange}`),
+          fetch(`/api/admin/accounting/tickets?${ticketsParams}`, { headers: adminHeaders(address) }),
+          fetch(`/api/admin/accounting/tips?dateRange=${dateRange}`, { headers: adminHeaders(address) }),
         ]);
 
         let ticketData = { sales: [], summary: { totalRevenue: 0, totalSold: 0, eventBreakdown: [] } };

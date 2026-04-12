@@ -13,6 +13,16 @@ const GENRE_OPTIONS = [
   'Garage', 'Jungle', 'Breakbeat', 'Electro', 'Mixed', 'Other'
 ];
 
+function adminHeaders(walletAddress?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress
+  }
+  return headers
+}
+
 export default function AdminSchedulePage() {
   const { address, isConnected } = useAccount();
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
@@ -92,7 +102,7 @@ export default function AdminSchedulePage() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({
           walletAddress: address,
           ...formData,
@@ -154,7 +164,7 @@ export default function AdminSchedulePage() {
     try {
       const res = await fetch(`/api/schedule/${slotId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(address),
         body: JSON.stringify({ walletAddress: address }),
       });
 

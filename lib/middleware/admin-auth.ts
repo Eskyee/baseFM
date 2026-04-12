@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSignature, getAdminWallets } from '@/lib/admin/config';
 
-const ADMIN_WALLETS = process.env.ADMIN_WALLET_ADDRESS?.split(',').map(w => w.toLowerCase()) || [];
-
 /**
  * Admin authentication middleware with cryptographic signature verification.
  * 
@@ -76,5 +74,5 @@ export async function requireAdmin(request: NextRequest): Promise<NextResponse |
 }
 
 export function isAdmin(walletAddress: string): boolean {
-  return ADMIN_WALLETS.includes(walletAddress.toLowerCase());
+  return getAdminWallets().includes(walletAddress.toLowerCase());
 }
