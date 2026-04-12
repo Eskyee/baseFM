@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [isArming, setIsArming] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { hasAccess, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
+  const { hasAccess, isAdmin, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
   const { streams, isLoading } = useStreams({
     djWalletAddress: address,
   });
@@ -164,7 +164,7 @@ export default function DashboardPage() {
                   </span>
                 ) : isConnected ? (
                   <span className={`px-3 py-1 text-[10px] uppercase tracking-widest ${statusClasses(hasAccess ? 'active' : 'error')}`}>
-                    {hasAccess ? 'Eligible' : 'Insufficient'}
+                    {isAdmin ? 'Admin' : hasAccess ? 'Eligible' : 'Insufficient'}
                   </span>
                 ) : null}
               </div>
@@ -173,6 +173,14 @@ export default function DashboardPage() {
                 <p className="text-sm text-zinc-500">Connect first to verify the DJ token gate.</p>
               ) : (
                 <div className="space-y-4">
+                  {isAdmin ? (
+                    <div className="border border-blue-500/20 bg-blue-500/10 p-4">
+                      <p className="text-blue-300 text-[10px] uppercase tracking-widest mb-2">Admin Override</p>
+                      <p className="text-sm text-zinc-200">
+                        This wallet is configured as a baseFM admin, so the DJ dashboard stays open even if the public token threshold is not met.
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold tracking-tight">{balance}</span>
                     <span className="text-xs uppercase tracking-widest text-zinc-500">{tokenSymbol}</span>
