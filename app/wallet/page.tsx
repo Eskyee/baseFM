@@ -8,6 +8,7 @@ import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
 import { TransactionHistory } from '@/components/TransactionHistory';
 import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
+import { AGENTBOT_SOLANA_TOKEN_MINT } from '@/lib/token/surfaces';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
@@ -88,7 +89,7 @@ export default function WalletPage() {
                 </div>
               </div>
 
-              <div className="grid gap-px bg-zinc-900 sm:grid-cols-2">
+              <div className="grid gap-px bg-zinc-900 sm:grid-cols-3">
                 <div className="bg-black p-4">
                   <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">ETH</div>
                   <div className="text-2xl font-bold tracking-tight text-white">
@@ -102,6 +103,13 @@ export default function WalletPage() {
                     {tokenLoading ? '...' : tokenBalance ? parseFloat(tokenBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                   </div>
                   <div className="text-xs text-zinc-500 mt-2">Station token and access path</div>
+                </div>
+                <div className="bg-black p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">AGENTBOT</div>
+                  <div className="text-sm font-bold tracking-tight text-white break-all">
+                    {AGENTBOT_SOLANA_TOKEN_MINT}
+                  </div>
+                  <div className="text-xs text-zinc-500 mt-2">Solana community token for the wider Agentbot path</div>
                 </div>
               </div>
             </div>

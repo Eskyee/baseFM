@@ -8,10 +8,21 @@ import { DJ } from '@/types/dj';
 import { Stream } from '@/types/stream';
 import { DJStats } from '@/lib/db/dj-stats';
 import { TipButton } from '@/components/TipButton';
+import { AGENTBOT_SOLANA_TOKEN_MINT } from '@/lib/token/surfaces';
 
 const DEFAULT_AVATAR = '/logo.png';
 
 type TabType = 'shows' | 'about';
+
+const GENERIC_STREAM_TITLES = new Set(['test', 'testing', 'untitled', 'live', 'stream']);
+
+function getDisplayStreamTitle(stream: Stream) {
+  const title = stream.title.trim();
+  if (!title || GENERIC_STREAM_TITLES.has(title.toLowerCase())) {
+    return `${stream.djName} live set`;
+  }
+  return title;
+}
 
 export default function DJProfilePage({ params }: { params: { slug: string } }) {
   const { address } = useAccount();
@@ -23,6 +34,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const [activeTab, setActiveTab] = useState<TabType>('shows');
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [followError, setFollowError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -63,6 +75,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const handleFollow = async () => {
     if (!address || !dj || isFollowLoading) return;
     setIsFollowLoading(true);
+    setFollowError(null);
 
     try {
       const method = isFollowing ? 'DELETE' : 'POST';
@@ -72,15 +85,20 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         body: JSON.stringify({ walletAddress: address }),
       });
 
-      if (res.ok) {
-        setIsFollowing(!isFollowing);
-        if (stats) {
-          setStats({
-            ...stats,
-            followerCount: isFollowing ? stats.followerCount - 1 : stats.followerCount + 1,
-          });
-        }
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Failed to update follow state');
       }
+
+      setIsFollowing(!isFollowing);
+      if (stats) {
+        setStats({
+          ...stats,
+          followerCount: isFollowing ? Math.max(0, stats.followerCount - 1) : stats.followerCount + 1,
+        });
+      }
+    } catch (err) {
+      setFollowError(err instanceof Error ? err.message : 'Failed to update follow state');
     } finally {
       setIsFollowLoading(false);
     }
@@ -125,6 +143,10 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
   const upcomingStreams = streams.filter(s => s.status === 'CREATED' || s.status === 'PREPARING');
   const hasAvatar = !!dj.avatarUrl;
   const hasCover = !!dj.coverImageUrl;
+  const showCount = Math.max(stats?.totalShows || 0, dj.totalShows || 0, streams.length);
+  const followerCount = stats?.followerCount || 0;
+  const tipTotal = stats?.totalTipsEth || 0;
+  const mixCount = stats?.mixCount || 0;
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -291,6 +313,9 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                 )}
                 <TipButton djWalletAddress={dj.walletAddress} djName={dj.name} />
               </div>
+              {followError ? (
+                <p className="mt-3 text-xs text-red-400">{followError}</p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -299,28 +324,35 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
         <div className="grid grid-cols-4 gap-3 mb-6">
           <div className="bg-[#1A1A1A] rounded-xl p-3 text-center">
             <div className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
-              {formatNumber(stats?.followerCount || 0)}
+              {formatNumber(followerCount)}
             </div>
             <div className="text-[#666] text-xs">Followers</div>
           </div>
           <div className="bg-[#1A1A1A] rounded-xl p-3 text-center">
             <div className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
-              {formatNumber(stats?.totalShows || dj.totalShows || 0)}
+              {formatNumber(showCount)}
             </div>
-            <div className="text-[#666] text-xs">Shows</div>
+            <div className="text-[#666] text-xs">Tracked Sets</div>
+          </div>
+          <div className="bg-[#1A1A1A] rounded-xl p-3 text-center">
+            <div className="text-xl sm:text-2xl font-bold text-[#F5F5F5] uppercase">
+              {liveStream ? 'Live' : 'Off Air'}
+            </div>
+            <div className="text-[#666] text-xs">Status</div>
           </div>
           <div className="bg-[#1A1A1A] rounded-xl p-3 text-center">
             <div className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
-              {formatNumber(stats?.totalListeners || dj.totalListeners || 0)}
+              {tipTotal > 0 ? tipTotal.toFixed(2) : mixCount > 0 ? formatNumber(mixCount) : '0'}
             </div>
-            <div className="text-[#666] text-xs">Listeners</div>
+            <div className="text-[#666] text-xs">{tipTotal > 0 ? 'ETH Tips' : mixCount > 0 ? 'Public Mixes' : 'ETH Tips'}</div>
           </div>
-          <div className="bg-[#1A1A1A] rounded-xl p-3 text-center">
-            <div className="text-xl sm:text-2xl font-bold text-[#F5F5F5]">
-              {(stats?.totalTipsEth || 0).toFixed(2)}
-            </div>
-            <div className="text-[#666] text-xs">ETH Tips</div>
-          </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-[#2A2A2A] bg-[#111] p-4">
+          <p className="text-[#888] text-sm leading-relaxed">
+            This page only shows tracked baseFM data. Followers come from on-platform follows, tracked sets come from recorded stream history,
+            and the Solana Agentbot token lives at <span className="font-mono text-[#BBB] break-all">{AGENTBOT_SOLANA_TOKEN_MINT}</span>.
+          </p>
         </div>
 
         {/* Social Links */}
@@ -353,7 +385,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                   <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                   <span className="text-red-400 font-semibold text-sm uppercase tracking-wider">Live Now</span>
                 </span>
-                <span className="text-[#F5F5F5] font-medium">{liveStream.title}</span>
+                <span className="text-[#F5F5F5] font-medium">{getDisplayStreamTitle(liveStream)}</span>
               </div>
               <svg className="w-5 h-5 text-[#666] group-hover:text-[#888] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -404,7 +436,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                       className="flex items-center justify-between bg-[#1A1A1A] rounded-xl p-4 hover:bg-[#222] transition-colors"
                     >
                       <div>
-                        <h3 className="text-[#F5F5F5] font-medium">{stream.title}</h3>
+                        <h3 className="text-[#F5F5F5] font-medium">{getDisplayStreamTitle(stream)}</h3>
                         {stream.scheduledStartTime && (
                           <span className="text-[#888] text-sm">
                             {new Date(stream.scheduledStartTime).toLocaleString(undefined, {
@@ -460,7 +492,7 @@ export default function DJProfilePage({ params }: { params: { slug: string } }) 
                       </div>
                       <div className="p-3">
                         <h3 className="text-[#F5F5F5] text-sm font-medium line-clamp-1">
-                          {stream.title}
+                          {getDisplayStreamTitle(stream)}
                         </h3>
                         <span className="text-[#666] text-xs">
                           {new Date(stream.createdAt).toLocaleDateString(undefined, {

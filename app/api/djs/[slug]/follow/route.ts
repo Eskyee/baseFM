@@ -59,6 +59,11 @@ export async function POST(
       return NextResponse.json({ error: 'DJ not found' }, { status: 404 });
     }
 
+    const alreadyFollowing = await isFollowingDJ(dj.id, walletAddress);
+    if (alreadyFollowing) {
+      return NextResponse.json({ success: true, alreadyFollowing: true });
+    }
+
     await followDJ(dj.id, walletAddress);
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -76,7 +81,16 @@ export async function DELETE(
 ) {
   try {
     const { searchParams } = new URL(request.url);
-    const wallet = searchParams.get('wallet');
+    let wallet = searchParams.get('wallet');
+
+    if (!wallet) {
+      try {
+        const body = await request.json();
+        wallet = body.walletAddress;
+      } catch {
+        // Ignore body parse failures and keep validation below.
+      }
+    }
 
     if (!wallet) {
       return NextResponse.json(
@@ -94,6 +108,11 @@ export async function DELETE(
 
     if (!dj) {
       return NextResponse.json({ error: 'DJ not found' }, { status: 404 });
+    }
+
+    const alreadyFollowing = await isFollowingDJ(dj.id, wallet);
+    if (!alreadyFollowing) {
+      return NextResponse.json({ success: true, alreadyUnfollowed: true });
     }
 
     await unfollowDJ(dj.id, wallet);
