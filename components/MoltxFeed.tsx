@@ -22,7 +22,7 @@ interface MoltxFeedProps {
 export function MoltxFeed({
   agentName = 'Atlas_baseFM',
   limit = 3,
-  className = ''
+  className = '',
 }: MoltxFeedProps) {
   const [posts, setPosts] = useState<MoltxPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,8 +41,8 @@ export function MoltxFeed({
         const data = await response.json();
         const agentPosts = data.data?.posts || [];
         setPosts(agentPosts.slice(0, limit));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load posts');
+      } catch (fetchError) {
+        setError(fetchError instanceof Error ? fetchError.message : 'Failed to load posts');
       } finally {
         setIsLoading(false);
       }
@@ -51,7 +51,6 @@ export function MoltxFeed({
     fetchPosts();
   }, [agentName, limit]);
 
-  // Format relative time
   function formatTime(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -69,108 +68,77 @@ export function MoltxFeed({
 
   if (isLoading) {
     return (
-      <div className={`bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-2xl p-5 border border-[#2A2A2A] ${className}`}>
-        <div className="animate-pulse space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#2A2A2A]" />
-            <div className="h-4 bg-[#2A2A2A] rounded w-32" />
+      <div className={`basefm-panel ${className}`}>
+        <div className="animate-pulse">
+          <div className="border-b border-zinc-900 p-4">
+            <div className="h-3 w-24 bg-zinc-900 mb-3" />
+            <div className="h-4 w-40 bg-zinc-900" />
           </div>
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-2 p-3 bg-[#0A0A0A] rounded-xl">
-              <div className="h-3 bg-[#2A2A2A] rounded w-full" />
-              <div className="h-3 bg-[#2A2A2A] rounded w-3/4" />
-            </div>
-          ))}
+          <div className="grid gap-px bg-zinc-900">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="bg-black p-4">
+                <div className="h-3 w-full bg-zinc-900 mb-2" />
+                <div className="h-3 w-3/4 bg-zinc-900 mb-4" />
+                <div className="h-3 w-20 bg-zinc-900" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   if (error || posts.length === 0) {
-    return null; // Silently hide if no posts or error
+    return null;
   }
 
   return (
-    <div className={`bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-2xl overflow-hidden border border-[#2A2A2A] ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
-          <div>
-            <h3 className="text-[#F5F5F5] font-bold text-sm flex items-center gap-1.5">
-              Agentbot
-              <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-              </svg>
-            </h3>
-            <p className="text-[#666] text-xs">by RaveCulture</p>
-          </div>
+    <div className={`basefm-panel overflow-hidden ${className}`}>
+      <div className="flex items-center justify-between p-4 border-b border-zinc-900">
+        <div>
+          <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Agent feed</div>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-white">Agentbot</h3>
         </div>
         <Link
-          href="https://agentbot.raveculture.xyz"
+          href="https://agentbot.sh"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-1.5 bg-purple-600/20 text-purple-400 text-xs font-medium rounded-full hover:bg-purple-600/30 transition-colors"
+          className="basefm-button-secondary !px-4 !py-2"
         >
           Deploy
         </Link>
       </div>
 
-      {/* Posts */}
-      <div className="divide-y divide-[#2A2A2A]">
+      <div className="divide-y divide-zinc-900">
         {posts.map((post) => (
           <Link
             key={post.id}
             href={`https://moltx.io/post/${post.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block p-4 hover:bg-[#1A1A1A] transition-colors group"
+            className="block p-4 hover:bg-zinc-950 transition-colors group"
           >
-            <p className="text-[#F5F5F5] text-sm leading-relaxed mb-2 line-clamp-3">
-              {post.content}
-            </p>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-[#666]">{formatTime(post.created_at)}</span>
-              <div className="flex items-center gap-3 text-[#666]">
-                {post.reply_count !== undefined && post.reply_count > 0 && (
-                  <span className="flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    {post.reply_count}
-                  </span>
-                )}
-                {post.like_count !== undefined && post.like_count > 0 && (
-                  <span className="flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    {post.like_count}
-                  </span>
-                )}
-                <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  View →
-                </span>
+            <p className="text-sm leading-relaxed text-zinc-300 mb-3 line-clamp-3">{post.content}</p>
+            <div className="flex items-center justify-between gap-4 text-[10px] uppercase tracking-widest">
+              <span className="text-zinc-600">{formatTime(post.created_at)}</span>
+              <div className="flex items-center gap-3 text-zinc-500">
+                {post.reply_count ? <span>{post.reply_count} replies</span> : null}
+                {post.like_count ? <span>{post.like_count} likes</span> : null}
+                <span className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">Open</span>
               </div>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-[#2A2A2A] bg-[#0A0A0A]">
+      <div className="border-t border-zinc-900 p-4">
         <Link
-          href="https://agentbot.raveculture.xyz"
+          href="https://agentbot.sh"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 py-2 text-sm text-[#888] hover:text-purple-400 transition-colors"
+          className="text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
         >
-          <span>Deploy your own agent</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          Open Agentbot →
         </Link>
       </div>
     </div>

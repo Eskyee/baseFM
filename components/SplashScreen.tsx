@@ -28,40 +28,37 @@ export function SplashScreen({ children }: { children: React.ReactNode }) {
     <>
       {/* Splash Screen */}
       <div
-        className={`fixed inset-0 z-[100] bg-[#0A0A0A] flex flex-col items-center justify-center transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300 font-mono ${
           fadeOut ? 'opacity-0' : 'opacity-100'
         }`}
       >
-        {/* Logo with pulse animation */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="basefm-kicker text-blue-500 mb-8">baseFM by Agentbot</div>
+
+        <div className="border border-zinc-800 p-4 animate-fade-in">
           <Image
             src="/logo.png"
             alt="baseFM"
-            width={120}
-            height={120}
-            className="relative z-10 rounded-2xl animate-[pulse_2s_ease-in-out_infinite]"
+            width={96}
+            height={96}
+            className="border border-zinc-900"
             priority
           />
         </div>
 
-        {/* Brand name */}
-        <h1 className="mt-6 text-2xl font-bold text-[#F5F5F5] tracking-tight">
+        <h1 className="mt-8 text-3xl font-bold text-white tracking-tighter uppercase">
           baseFM
         </h1>
-        <p className="mt-2 text-sm text-[#888]">
-          Onchain Radio
+        <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-500">
+          Onchain radio on Base
         </p>
 
-        {/* Loading indicator */}
-        <div className="mt-8 flex gap-1">
-          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="mt-8 flex gap-2">
+          <div className="h-2 w-2 bg-zinc-600 animate-pulse" />
+          <div className="h-2 w-2 bg-zinc-500 animate-pulse" style={{ animationDelay: '150ms' }} />
+          <div className="h-2 w-2 bg-blue-500 animate-pulse" style={{ animationDelay: '300ms' }} />
         </div>
 
-        {/* Powered by */}
-        <div className="absolute bottom-8 flex items-center gap-2 text-xs text-[#666]">
+        <div className="absolute bottom-8 flex items-center gap-2 text-[10px] uppercase tracking-widest text-zinc-600">
           <span>Powered by</span>
           <svg className="w-4 h-4" viewBox="0 0 111 111" fill="none">
             <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z" fill="#0052FF"/>
