@@ -11,10 +11,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://basefm.space'),
   title: {
-    default: 'baseFM - The Onchain Radio Protocol on Base',
+    default: 'baseFM by Agentbot - The Onchain Radio Protocol on Base',
     template: '%s | baseFM',
   },
-  description: 'Underground radio, events, and culture — all onchain. Tune in to autonomous DJ sets, mint digital wristbands, and join the most technically elite community on Base.',
+  description: 'baseFM by Agentbot. Underground radio, events, and culture on Base with live streams, wallets, and autonomous DJ tooling.',
   keywords: ['Onchain Radio', 'Base Network', 'Autonomous DJ', 'Underground Music', 'Jungle', 'Dub', 'NFT Tickets', 'Smart Wallet'],
   manifest: '/manifest.json',
   appleWebApp: {
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
     'talentapp:project_verification': 'c2bedbde2c894be1a7d670de82f091081cb229241b464b0e23d1898bc264611bfe56ed0325995c811affaaaea88ec699697e09e23a0b4b4ed0f75f1fd993b42f',
   },
   openGraph: {
-    title: 'baseFM - Onchain Radio on Base',
-    description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
+    title: 'baseFM by Agentbot - Onchain Radio on Base',
+    description: 'Underground radio, events, tickets, services and bookings on Base. Powered by Agentbot for live streams and autonomous DJ workflows.',
     url: 'https://basefm.space',
     siteName: 'baseFM',
     images: [
@@ -52,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'baseFM - Onchain Radio on Base',
-    description: 'Underground radio, events, tickets, services and bookings — all onchain. Direct to your wallet, no third parties, fully decentralised.',
+    title: 'baseFM by Agentbot - Onchain Radio on Base',
+    description: 'Underground radio, events, tickets, services and bookings on Base. Powered by Agentbot for live streams and autonomous DJ workflows.',
     images: ['https://basefm.space/og-image.png'],
   },
 };

@@ -26,6 +26,20 @@ export function Footer() {
           {/* Links */}
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link
+              href="https://agentbot.sh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+            >
+              Agentbot
+            </Link>
+            <Link
+              href="/guide"
+              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+            >
+              Guide
+            </Link>
+            <Link
               href="https://talent.app/raveculture.base.eth"
               target="_blank"
               rel="noopener noreferrer"
@@ -58,7 +72,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-6 pt-6 border-t border-[#1A1A1A] text-center">
           <p className="text-xs text-[#666]">
-            Created by RaveCulture for baseFM © 2026 · MIT License
+            Created by RaveCulture for baseFM · powered by Agentbot © 2026 · MIT License
           </p>
         </div>
 

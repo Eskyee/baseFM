@@ -86,15 +86,28 @@ export default function HomePage() {
         {/* Header — one line, not a wall of text */}
         <header className="flex items-center justify-between">
           <div>
-            <h1 className="text-[#F5F5F5] text-xl font-bold">baseFM</h1>
-            <p className="text-[#888] text-sm">Onchain radio on Base</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-[#F5F5F5] text-xl font-bold">baseFM</h1>
+              <span className="inline-flex items-center rounded-full border border-[#333] px-2 py-0.5 text-[10px] uppercase tracking-widest text-[#888]">
+                Agentbot Powered
+              </span>
+            </div>
+            <p className="text-[#888] text-sm">Onchain radio on Base with Agentbot live infrastructure</p>
           </div>
-          <Link
-            href="/events"
-            className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium hover:bg-[#222] transition-colors active:scale-[0.97]"
-          >
-            Events
-          </Link>
+          <div className="flex items-center justify-end gap-2">
+            <Link
+              href="/guide"
+              className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium hover:bg-[#222] transition-colors active:scale-[0.97]"
+            >
+              Guide
+            </Link>
+            <Link
+              href="/events"
+              className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-[#E5E5E5] transition-colors active:scale-[0.97]"
+            >
+              Events
+            </Link>
+          </div>
         </header>
 
         {/* === LIVE SECTION === */}
@@ -106,6 +119,9 @@ export default function HomePage() {
                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                 Live Now
               </h2>
+              <p className="text-[#666] text-xs uppercase tracking-widest mb-3">
+                Canonical live state from Agentbot
+              </p>
               <LiveShowCard
                 id={featuredStream.id}
                 title={featuredStream.title}
@@ -164,6 +180,12 @@ export default function HomePage() {
               <p className="text-[#F5F5F5] font-semibold mb-1">No one is live right now</p>
               <p className="text-[#888] text-sm mb-5">Check the schedule or explore DJs</p>
               <div className="flex items-center justify-center gap-3">
+                <Link
+                  href="/guide"
+                  className="px-5 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-medium hover:bg-[#3C3C3E] transition-all active:scale-[0.97]"
+                >
+                  How it Works
+                </Link>
                 <Link
                   href="/schedule"
                   className="px-5 py-2.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-[#E5E5E5] transition-all active:scale-[0.97]"

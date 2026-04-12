@@ -160,6 +160,9 @@ export function Navbar() {
               <span className="text-[#F5F5F5] font-bold text-lg hidden sm:block">
                 baseFM
               </span>
+              <span className="hidden lg:inline-flex items-center rounded-full border border-[#333] px-2 py-0.5 text-[10px] uppercase tracking-widest text-[#888]">
+                by Agentbot
+              </span>
             </Link>
 
             {/* Desktop Navigation - Dropdown Menus */}
@@ -258,6 +261,15 @@ export function Navbar() {
                 }`}
               >
                 <BookOpen className="w-5 h-5" />
+              </Link>
+              <Link
+                href="https://agentbot.sh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg transition-all duration-150 text-[#A3A3A3] hover:text-white hover:bg-[#171717]"
+                title="Agentbot"
+              >
+                <Bot className="w-5 h-5" />
               </Link>
             </nav>
 

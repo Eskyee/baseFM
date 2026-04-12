@@ -30,6 +30,9 @@ export default function GuidePage() {
           <p className="text-[#888] text-lg">
             Choose your adventure
           </p>
+          <p className="text-[#666] text-sm mt-3">
+            baseFM runs with Agentbot as the live station and broadcast control layer.
+          </p>
         </header>
 
         {/* Guide Chooser */}
