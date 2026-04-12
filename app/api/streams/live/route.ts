@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { fetchAgentbotLiveStreams } from '@/lib/agentbot/live';
 import { getLiveStreams } from '@/lib/db/streams';
 
 // Never cache — live status must always reflect real-time DB state
@@ -9,7 +10,15 @@ const NO_CACHE = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-
 
 export async function GET() {
   try {
-    const streams = await getLiveStreams();
+    let streams = []
+
+    try {
+      streams = await fetchAgentbotLiveStreams();
+    } catch (error) {
+      console.error('[baseFM] Agentbot live fetch failed, using local DB:', error);
+      streams = await getLiveStreams();
+    }
+
     return NextResponse.json({ streams }, { headers: NO_CACHE });
   } catch (error) {
     console.error('Error fetching live streams:', error);

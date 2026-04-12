@@ -3,7 +3,13 @@ import { createStream, getStreams, deleteStream } from '@/lib/db/streams';
 import { createMuxLiveStream, getMuxPlaybackUrl, isMuxConfigured } from '@/lib/streaming/mux';
 import { updateStreamWithMuxDetails } from '@/lib/db/streams';
 import { isValidWalletAddress } from '@/lib/auth/wallet';
+import { fetchAgentbotLiveStreams } from '@/lib/agentbot/live';
 import { StreamStatus } from '@/types/stream';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE = { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate', Pragma: 'no-cache' };
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,18 +18,38 @@ export async function GET(request: NextRequest) {
     const djWalletAddress = searchParams.get('djWalletAddress');
     const limit = searchParams.get('limit');
 
+    const wantsOnlyLive =
+      status.length > 0 &&
+      status.every((value) => value === 'LIVE') &&
+      !djWalletAddress
+
+    if (wantsOnlyLive) {
+      try {
+        const streams = await fetchAgentbotLiveStreams()
+        return NextResponse.json(
+          {
+            streams: limit ? streams.slice(0, parseInt(limit, 10)) : streams,
+            source: 'agentbot-canonical',
+          },
+          { headers: NO_CACHE }
+        )
+      } catch (error) {
+        console.error('[baseFM] Agentbot live fallback failed, using local DB:', error)
+      }
+    }
+
     const streams = await getStreams({
       status: status.length > 0 ? status : undefined,
       djWalletAddress: djWalletAddress || undefined,
       limit: limit ? parseInt(limit, 10) : undefined,
     });
 
-    return NextResponse.json({ streams });
+    return NextResponse.json({ streams }, { headers: NO_CACHE });
   } catch (error) {
     console.error('Error fetching streams:', error);
     return NextResponse.json(
       { error: 'Failed to fetch streams' },
-      { status: 500 }
+      { status: 500, headers: NO_CACHE }
     );
   }
 }
