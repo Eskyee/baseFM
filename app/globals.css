@@ -2,176 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Geist Design System - Vercel Guidelines Applied */
-:root {
-  /* Geist Color System - High Contrast */
-  --gray-50: #FAFAFA;
-  --gray-100: #F5F5F5;
-  --gray-200: #E5E5E5;
-  --gray-300: #D4D4D4;
-  --gray-400: #A3A3A3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
-  --gray-1000: #0A0A0A;
-
-  /* Semantic Colors */
-  --background: #000000;
-  --foreground: #FAFAFA;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.2);
-  
-  /* Accent - Vercel Blue */
-  --accent: #0070F3;
-  --accent-hover: #0761D1;
-  --accent-light: rgba(0, 112, 243, 0.1);
-  
-  /* Status Colors */
-  --success: #0070F3;
-  --warning: #F5A623;
-  --error: #E00;
-  --live: #EF4444;
-
-  /* Shadows - Layered (Vercel Guidelines) */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-
-  /* Spacing - 4px base */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
-  --space-16: 64px;
-
-  /* Border Radius - Nested radii */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
-
-  /* Typography */
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'Geist Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-}
-
-html {
-  background-color: var(--background);
-  color-scheme: dark;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  color: var(--foreground);
-  background-color: var(--background);
-  font-family: var(--font-sans);
-  overscroll-behavior-y: none;
-  touch-action: manipulation; /* Prevent double-tap zoom */
-}
-
-/* Geist Font Loading */
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/geist/Geist-Variable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist Mono';
-  src: url('/fonts/geist-mono/GeistMono-Variable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* PWA standalone mode - extra protection for notched devices */
-@media all and (display-mode: standalone) {
-  html, body {
-    overscroll-behavior: none;
-    background-color: var(--background);
+@layer base {
+  :root {
+    --bg-primary: #000000;
+    --bg-surface: #18181b;
+    --bg-raised: #27272a;
+    --bg-inset: #09090b;
+    --fg-primary: #ffffff;
+    --fg-secondary: #a1a1aa;
+    --fg-tertiary: #71717a;
+    --fg-muted: #52525b;
+    --border-subtle: #18181b;
+    --border-strong: #27272a;
+    --accent: #3b82f6;
   }
 
-  html::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top, 0px);
-    background-color: var(--background);
-    z-index: 9999;
-    pointer-events: none;
+  html {
+    color-scheme: dark;
+    font-family: "Geist Mono", "SFMono-Regular", "SF Mono", Monaco, Consolas, "Liberation Mono", monospace;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg-primary);
+    color: var(--fg-primary);
+    font-family: inherit;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+  }
+
+  * {
+    border-color: var(--border-subtle);
+    outline-color: var(--fg-secondary);
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.05);
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--fg-secondary);
+    outline-offset: 2px;
   }
 }
 
-/* Typography - Geist Scale */
-h1 { 
-  font-size: 40px; 
-  font-weight: 600; 
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-h2 { 
-  font-size: 32px; 
-  font-weight: 600; 
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-h3 { 
-  font-size: 24px; 
-  font-weight: 600; 
-  line-height: 1.3;
-}
-h4 {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-/* Vercel-style scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-700);
-  border-radius: var(--radius-full);
-  border: 2px solid var(--background);
+  background: var(--bg-raised);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-600);
+  background: #3f3f46;
 }
 
-/* Focus styles - Vercel Guidelines */
-*:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -179,798 +85,134 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Utility Classes - Vercel Style */
-.geist-border {
-  border: 1px solid var(--border);
-}
-
-.geist-border-hover:hover {
-  border-color: var(--border-hover);
-}
-
-.geist-shadow-sm {
-  box-shadow: var(--shadow-sm);
-}
-
-.geist-shadow-md {
-  box-shadow: var(--shadow-md);
-}
-
-.geist-shadow-lg {
-  box-shadow: var(--shadow-lg);
-}
-
-.geist-shadow-xl {
-  box-shadow: var(--shadow-xl);
-}
-
-/* Button Base - Vercel Style */
-.geist-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 0 var(--space-4);
-  height: 36px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.15s ease;
-  cursor: pointer;
-  border: 1px solid transparent;
-  touch-action: manipulation;
-}
-
-.geist-button:active {
-  transform: scale(0.98);
-}
-
-.geist-button-primary {
-  background: var(--foreground);
-  color: var(--background);
-  border-color: var(--foreground);
-}
-
-.geist-button-primary:hover {
-  background: var(--gray-100);
-  border-color: var(--gray-100);
-}
-
-.geist-button-secondary {
-  background: transparent;
-  color: var(--foreground);
-  border-color: var(--border);
-}
-
-.geist-button-secondary:hover {
-  background: var(--gray-900);
-  border-color: var(--border-hover);
-}
-
-/* Input Base - Vercel Style */
-.geist-input {
-  width: 100%;
-  height: 40px;
-  padding: 0 var(--space-3);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--foreground);
-  font-size: 14px;
-  transition: all 0.15s ease;
-}
-
-.geist-input:hover {
-  border-color: var(--border-hover);
-}
-
-.geist-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light);
-}
-
-/* Card - Vercel Style */
-.geist-card {
-  background: var(--gray-1000);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-}
-
-.geist-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-}
-
-/* Text Styles */
-.text-balance {
-  text-wrap: balance;
-}
-
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Line clamp utilities */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Animations - Vercel Guidelines */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDown {
-  from { 
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes glow {
-  0%, 100% { 
-    box-shadow: 0 0 8px var(--live), 0 0 0 1px rgba(239, 68, 68, 0.2);
-  }
-  50% { 
-    box-shadow: 0 0 16px var(--live), 0 0 0 1px rgba(239, 68, 68, 0.4);
-  }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-slide-down {
-  animation: slideDown 0.2s ease-out;
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s linear infinite;
-  background: linear-gradient(
-    90deg,
-    var(--gray-900) 0%,
-    var(--gray-800) 50%,
-    var(--gray-900) 100%
-  );
-  background-size: 200% 100%;
-}
-
-/* Range input styling */
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  background: #374151;
-  height: 4px;
-  border-radius: 2px;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 50%;
-  margin-top: -4px;
-  transition: transform 0.15s ease;
-}
-
-input[type="range"]:hover::-webkit-slider-thumb {
-  transform: scale(1.2);
-}
-
-input[type="range"]::-moz-range-track {
-  background: #374151;
-  height: 4px;
-  border-radius: 2px;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: var(--accent);
-  border-radius: 50%;
-  border: none;
-}
-
-/* Persistent player safe area */
-.has-player {
-  padding-bottom: 80px;
-}
-
-/* Carousel scroll snap */
-.carousel-scroll {
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-
-.carousel-item {
-  scroll-snap-align: start;
-}
-
-/* Hide scrollbar for carousel */
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Subtle transitions */
-.transition-subtle {
-  transition: all 0.2s ease;
-}
-
-/* Focus states for accessibility */
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Schedule grid */
-.schedule-grid {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: var(--space-sm);
-}
-
-/* Time slot styling */
-.time-slot {
-  border-left: 2px solid transparent;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.time-slot.active {
-  border-left-color: var(--accent);
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.time-slot.past {
-  opacity: 0.5;
-}
-
-/* ========== Mobile-First Enhancements ========== */
-
-/* Navbar height variable (includes safe area for notched devices) */
-:root {
-  --navbar-height: calc(3.5rem + env(safe-area-inset-top, 0px));
-}
-
-.navbar-spacer {
-  height: var(--navbar-height);
-}
-
-/* Safe area support for notched devices */
-.safe-area-top {
-  padding-top: env(safe-area-inset-top);
-}
-
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.safe-area-left {
-  padding-left: env(safe-area-inset-left);
-}
-
-.safe-area-right {
-  padding-right: env(safe-area-inset-right);
-}
-
-.safe-area-all {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* Landscape mode adjustments for iPhone */
-@media screen and (orientation: landscape) and (max-height: 500px) {
-  :root {
-    --navbar-height: calc(2.75rem + env(safe-area-inset-top, 0px));
-  }
-
-  /* Reduce padding in landscape for more content space */
-  .landscape-compact {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-}
-
-/* Touch-friendly tap targets (44px minimum) */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Prevent text selection on interactive elements */
-.no-select {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-/* Better tap highlighting on mobile */
-@media (hover: none) {
-  button, a, [role="button"] {
-    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.2);
-  }
-}
-
-/* Smooth momentum scrolling */
-.momentum-scroll {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-/* Pull-to-refresh prevention */
-body {
-  overscroll-behavior-y: none;
-}
-
-/* Mobile bottom nav safe area */
-.mobile-player-safe {
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
-}
-
-/* Responsive typography */
-@media (max-width: 640px) {
-  h1 { font-size: 24px; }
-  h2 { font-size: 20px; }
-  h3 { font-size: 18px; }
-}
-
-/* Prevent zoom on input focus (iOS) */
-@media (max-width: 640px) {
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-}
-
-/* Full-bleed mobile cards */
-@media (max-width: 640px) {
-  .mobile-full-bleed {
-    margin-left: -1rem;
-    margin-right: -1rem;
-    border-radius: 0;
-  }
-}
-
-/* Mobile bottom sheet animation */
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-/* Loading skeleton shimmer */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    #1A1A1A 25%,
-    #2A2A2A 50%,
-    #1A1A1A 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* Floating action button positioning */
-.fab {
-  position: fixed;
-  bottom: calc(100px + env(safe-area-inset-bottom));
-  right: 16px;
-  z-index: 30;
-}
-
-/* Mobile-friendly form inputs */
-input[type="text"],
-input[type="email"],
-input[type="url"],
-textarea,
-select {
-  appearance: none;
-  border-radius: 8px;
-}
-
-/* Better touch scrolling for horizontal lists */
-.horizontal-scroll {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  gap: 12px;
-  padding: 4px;
-}
-
-.horizontal-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.horizontal-scroll > * {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-}
-
-/* ========== Apple-Level Polish ========== */
-
-/* iOS-style system colors */
-:root {
-  --ios-blue: #0A84FF;
-  --ios-green: #30D158;
-  --ios-red: #FF453A;
-  --ios-orange: #FF9F0A;
-  --ios-yellow: #FFD60A;
-  --ios-purple: #BF5AF2;
-  --ios-pink: #FF375F;
-  --ios-gray: #8E8E93;
-  --ios-gray-2: #636366;
-  --ios-gray-3: #48484A;
-  --ios-gray-4: #3A3A3C;
-  --ios-gray-5: #2C2C2E;
-  --ios-gray-6: #1C1C1E;
-}
-
-/* Spring animation for iOS-like feel */
-@keyframes spring-in {
-  0% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-spring {
-  animation: spring-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* iOS modal slide up */
-@keyframes ios-slide-up {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.animate-ios-slide-up {
-  animation: ios-slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-/* Fade in animation */
 @keyframes fade-in {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
   }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out;
+  animation: fade-in 0.4s ease-out forwards;
 }
 
-/* Scale in animation */
-@keyframes scale-in {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out forwards;
 }
 
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+.animate-ticker {
+  animation: ticker 60s linear infinite;
 }
 
-/* Blur backdrop for modals */
-.backdrop-blur-ios {
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+.animate-ticker:hover {
+  animation-play-state: paused;
 }
 
-/* iOS-style pressed state */
-.ios-press {
-  transition: transform 0.1s ease, opacity 0.1s ease;
+.basefm-kicker {
+  display: inline-block;
+  border: 1px solid #27272a;
+  padding: 0.375rem 0.75rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-.ios-press:active {
-  transform: scale(0.97);
-  opacity: 0.8;
+.basefm-panel {
+  border: 1px solid #27272a;
+  background: #09090b;
 }
 
-/* iOS-style button */
-.ios-button {
-  position: relative;
-  transition: all 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
+.basefm-panel-muted {
+  border: 1px solid #18181b;
+  background: #18181b;
 }
 
-.ios-button:active {
-  transform: scale(0.97);
+.basefm-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #000000;
+  padding: 0.875rem 1.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.ios-button:disabled {
-  opacity: 0.5;
-  pointer-events: none;
+.basefm-button-primary:hover {
+  background: #e4e4e7;
+  border-color: #e4e4e7;
 }
 
-/* iOS-style card with subtle shadow */
-.ios-card {
-  background: var(--ios-gray-6);
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-/* iOS-style input */
-.ios-input {
-  background: var(--ios-gray-5);
-  border: none;
-  border-radius: 12px;
-  padding: 16px;
-  color: white;
-  font-size: 17px;
-  transition: box-shadow 0.15s ease;
-}
-
-.ios-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
-}
-
-.ios-input::placeholder {
-  color: var(--ios-gray-3);
-}
-
-/* Glass morphism effect */
-.glass {
-  background: rgba(28, 28, 30, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Smooth image loading */
-img {
-  transition: opacity 0.3s ease;
-}
-
-img[loading] {
-  opacity: 0;
-}
-
-img.loaded {
-  opacity: 1;
-}
-
-/* Better text rendering */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Haptic-style feedback for interactive elements */
-@media (hover: none) and (pointer: coarse) {
-  .haptic:active {
-    transform: scale(0.97);
-    transition: transform 0.1s ease;
-  }
-}
-
-/* Hide spin buttons on number inputs */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-/* Consistent focus rings */
-:focus-visible {
-  outline: 2px solid var(--ios-blue);
-  outline-offset: 2px;
-}
-
-/* Better scrolling performance */
-.smooth-scroll {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Rubber band effect prevention for modals */
-.no-bounce {
-  overscroll-behavior: none;
-}
-
-/* Loading pulse animation */
-@keyframes pulse-soft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.animate-pulse-soft {
-  animation: pulse-soft 1.5s ease-in-out infinite;
-}
-
-/* Success checkmark animation */
-@keyframes checkmark {
-  0% {
-    stroke-dashoffset: 100;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-.animate-checkmark {
-  stroke-dasharray: 100;
-  animation: checkmark 0.4s ease-out forwards;
-}
-
-/* ========== Trading Agent Dashboard ========== */
-
-/* Blink animation for cursor */
-@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-.animate-blink {
-  animation: blink 1s step-end infinite;
-}
-
-/* Balance flash animation when updated */
-@keyframes balance-flash {
-  0% {
-    color: #22c55e;
-  }
-  100% {
-    color: #fafafa;
-  }
-}
-
-.animate-balance-flash {
-  animation: balance-flash 1.5s ease-out forwards;
-}
-
-/* Trading log icons pulse */
-@keyframes pulse-dot {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-/* Trading scrollbar styling */
-.trading-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.trading-scrollbar::-webkit-scrollbar-track {
+.basefm-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #27272a;
   background: transparent;
+  color: #a1a1aa;
+  padding: 0.875rem 1.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.trading-scrollbar::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 3px;
+.basefm-button-secondary:hover {
+  background: #18181b;
+  border-color: #52525b;
+  color: #ffffff;
 }
 
-.trading-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+.basefm-button-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: transparent;
+  color: #f87171;
+  padding: 0.875rem 1.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.basefm-button-danger:hover {
+  background: rgba(248, 113, 113, 0.08);
 }

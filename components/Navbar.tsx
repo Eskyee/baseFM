@@ -134,10 +134,9 @@ export function Navbar() {
         aria-hidden="true"
       />
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-black border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-zinc-900 font-mono"
         style={{ 
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          borderColor: 'rgba(255, 255, 255, 0.1)'
         }}
       >
         <div
@@ -155,12 +154,12 @@ export function Navbar() {
                 alt="baseFM"
                 width={32}
                 height={32}
-                className="rounded-lg transition-transform group-hover:scale-105"
+                className="border border-zinc-900 transition-transform group-hover:scale-105"
               />
               <span className="text-[#F5F5F5] font-bold text-lg hidden sm:block">
                 baseFM
               </span>
-              <span className="hidden lg:inline-flex items-center rounded-full border border-[#333] px-2 py-0.5 text-[10px] uppercase tracking-widest text-[#888]">
+              <span className="hidden lg:inline-flex items-center border border-zinc-800 px-2 py-1 text-[10px] uppercase tracking-widest text-zinc-500">
                 by Agentbot
               </span>
             </Link>
@@ -170,10 +169,10 @@ export function Navbar() {
               {/* Home */}
               <Link
                 href="/"
-                className={`p-2 rounded-lg transition-all duration-150 ${
+                className={`border border-transparent p-2 transition-all duration-150 ${
                   pathname === '/' 
-                    ? 'text-white bg-[#171717]' 
-                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                    ? 'text-white bg-zinc-950 border-zinc-800' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                 }`}
               >
                 <Home className="w-5 h-5" />
@@ -189,12 +188,12 @@ export function Navbar() {
                   <div key={group.id} className="relative">
                     <button
                       onClick={() => setOpenDropdown(isOpen ? null : group.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-150 ${
+                      className={`flex items-center gap-1.5 border px-3 py-2 transition-all duration-150 ${
                         isActive || isOpen
-                          ? 'text-white bg-[#171717]'
+                          ? 'text-white bg-zinc-950 border-zinc-800'
                           : isFeatured
-                          ? 'text-[#0070F3] hover:text-[#0761D1] hover:bg-[rgba(0,112,243,0.1)]'
-                          : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                          ? 'text-blue-500 border-zinc-900 hover:text-white hover:border-zinc-800 hover:bg-zinc-950'
+                          : 'text-[#A3A3A3] border-transparent hover:text-white hover:border-zinc-900 hover:bg-zinc-950'
                       }`}
                     >
                       <group.Icon className="w-4 h-4" />
@@ -205,20 +204,19 @@ export function Navbar() {
                     {/* Dropdown Menu */}
                     {isOpen && (
                       <div 
-                        className="absolute top-full left-0 mt-1 w-48 bg-black rounded-lg py-1 animate-slide-down"
+                        className="absolute top-full left-0 mt-1 w-52 bg-black py-1 animate-slide-down border border-zinc-800"
                         style={{
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                          boxShadow: 'none'
                         }}
                       >                        {group.links.map((link) => {
                           const Icon = link.Icon;
                           const isLinkActive = pathname === link.href;
                           const isExternal = 'external' in link && link.external;
 
-                          const linkClasses = `flex items-center gap-2.5 px-3 py-2 text-sm transition-all duration-150 ${
+                          const linkClasses = `flex items-center gap-2.5 border border-transparent px-3 py-2 text-sm transition-all duration-150 ${
                             isLinkActive
-                              ? 'text-white bg-[#171717]'
-                              : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                              ? 'text-white bg-zinc-950 border-zinc-800'
+                              : 'text-[#A3A3A3] hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                           }`;
 
                           return isExternal ? (
@@ -254,10 +252,10 @@ export function Navbar() {
               {/* Guide */}
               <Link
                 href="/guide"
-                className={`p-2 rounded-lg transition-all duration-150 ${
+                className={`border border-transparent p-2 transition-all duration-150 ${
                   pathname === '/guide' 
-                    ? 'text-white bg-[#171717]' 
-                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                    ? 'text-white bg-zinc-950 border-zinc-800' 
+                    : 'text-[#A3A3A3] hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                 }`}
               >
                 <BookOpen className="w-5 h-5" />
@@ -266,7 +264,7 @@ export function Navbar() {
                 href="https://agentbot.sh"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg transition-all duration-150 text-[#A3A3A3] hover:text-white hover:bg-[#171717]"
+                className="border border-transparent p-2 transition-all duration-150 text-[#A3A3A3] hover:text-white hover:bg-zinc-950 hover:border-zinc-900"
                 title="Agentbot"
               >
                 <Bot className="w-5 h-5" />
@@ -279,7 +277,7 @@ export function Navbar() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 sm:p-2.5 rounded-lg text-white bg-[#171717] hover:bg-[#252525] transition-all duration-150 flex-shrink-0 border border-[#333]"
+                className="md:hidden p-2 sm:p-2.5 text-white bg-zinc-950 hover:bg-zinc-900 transition-all duration-150 flex-shrink-0 border border-zinc-800"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -319,10 +317,10 @@ export function Navbar() {
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 border text-sm font-medium transition-all duration-150 ${
                   pathname === '/' 
-                    ? 'text-white bg-[#171717]' 
-                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                    ? 'text-white bg-zinc-950 border-zinc-800' 
+                    : 'text-[#A3A3A3] border-transparent hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -333,7 +331,7 @@ export function Navbar() {
               {allGroups.map((group) => (
                 <div key={group.id} className="space-y-1">
                   <div className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
-                    group.featured ? 'text-[#0070F3]' : 'text-[#737373]'
+                    group.featured ? 'text-blue-500' : 'text-[#737373]'
                   }`}>
                     <group.Icon className="w-3.5 h-3.5" />
                     {group.label}
@@ -343,10 +341,10 @@ export function Navbar() {
                     const isActive = pathname === link.href;
                     const isExternal = 'external' in link && link.external;
 
-                    const linkClasses = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
+                    const linkClasses = `flex items-center gap-2.5 px-3 py-2 border text-sm transition-all duration-150 ${
                       isActive 
-                        ? 'text-white bg-[#171717]' 
-                        : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                        ? 'text-white bg-zinc-950 border-zinc-800' 
+                        : 'text-[#A3A3A3] border-transparent hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                     }`;
 
                     return isExternal ? (
@@ -380,10 +378,10 @@ export function Navbar() {
               <Link
                 href="/guide"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 border text-sm font-medium transition-all duration-150 ${
                   pathname === '/guide' 
-                    ? 'text-white bg-[#171717]' 
-                    : 'text-[#A3A3A3] hover:text-white hover:bg-[#171717]'
+                    ? 'text-white bg-zinc-950 border-zinc-800' 
+                    : 'text-[#A3A3A3] border-transparent hover:text-white hover:bg-zinc-950 hover:border-zinc-900'
                 }`}
               >
                 <BookOpen className="w-4 h-4" />

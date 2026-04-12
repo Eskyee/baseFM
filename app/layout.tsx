@@ -81,7 +81,7 @@ export default function RootLayout({
         <meta property="fc:miniapp:description" content="Onchain Radio on Base" />
         <meta property="fc:miniapp:url" content="https://basefm.space" />
       </head>
-      <body className="bg-[#0A0A0A] min-h-screen font-sans">
+      <body className="bg-black min-h-screen font-mono text-white">
         <ErrorBoundary>
           <OnchainProvider>
             <PlayerProvider>

@@ -6,36 +6,41 @@ import { BaseAd } from './BaseAd';
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#1A1A1A] mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <footer className="border-t border-zinc-900 mt-auto bg-black font-mono">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 py-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           {/* Logo & Tagline */}
-          <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="baseFM"
-              width={24}
-              height={24}
-              className="rounded"
-            />
-            <span className="text-[#888] text-sm">
-              Onchain Radio on Base
-            </span>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.png"
+                alt="baseFM"
+                width={24}
+                height={24}
+                className="border border-zinc-900"
+              />
+              <span className="text-white text-sm font-bold uppercase tracking-wider">
+                baseFM
+              </span>
+            </div>
+            <p className="max-w-sm text-xs uppercase tracking-widest text-zinc-600">
+              Open-source radio protocol on Base. Agentbot powers live station control.
+            </p>
           </div>
 
           {/* Links */}
-          <div className="flex items-center gap-4 flex-wrap justify-center">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-px lg:bg-zinc-900">
             <Link
               href="https://agentbot.sh"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+              className="text-zinc-500 text-[10px] uppercase tracking-widest hover:text-white transition-colors lg:bg-black lg:p-4"
             >
               Agentbot
             </Link>
             <Link
               href="/guide"
-              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+              className="text-zinc-500 text-[10px] uppercase tracking-widest hover:text-white transition-colors lg:bg-black lg:p-4"
             >
               Guide
             </Link>
@@ -43,7 +48,7 @@ export function Footer() {
               href="https://talent.app/raveculture.base.eth"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#888] text-sm hover:text-[#F5F5F5] transition-colors"
+              className="text-zinc-500 text-[10px] uppercase tracking-widest hover:text-white transition-colors lg:bg-black lg:p-4"
             >
               RaveCulture
             </Link>
@@ -51,7 +56,7 @@ export function Footer() {
               href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#888] text-sm hover:text-purple-400 transition-colors flex items-center gap-1"
+              className="text-zinc-500 text-[10px] uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2 lg:bg-black lg:p-4"
             >
               <span>Support</span>
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -62,7 +67,7 @@ export function Footer() {
               href="https://base.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#888] text-sm hover:text-blue-400 transition-colors"
+              className="text-zinc-500 text-[10px] uppercase tracking-widest hover:text-white transition-colors lg:bg-black lg:p-4"
             >
               Built on Base
             </Link>
@@ -70,9 +75,9 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-6 pt-6 border-t border-[#1A1A1A] text-center">
-          <p className="text-xs text-[#666]">
-            Created by RaveCulture for baseFM · powered by Agentbot © 2026 · MIT License
+        <div className="mt-8 pt-8 border-t border-zinc-900 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-zinc-600">
+            Created by RaveCulture for baseFM · powered by Agentbot · MIT License · 2026
           </p>
         </div>
 

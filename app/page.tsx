@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLiveStreams, useStreams } from '@/hooks/useStreams';
-import { useEvents } from '@/hooks/useEvents';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import { MoltxFeed } from '@/components/MoltxFeed';
-import Link from 'next/link';
 import {
   getNextUpcomingEvent,
   hasAnyEvents,
@@ -37,275 +36,300 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchDJOfTheDay() {
       try {
-        const res = await fetch('/api/dj-of-the-day');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.djOfTheDay) {
-            setDjOfTheDay(data.djOfTheDay);
-          }
+        const response = await fetch('/api/dj-of-the-day');
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.djOfTheDay) {
+          setDjOfTheDay(data.djOfTheDay);
         }
-      } catch (err) {
-        // Silently fail - DJ of the day is optional
+      } catch {
+        // Optional surface.
       }
     }
+
     fetchDJOfTheDay();
   }, []);
 
   const featuredStream = liveStreams[0];
   const otherLiveStreams = liveStreams.slice(1);
-  const isLoading = liveLoading && upcomingLoading;
+  const nextEvent = getNextUpcomingEvent();
+  const eventsExist = hasAnyEvents();
+  const loading = liveLoading && upcomingLoading;
   const hasLive = liveStreams.length > 0;
-  const hasUpcoming = upcomingStreams.length > 0;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen pb-20">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <div className="animate-pulse space-y-6">
-            <div className="h-5 bg-[#1A1A1A] rounded w-40" />
-            <div className="aspect-[16/9] bg-[#1A1A1A] rounded-2xl" />
-            <div className="h-5 bg-[#1A1A1A] rounded w-32" />
-            <div className="flex gap-3 overflow-hidden">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-36 flex-shrink-0">
-                  <div className="aspect-square bg-[#1A1A1A] rounded-lg" />
-                  <div className="h-3 bg-[#1A1A1A] rounded w-28 mt-2" />
+  return (
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+        <div className="max-w-4xl space-y-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="basefm-kicker text-blue-500">BaseFM by Agentbot</span>
+            <a
+              href="https://github.com/Eskyee/baseFM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="basefm-kicker text-zinc-500 hover:text-white transition-colors"
+            >
+              Open Source
+            </a>
+          </div>
+
+          <div className="space-y-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter uppercase leading-[0.9]">
+              Onchain radio on Base.
+              <br />
+              <span className="text-zinc-700">Agentbot runs the live station.</span>
+            </h1>
+            <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
+              baseFM stays culture-first and open source. Agentbot provides the canonical live state,
+              relay truth, and operator tooling so streams, archives, and broadcast recovery are handled
+              like production infrastructure instead of guesswork.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link href="/live" className="basefm-button-primary">
+              Listen Live
+            </Link>
+            <Link href="/guide" className="basefm-button-secondary">
+              Read Guide
+            </Link>
+            <a
+              href="https://agentbot.sh/basefm/live"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="basefm-button-secondary"
+            >
+              Agentbot Station
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-12 grid gap-px bg-zinc-900 sm:grid-cols-4">
+          {[
+            {
+              label: 'Live Now',
+              value: hasLive ? `${liveStreams.length}` : '0',
+              detail: hasLive ? 'Canonical playback active' : 'No active program feed',
+            },
+            {
+              label: 'Queued Sets',
+              value: `${upcomingStreams.length}`,
+              detail: upcomingStreams.length > 0 ? 'Created or preparing' : 'No queued shows',
+            },
+            {
+              label: 'Relays',
+              value: 'Agentbot',
+              detail: 'Source of truth for live state',
+            },
+            {
+              label: 'Model',
+              value: 'Open Source',
+              detail: 'baseFM brand with Agentbot ops',
+            },
+          ].map((item) => (
+            <div key={item.label} className="bg-black p-5">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">{item.label}</div>
+              <div className="text-xl sm:text-2xl font-bold text-white uppercase">{item.value}</div>
+              <p className="mt-2 text-xs text-zinc-500 leading-relaxed">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <div className="max-w-2xl mb-8">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Station</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tighter uppercase">
+              {hasLive ? 'Live now.' : 'Off air.'}
+              <br />
+              <span className="text-zinc-700">
+                {hasLive ? 'Agentbot is serving the current program feed.' : 'The station will show the next set here.'}
+              </span>
+            </h2>
+          </div>
+
+          {loading ? (
+            <div className="grid gap-px bg-zinc-900 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="bg-black p-6 animate-pulse">
+                  <div className="h-3 w-24 bg-zinc-900 mb-4" />
+                  <div className="h-32 bg-zinc-900 mb-4" />
+                  <div className="h-3 w-40 bg-zinc-900 mb-2" />
+                  <div className="h-3 w-28 bg-zinc-900" />
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+          ) : hasLive && featuredStream ? (
+            <div className="space-y-6">
+              <div className="basefm-panel p-4 sm:p-6">
+                <div className="flex items-center justify-between gap-4 mb-4">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600">Featured program</div>
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-green-400">
+                    <span className="h-2 w-2 bg-green-400" />
+                    Live
+                  </div>
+                </div>
+                <LiveShowCard
+                  id={featuredStream.id}
+                  title={featuredStream.title}
+                  djName={featuredStream.djName}
+                  djWalletAddress={featuredStream.djWalletAddress}
+                  artwork={featuredStream.coverImageUrl}
+                  genre={featuredStream.genre}
+                  isLive={featuredStream.status === 'LIVE'}
+                  isTokenGated={featuredStream.isGated}
+                  muxPlaybackId={featuredStream.muxPlaybackId}
+                  hlsUrl={featuredStream.hlsPlaybackUrl}
+                  useGlobalPlayer
+                  variant="featured"
+                />
+              </div>
 
-  return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-10">
-
-        {/* Header — one line, not a wall of text */}
-        <header className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-[#F5F5F5] text-xl font-bold">baseFM</h1>
-              <span className="inline-flex items-center rounded-full border border-[#333] px-2 py-0.5 text-[10px] uppercase tracking-widest text-[#888]">
-                Agentbot Powered
-              </span>
-            </div>
-            <p className="text-[#888] text-sm">Onchain radio on Base with Agentbot live infrastructure</p>
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <Link
-              href="/guide"
-              className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium hover:bg-[#222] transition-colors active:scale-[0.97]"
-            >
-              Guide
-            </Link>
-            <Link
-              href="/events"
-              className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-[#E5E5E5] transition-colors active:scale-[0.97]"
-            >
-              Events
-            </Link>
-          </div>
-        </header>
-
-        {/* === LIVE SECTION === */}
-        {hasLive && (
-          <>
-            {/* Featured live stream */}
-            <section>
-              <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                Live Now
-              </h2>
-              <p className="text-[#666] text-xs uppercase tracking-widest mb-3">
-                Canonical live state from Agentbot
-              </p>
-              <LiveShowCard
-                id={featuredStream.id}
-                title={featuredStream.title}
-                djName={featuredStream.djName}
-                djWalletAddress={featuredStream.djWalletAddress}
-                artwork={featuredStream.coverImageUrl}
-                genre={featuredStream.genre}
-                isLive={featuredStream.status === 'LIVE'}
-                isTokenGated={featuredStream.isGated}
-                muxPlaybackId={featuredStream.muxPlaybackId}
-                hlsUrl={featuredStream.hlsPlaybackUrl}
-                useGlobalPlayer
-                variant="featured"
-              />
-            </section>
-
-            {/* Additional live streams */}
-            {otherLiveStreams.length > 0 && (
-              <section>
-                <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
-                  Also Live
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {otherLiveStreams.length > 0 && (
+                <div className="grid gap-px bg-zinc-900 sm:grid-cols-2 lg:grid-cols-3">
                   {otherLiveStreams.map((stream) => (
-                    <LiveShowCard
-                      key={stream.id}
-                      id={stream.id}
-                      title={stream.title}
-                      djName={stream.djName}
-                      djWalletAddress={stream.djWalletAddress}
-                      artwork={stream.coverImageUrl}
-                      genre={stream.genre}
-                      isLive
-                      isTokenGated={stream.isGated}
-                      muxPlaybackId={stream.muxPlaybackId}
-                      hlsUrl={stream.hlsPlaybackUrl}
-                      useGlobalPlayer
-                      variant="compact"
-                    />
+                    <div key={stream.id} className="bg-black p-4">
+                      <LiveShowCard
+                        id={stream.id}
+                        title={stream.title}
+                        djName={stream.djName}
+                        djWalletAddress={stream.djWalletAddress}
+                        artwork={stream.coverImageUrl}
+                        genre={stream.genre}
+                        isLive
+                        isTokenGated={stream.isGated}
+                        muxPlaybackId={stream.muxPlaybackId}
+                        hlsUrl={stream.hlsPlaybackUrl}
+                        useGlobalPlayer
+                        variant="compact"
+                      />
+                    </div>
                   ))}
                 </div>
-              </section>
-            )}
-          </>
-        )}
-
-        {/* === NOTHING LIVE — guide users instead of empty state === */}
-        {!hasLive && (
-          <section>
-            <div className="rounded-2xl bg-[#1A1A1A] p-6 text-center">
-              <div className="w-14 h-14 rounded-full bg-[#0A0A0A] flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                </svg>
+              )}
+            </div>
+          ) : (
+            <div className="grid gap-px bg-zinc-900 lg:grid-cols-[1.4fr_1fr]">
+              <div className="bg-black p-6 sm:p-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">What to do next</div>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-3">
+                  No live set is active.
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed max-w-xl mb-6">
+                  Check the schedule, browse DJs, or read the guide before the next broadcast starts.
+                  baseFM keeps the listener surface simple while Agentbot handles the control plane behind it.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/schedule" className="basefm-button-primary">
+                    View Schedule
+                  </Link>
+                  <Link href="/djs" className="basefm-button-secondary">
+                    Browse DJs
+                  </Link>
+                  <Link href="/guide" className="basefm-button-secondary">
+                    How It Works
+                  </Link>
+                </div>
               </div>
-              <p className="text-[#F5F5F5] font-semibold mb-1">No one is live right now</p>
-              <p className="text-[#888] text-sm mb-5">Check the schedule or explore DJs</p>
-              <div className="flex items-center justify-center gap-3">
-                <Link
-                  href="/guide"
-                  className="px-5 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-medium hover:bg-[#3C3C3E] transition-all active:scale-[0.97]"
-                >
-                  How it Works
-                </Link>
-                <Link
-                  href="/schedule"
-                  className="px-5 py-2.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-[#E5E5E5] transition-all active:scale-[0.97]"
-                >
-                  View Schedule
-                </Link>
-                <Link
-                  href="/djs"
-                  className="px-5 py-2.5 bg-[#2C2C2E] text-white rounded-full text-sm font-medium hover:bg-[#3C3C3E] transition-all active:scale-[0.97]"
-                >
-                  Browse DJs
-                </Link>
+              <div className="bg-black p-6 sm:p-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Broadcast path</div>
+                <div className="space-y-4 text-sm text-zinc-400">
+                  {[
+                    ['Source', 'CDJs, controller, or recorded mix'],
+                    ['Encoder', 'OBS or another RTMP encoder'],
+                    ['Agentbot', 'Canonical live state, relay truth, archive policy'],
+                    ['baseFM', 'Listener surface and culture layer'],
+                  ].map(([label, value]) => (
+                    <div key={label} className="grid grid-cols-[90px_1fr] gap-4 border-t border-zinc-900 pt-4 first:border-t-0 first:pt-0">
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-600">{label}</div>
+                      <div className="leading-relaxed">{value}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </section>
-        )}
+          )}
+        </div>
+      </section>
 
-        {/* === EVENT === */}
-        {(() => {
-          const nextEvent = getNextUpcomingEvent();
-          const hasEvents = hasAnyEvents();
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <div className="max-w-2xl mb-8">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Programming</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tighter uppercase">
+              Built for sets,
+              <br />
+              <span className="text-zinc-700">not streaming confusion.</span>
+            </h2>
+          </div>
 
-          // Show featured card for upcoming event
-          if (nextEvent) {
-            return (
-              <section>
-                <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  Upcoming Event
-                </h2>
-                <Link
-                  href={`/events/${nextEvent.slug}`}
-                  className="block bg-gradient-to-r from-purple-900/40 to-black rounded-2xl overflow-hidden border border-purple-500/20 group active:scale-[0.98] transition-transform"
-                >
-                  <div className="p-5">
-                    <div className="flex items-center gap-2 mb-2">
-                      {nextEvent.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 bg-[#2C2C2E] text-[#8E8E93] text-[10px] font-medium rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <h3 className="text-white font-bold text-lg leading-tight mb-1">
-                      {nextEvent.title}
-                    </h3>
-                    <p className="text-[#8E8E93] text-sm mb-3">
-                      {nextEvent.subtitle}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-[#8E8E93]">
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {nextEvent.displayDate}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {nextEvent.venue}
-                      </span>
-                    </div>
+          <div className="grid gap-px bg-zinc-900 lg:grid-cols-2">
+            <div className="bg-black p-6 sm:p-8">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Next event</div>
+              {nextEvent ? (
+                <Link href={`/events/${nextEvent.slug}`} className="block border border-zinc-800 p-5 hover:border-zinc-600 transition-colors">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-2">{nextEvent.title}</h3>
+                  <p className="text-sm text-zinc-400 mb-4">{nextEvent.subtitle}</p>
+                  <div className="space-y-2 text-xs text-zinc-500">
+                    <div>{nextEvent.displayDate}</div>
+                    <div>{nextEvent.venue}</div>
                     {nextEvent.headliners.length > 0 && (
-                      <p className="text-[#666] text-xs mt-3 line-clamp-1">
-                        {nextEvent.headliners.slice(0, 3).join(' • ')}
-                        {nextEvent.headliners.length > 3 && ` +${nextEvent.headliners.length - 3} more`}
-                      </p>
+                      <div>{nextEvent.headliners.slice(0, 3).join(' · ')}</div>
                     )}
                   </div>
                 </Link>
-              </section>
-            );
-          }
-
-          // No upcoming event but has past events - show smaller browse link
-          if (hasEvents) {
-            return (
-              <Link
-                href="/events"
-                className="flex items-center justify-between px-4 py-3 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors active:scale-[0.98] group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span className="text-[#F5F5F5] font-medium text-sm">Browse Events</span>
-                    <p className="text-[#666] text-xs">View past events</p>
-                  </div>
+              ) : eventsExist ? (
+                <Link href="/events" className="block border border-zinc-800 p-5 hover:border-zinc-600 transition-colors">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-2">Browse events</h3>
+                  <p className="text-sm text-zinc-400">The archive is live even when there is no featured upcoming date.</p>
+                </Link>
+              ) : (
+                <div className="border border-zinc-900 p-5">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-2">No event card yet</h3>
+                  <p className="text-sm text-zinc-400">When the next event is scheduled it will anchor this section.</p>
                 </div>
-                <svg className="w-5 h-5 text-[#666] group-hover:text-[#888] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            );
-          }
+              )}
+            </div>
 
-          // No events at all - hide section
-          return null;
-        })()}
+            <div className="bg-black p-6 sm:p-8">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Operating model</div>
+              <div className="grid gap-px bg-zinc-900">
+                {[
+                  ['Open source protocol', 'baseFM stays forkable and public-facing.'],
+                  ['Agentbot control plane', 'Live routing, recovery, and relay verification stay consistent.'],
+                  ['Wallet-native audience', 'Base wallets, community access, and direct support remain core.'],
+                  ['DJ-first flow', 'Hardware and encoder workflows stay familiar while the station handles broadcast ops.'],
+                ].map(([title, body]) => (
+                  <div key={title} className="bg-black p-4">
+                    <div className="text-sm font-bold uppercase tracking-wider text-white mb-2">{title}</div>
+                    <p className="text-xs leading-relaxed text-zinc-500">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* === DJ OF THE DAY === */}
-        {djOfTheDay && (
-          <section>
-            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-purple-500 rounded-full" />
-              DJ of the Day
-            </h2>
+      {djOfTheDay && (
+        <section className="border-t border-zinc-900">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+            <div className="max-w-2xl mb-8">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Featured</div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tighter uppercase">
+                DJ of the day.
+                <br />
+                <span className="text-zinc-700">Signal worth following.</span>
+              </h2>
+            </div>
+
             <Link
               href={`/djs/${djOfTheDay.dj.slug}`}
-              className="block bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-colors group"
+              className="grid gap-px bg-zinc-900 lg:grid-cols-[220px_1fr] hover:[&>*]:border-zinc-600"
             >
-              <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-[#1A1A1A] flex-shrink-0 ring-2 ring-purple-500/30">
+              <div className="bg-black border border-transparent p-6 flex items-center justify-center">
+                <div className="relative h-36 w-36 overflow-hidden border border-zinc-800 bg-zinc-950">
                   {djOfTheDay.dj.avatarUrl ? (
                     <Image
                       src={djOfTheDay.dj.avatarUrl}
@@ -314,255 +338,98 @@ export default function HomePage() {
                       className="object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Image src="/logo.png" alt="" width={32} height={32} className="opacity-50" />
+                    <div className="h-full w-full flex items-center justify-center">
+                      <Image src="/logo.png" alt="" width={56} height={56} className="opacity-40" />
                     </div>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-[#F5F5F5] font-bold text-lg truncate">{djOfTheDay.dj.name}</h3>
-                    {djOfTheDay.dj.isVerified && (
-                      <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                      </svg>
-                    )}
+              </div>
+              <div className="bg-black border border-transparent p-6 sm:p-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">{djOfTheDay.reason}</div>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-2xl font-bold uppercase tracking-tight text-white">{djOfTheDay.dj.name}</h3>
+                  {djOfTheDay.dj.isVerified && <span className="basefm-kicker text-blue-500">Verified</span>}
+                </div>
+                <div className="grid gap-px bg-zinc-900 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="bg-black p-4">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Shows</div>
+                    <div className="text-sm font-bold uppercase tracking-wider text-white">{djOfTheDay.dj.totalShows}</div>
                   </div>
-                  <p className="text-[#888] text-sm mb-2">{djOfTheDay.reason}</p>
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="text-[#666]">{djOfTheDay.dj.totalShows} shows</span>
-                    {djOfTheDay.dj.genres.length > 0 && (
-                      <span className="text-purple-400">{djOfTheDay.dj.genres.slice(0, 2).join(' • ')}</span>
-                    )}
+                  <div className="bg-black p-4 sm:col-span-2">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Genres</div>
+                    <div className="text-sm text-zinc-400">
+                      {djOfTheDay.dj.genres.length > 0 ? djOfTheDay.dj.genres.join(' · ') : 'Underground program'}
+                    </div>
                   </div>
                 </div>
-                <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               </div>
             </Link>
-          </section>
-        )}
-
-        {/* === AGENTBOT FEED === */}
-        <section>
-          <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-            Agentbot
-          </h2>
-          <MoltxFeed agentName="Atlas_baseFM" limit={3} />
+          </div>
         </section>
+      )}
 
-        {/* === NEW HERE? — guide link for newcomers === */}
-        <section>
-          <Link
-            href="/guide"
-            className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border border-yellow-500/20 rounded-xl hover:border-yellow-500/40 transition-colors active:scale-[0.98] group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Agent log</div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tighter uppercase mb-8">
+                Station notes.
+                <br />
+                <span className="text-zinc-700">Operator visibility without dashboard clutter.</span>
+              </h2>
+              <MoltxFeed agentName="Atlas_baseFM" limit={3} />
+            </div>
+
+            <div className="space-y-8">
+              <div className="basefm-panel p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Quick paths</div>
+                <div className="grid gap-px bg-zinc-900">
+                  {[
+                    ['/guide', 'Guide', 'Start here if you need the cleanest path through the product.'],
+                    ['/schedule', 'Schedule', 'See the next shows and time blocks.'],
+                    ['/djs', 'DJs', 'Find the artists and their current profiles.'],
+                    ['/community', 'Community', 'Token-gated and social surfaces.'],
+                    ['/dashboard', 'Dashboard', 'Go backstage if you are operating the station.'],
+                  ].map(([href, label, body]) => (
+                    <Link key={href} href={href} className="bg-black p-4 hover:bg-zinc-950 transition-colors">
+                      <div className="text-sm font-bold uppercase tracking-wider text-white mb-1">{label}</div>
+                      <p className="text-xs leading-relaxed text-zinc-500">{body}</p>
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <div>
-                <span className="text-[#F5F5F5] font-medium text-sm">New here?</span>
-                <p className="text-[#888] text-xs">Learn how baseFM works + safety tips</p>
+
+              <div className="basefm-panel p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Support the station</div>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Support keeps the infrastructure running: radio operations, relay capacity, and cultural programming.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="https://www.coinbase.com/pay?address=eskyee.base.eth&currency=ETH"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="basefm-button-primary"
+                  >
+                    Donate
+                  </Link>
+                  <Link
+                    href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="basefm-button-secondary"
+                  >
+                    Support Token
+                  </Link>
+                </div>
               </div>
-            </div>
-            <svg className="w-5 h-5 text-yellow-400/60 group-hover:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </section>
 
-        {/* === QUICK LINKS — always visible === */}
-        <section>
-          <div className="grid grid-cols-3 gap-3">
-            <Link
-              href="/community"
-              className="flex flex-col items-center gap-2 p-4 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors active:scale-[0.97]"
-            >
-              <svg className="w-6 h-6 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-              </svg>
-              <span className="text-[#F5F5F5] text-xs font-medium">Community</span>
-            </Link>
-            <Link
-              href="/djs"
-              className="flex flex-col items-center gap-2 p-4 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors active:scale-[0.97]"
-            >
-              <svg className="w-6 h-6 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
-              <span className="text-[#F5F5F5] text-xs font-medium">DJs</span>
-            </Link>
-            <Link
-              href="/archive"
-              className="flex flex-col items-center gap-2 p-4 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors active:scale-[0.97]"
-            >
-              <svg className="w-6 h-6 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2h-4v2h4v2H9V7h6v2z" />
-              </svg>
-              <span className="text-[#F5F5F5] text-xs font-medium">Archive</span>
-            </Link>
-          </div>
-        </section>
-
-        {/* === RAVECULTURE PREVIEW — tighter === */}
-        <section>
-          <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl overflow-hidden border border-purple-500/20">
-            <div className="p-4 pb-3">
-              <h2 className="text-[#F5F5F5] text-base font-bold">raveculture&reg;</h2>
-              <p className="text-[#888] text-xs">Underground culture. Onchain access.</p>
-            </div>
-            <div className="bg-black">
-              <iframe
-                src="https://player.mux.com/X9OgXqO8Gvo3iHgtTWJqgstGJFVIloBQnT5dhpxeIBM"
-                className="w-full border-none aspect-video"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
+              <ShareApp variant="compact" className="justify-start" />
             </div>
           </div>
-        </section>
-
-        {/* === SHARE — compact row, not a full section === */}
-        <section className="pb-4">
-          <ShareApp variant="compact" className="justify-center" />
-        </section>
-
-        {/* === COMING UP === */}
-        {hasUpcoming && (
-          <section>
-            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-3">
-              Coming Up
-            </h2>
-            <div className="flex gap-3 overflow-x-auto carousel-scroll hide-scrollbar pb-2">
-              {upcomingStreams.map((stream) => (
-                <LiveShowCard
-                  key={stream.id}
-                  id={stream.id}
-                  title={stream.title}
-                  djName={stream.djName}
-                  artwork={stream.coverImageUrl}
-                  genre={stream.genre}
-                  isLive={false}
-                  isTokenGated={stream.isGated}
-                  startTime={
-                    stream.scheduledStartTime
-                      ? new Date(stream.scheduledStartTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : undefined
-                  }
-                  variant="carousel"
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* === SUPPORT THE PLATFORM === */}
-        <section className="pt-6 border-t border-[#1A1A1A]">
-          <div className="bg-gradient-to-br from-purple-900/20 via-[#1A1A1A] to-blue-900/20 rounded-2xl p-5 border border-[#2A2A2A]">
-            <div className="text-center mb-4">
-              <h3 className="text-[#F5F5F5] font-bold text-lg mb-1">Support baseFM</h3>
-              <p className="text-[#888] text-sm">
-                Help fund the backend, improve the platform, or support the community
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              {/* Donate ETH/Crypto */}
-              <Link
-                href="https://www.coinbase.com/pay?address=eskyee.base.eth&currency=ETH"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white text-sm font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                <span>Donate</span>
-              </Link>
-              {/* Buy baseFM Token */}
-              <Link
-                href="https://base.meme/coin/base:0x1DBf2954FFEC96a333ae20F00c0bC40471ad8888"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#0A0A0A] border border-[#333] rounded-full text-[#F5F5F5] text-sm font-medium hover:bg-[#1A1A1A] hover:border-purple-500/50 transition-all active:scale-[0.98]"
-              >
-                <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                <span>Buy baseFM Token</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* === GITHUB SPONSORS === */}
-        <section className="pt-4">
-          <div className="flex flex-col items-center">
-            <div className="w-full max-w-[600px] rounded-xl overflow-hidden bg-[#0d1117]">
-              <iframe
-                src="https://github.com/sponsors/Eskyee/card"
-                title="Sponsor Eskyee"
-                height="225"
-                className="w-full border-0"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* === CREATOR INFO === */}
-        <section className="pt-4">
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center gap-3">
-              <Link
-                href="https://github.com/Eskyee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] rounded-full text-[#888] text-sm hover:text-[#F5F5F5] hover:bg-[#222] transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                </svg>
-                <span>Eskyee</span>
-              </Link>
-              <Link
-                href="https://github.com/Eskyee/baseFM"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] rounded-full text-[#888] text-sm hover:text-[#F5F5F5] hover:bg-[#222] transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <span>Source</span>
-              </Link>
-            </div>
-            <p className="text-[#666] text-xs text-center">
-              Created by Eskyee for baseFM
-            </p>
-            {/* Vercel Logo */}
-            <div className="mt-4 flex justify-center">
-              <a
-                href="https://vercel.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-60 hover:opacity-100 transition-opacity"
-              >
-                <svg width="80" height="16" viewBox="0 0 2048 407" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M467.444 406.809L233.722 0.335938L0 406.809H467.444ZM703.186 388.306L898.51 18.813H814.024L679.286 287.152L544.547 18.813H460.061L655.385 388.306H703.186ZM2034.31 18.813V388.307H1964.37V18.813H2034.31ZM1644.98 250.395C1644.98 221.599 1650.99 196.272 1663.01 174.415C1675.03 152.557 1691.79 135.731 1713.28 123.935C1734.77 112.139 1759.91 106.241 1788.69 106.241C1814.19 106.241 1837.14 111.792 1857.54 122.894C1877.94 133.996 1894.15 150.476 1906.17 172.333C1918.19 194.191 1924.39 220.905 1924.75 252.477V268.61H1718.75C1720.2 291.508 1726.94 309.549 1738.96 322.733C1751.35 335.57 1767.93 341.988 1788.69 341.988C1801.8 341.988 1813.83 338.519 1824.75 331.58C1835.68 324.641 1843.88 315.274 1849.34 303.478L1920.93 308.682C1912.18 334.702 1895.79 355.519 1871.75 371.131C1847.7 386.744 1820.02 394.55 1788.69 394.55C1759.91 394.55 1734.77 388.652 1713.28 376.856C1691.79 365.06 1675.03 348.233 1663.01 326.376C1650.99 304.518 1644.98 279.192 1644.98 250.395ZM1852.62 224.375C1850.07 201.823 1842.97 185.344 1831.31 174.935C1819.65 164.18 1805.45 158.802 1788.69 158.802C1769.38 158.802 1753.72 164.527 1741.7 175.976C1729.67 187.425 1722.21 203.558 1719.29 224.375H1852.62Z" fill="white"/>
-                </svg>
-              </a>
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </div>
+        </div>
+      </section>
+    </main>
   );
 }
