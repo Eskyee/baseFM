@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
@@ -29,18 +30,9 @@ function formatBalance(balance: number): string {
   return balance.toLocaleString();
 }
 
-function adminHeaders(walletAddress?: string) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress
-  }
-  return headers
-}
-
 export default function AdminCommunityPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch } = useAdminAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -52,9 +44,7 @@ export default function AdminCommunityPage() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch('/api/admin/community', {
-        headers: adminHeaders(address),
-      });
+      const res = await adminFetch('/api/admin/community');
       if (res.ok) {
         const data = await res.json();
         setMembers(data.members || []);
@@ -71,9 +61,9 @@ export default function AdminCommunityPage() {
     setMessage(null);
 
     try {
-      const res = await fetch('/api/admin/community', {
+      const res = await adminFetch('/api/admin/community', {
         method: 'POST',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           memberId,

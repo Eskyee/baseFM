@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
@@ -23,18 +24,9 @@ function formatBalance(balance: number): string {
   return balance.toLocaleString();
 }
 
-function adminHeaders(walletAddress?: string) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress
-  }
-  return headers
-}
-
 export default function AdminPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch } = useAdminAuth();
   const [isClearing, setIsClearing] = useState(false);
   const [result, setResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -49,9 +41,7 @@ export default function AdminPage() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch('/api/admin/community', {
-        headers: adminHeaders(address),
-      });
+      const res = await adminFetch('/api/admin/community');
       if (res.ok) {
         const data = await res.json();
         setMembers(data.members || []);
@@ -70,13 +60,17 @@ export default function AdminPage() {
     try {
       const res = await fetch('/api/admin/community', {
         method: 'POST',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address, memberId, action }),
       });
+      const signedRes = await adminFetch('/api/admin/community', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address, memberId, action }),
+      });
+      const data = await signedRes.json();
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (!signedRes.ok) {
         setResult({ error: data.error || 'Action failed' });
         return;
       }
@@ -114,9 +108,9 @@ export default function AdminPage() {
     setResult(null);
 
     try {
-      const response = await fetch('/api/admin/clear-streams', {
+      const response = await adminFetch('/api/admin/clear-streams', {
         method: 'POST',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address }),
       });
 

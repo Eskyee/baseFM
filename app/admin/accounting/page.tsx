@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
@@ -56,16 +57,9 @@ interface AccountingSummary {
   recentTips: TipRecord[];
 }
 
-function adminHeaders(walletAddress?: string) {
-  const headers: Record<string, string> = {}
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress
-  }
-  return headers
-}
-
 export default function AdminAccountingPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch } = useAdminAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<string>('all');
@@ -104,8 +98,8 @@ export default function AdminAccountingPage() {
         ticketsParams.set('dateRange', dateRange);
 
         const [ticketsRes, tipsRes] = await Promise.all([
-          fetch(`/api/admin/accounting/tickets?${ticketsParams}`, { headers: adminHeaders(address) }),
-          fetch(`/api/admin/accounting/tips?dateRange=${dateRange}`, { headers: adminHeaders(address) }),
+          adminFetch(`/api/admin/accounting/tickets?${ticketsParams}`),
+          adminFetch(`/api/admin/accounting/tips?dateRange=${dateRange}`),
         ]);
 
         let ticketData = { sales: [], summary: { totalRevenue: 0, totalSold: 0, eventBreakdown: [] } };

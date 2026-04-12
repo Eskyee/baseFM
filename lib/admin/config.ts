@@ -46,7 +46,7 @@ export async function verifyAdminSignature(
   }
 
   // Create the message that should have been signed
-  const message = `baseFM Admin Authentication\n\nNonce: ${nonce}\nTimestamp: ${timestamp}\n\nSign this message to authenticate as an admin.`;
+  const message = createAdminAuthMessage(nonce, timestamp);
 
   try {
     const isValid = await verifyMessage({
@@ -59,6 +59,10 @@ export async function verifyAdminSignature(
     console.error('Admin signature verification error:', error);
     return false;
   }
+}
+
+export function createAdminAuthMessage(nonce: string, timestamp: string): string {
+  return `baseFM Admin Authentication\n\nNonce: ${nonce}\nTimestamp: ${timestamp}\n\nSign this message to authenticate as an admin.`;
 }
 
 /**

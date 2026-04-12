@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,18 +10,9 @@ import { DJ } from '@/types/dj';
 
 const DEFAULT_AVATAR = '/logo.png';
 
-function adminHeaders(walletAddress?: string) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress
-  }
-  return headers
-}
-
 export default function AdminDJsPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch } = useAdminAuth();
   const [djs, setDJs] = useState<DJ[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -30,7 +22,7 @@ export default function AdminDJsPage() {
   useEffect(() => {
     async function fetchDJs() {
       try {
-        const res = await fetch('/api/admin/djs');
+        const res = await adminFetch('/api/admin/djs');
         if (res.ok) {
           const data = await res.json();
           setDJs(data.djs || []);
@@ -65,9 +57,9 @@ export default function AdminDJsPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/djs', {
+      const res = await adminFetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,
@@ -100,9 +92,9 @@ export default function AdminDJsPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/djs', {
+      const res = await adminFetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,
@@ -138,9 +130,9 @@ export default function AdminDJsPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/djs', {
+      const res = await adminFetch('/api/admin/djs', {
         method: 'PATCH',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           djWalletAddress: dj.walletAddress,

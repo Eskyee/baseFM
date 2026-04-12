@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,18 +18,9 @@ const TYPE_LABELS: Record<string, string> = {
 
 const DEFAULT_LOGO = '/logo.png';
 
-function adminHeaders(walletAddress?: string) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress
-  }
-  return headers
-}
-
 export default function AdminPromotersPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch } = useAdminAuth();
   const [promoters, setPromoters] = useState<Promoter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -38,7 +30,7 @@ export default function AdminPromotersPage() {
   useEffect(() => {
     async function fetchPromoters() {
       try {
-        const res = await fetch('/api/admin/promoters');
+        const res = await adminFetch('/api/admin/promoters');
         if (res.ok) {
           const data = await res.json();
           setPromoters(data.promoters || []);
@@ -73,9 +65,9 @@ export default function AdminPromotersPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/promoters', {
+      const res = await adminFetch('/api/admin/promoters', {
         method: 'PATCH',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           promoterId,
@@ -118,9 +110,9 @@ export default function AdminPromotersPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch('/api/admin/promoters', {
+      const res = await adminFetch('/api/admin/promoters', {
         method: 'DELETE',
-        headers: adminHeaders(address),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletAddress: address,
           promoterId: promoter.id,
