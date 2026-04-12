@@ -3,7 +3,7 @@
 import { useStream } from '@/hooks/useStream';
 import { TokenGate } from '@/components/TokenGate';
 import { TipButton } from '@/components/TipButton';
-import { usePlayer } from '@/components/AppShell';
+import { usePlayer } from '@/contexts/PlayerContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
@@ -11,7 +11,8 @@ import { ListenerCount } from '@/components/ListenerCount';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
-  const { currentShow, setCurrentShow } = usePlayer();
+  const { state, playStream, stopStream } = usePlayer();
+  const currentShow = state.currentStream;
 
   if (isLoading) {
     return (
@@ -59,26 +60,28 @@ export default function StreamPage({ params }: { params: { id: string } }) {
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
   const hasEnded = stream.status === 'ENDED';
-  const isInPersistentPlayer = currentShow?.streamId === stream.id;
+  const isInPersistentPlayer = currentShow?.id === stream.id;
 
   const enablePersistentPlayback = () => {
     const hlsUrl = stream.muxPlaybackId
       ? `https://stream.mux.com/${stream.muxPlaybackId}.m3u8`
       : stream.hlsPlaybackUrl;
 
-    setCurrentShow({
+    playStream({
+      id: stream.id,
       title: stream.title,
       djName: stream.djName,
+      djWalletAddress: stream.djWalletAddress,
       artwork: stream.coverImageUrl,
       isLive,
       isTokenGated: stream.isGated,
+      muxPlaybackId: stream.muxPlaybackId,
       hlsUrl: hlsUrl || undefined,
-      streamId: stream.id,
     });
   };
 
   const stopPersistentPlayback = () => {
-    setCurrentShow(null);
+    stopStream();
   };
 
   const player = (() => {

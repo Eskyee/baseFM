@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePlayer } from '@/components/AppShell';
+import { usePlayer } from '@/contexts/PlayerContext';
 import { Stream } from '@/types/stream';
 
 interface Replay {
@@ -16,7 +16,7 @@ interface Replay {
 }
 
 export default function ShowPage({ params }: { params: { slug: string } }) {
-  const { setCurrentShow } = usePlayer();
+  const { playStream } = usePlayer();
   const [stream, setStream] = useState<Stream | null>(null);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,14 +45,16 @@ export default function ShowPage({ params }: { params: { slug: string } }) {
   const handlePlay = () => {
     if (!stream) return;
 
-    setCurrentShow({
+    playStream({
+      id: stream.id,
       title: stream.title,
       djName: stream.djName,
+      djWalletAddress: stream.djWalletAddress,
       artwork: stream.coverImageUrl,
       isLive: stream.status === 'LIVE',
       isTokenGated: stream.isGated,
+      muxPlaybackId: stream.muxPlaybackId,
       hlsUrl: stream.hlsPlaybackUrl,
-      streamId: stream.id,
     });
   };
 
