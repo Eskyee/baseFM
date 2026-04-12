@@ -2,200 +2,112 @@
 
 import Link from 'next/link';
 import { EVENTS, getPastEvents } from '@/lib/events/config';
-import type { Event } from '@/lib/events/config';
-
-// ============================================================
-// Event Listing Page — public, no wallet required
-//
-// Shows upcoming and past events. Cultural platform feel.
-// CTA: "View Event" (never "Mint" or "Buy Token")
-// ============================================================
-
-function formatEventDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 export default function EventsPage() {
-  const upcoming = EVENTS.filter((e) => !e.isPast);
+  const upcoming = EVENTS.filter((event) => !event.isPast);
   const past = getPastEvents();
 
-  const isLoading = false;
+  return (
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+        <div className="max-w-4xl space-y-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="basefm-kicker text-blue-500">Events</span>
+            <span className="basefm-kicker text-zinc-500">Culture in real space</span>
+          </div>
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen pb-20">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <div className="animate-pulse space-y-6">
-            <div className="h-5 bg-[#1A1A1A] rounded w-32" />
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-36 bg-[#1A1A1A] rounded-2xl" />
-              ))}
-            </div>
+          <div className="space-y-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter uppercase leading-[0.9]">
+              Shows and gatherings.
+              <br />
+              <span className="text-zinc-700">The station in public.</span>
+            </h1>
+            <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
+              baseFM is not just a stream page. Use events to track real-world sessions, cultural drops, and the physical side of the station.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link href="/events/submit" className="basefm-button-primary">
+              Submit Event
+            </Link>
+            <Link href="/" className="basefm-button-secondary">
+              Back Home
+            </Link>
           </div>
         </div>
-      </div>
-    );
-  }
+      </section>
 
-  return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-10">
-        {/* Header */}
-        <header className="flex items-center justify-between">
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20 space-y-12">
           <div>
-            <h1 className="text-[#F5F5F5] text-xl font-bold">Events</h1>
-            <p className="text-[#888] text-sm">Discover what&apos;s happening</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/events/submit"
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full text-sm font-medium transition-all hover:opacity-90 active:scale-[0.97]"
-            >
-              + Submit Event
-            </Link>
-            <Link
-              href="/"
-              className="px-4 py-2 bg-[#1A1A1A] text-[#F5F5F5] rounded-full text-sm font-medium transition-colors active:scale-[0.97]"
-            >
-              Home
-            </Link>
-          </div>
-        </header>
-
-        {/* Upcoming Events */}
-        <section>
-          <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-4">
-            Upcoming
-          </h2>
-
-          {upcoming.length === 0 ? (
-            <div className="rounded-2xl bg-[#1A1A1A] p-6 text-center">
-              <p className="text-[#888] text-sm">
-                No upcoming events right now. Check back soon.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {upcoming.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.slug}`}
-                  className="block bg-[#1A1A1A] rounded-2xl overflow-hidden group active:scale-[0.98] transition-transform"
-                >
-                  <div className="p-5">
-                    {/* Tags */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase rounded-full">
-                        In Person
-                      </span>
-                      {event.tags?.slice(0, 2).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-0.5 bg-[#2C2C2E] text-[#888] text-[10px] font-medium rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-[#F5F5F5] font-bold text-lg leading-tight mb-1">
-                      {event.title}
-                    </h3>
-
-                    {/* Subtitle */}
-                    {event.subtitle && (
-                      <p className="text-[#888] text-sm mb-3 line-clamp-2">
-                        {event.subtitle}
-                      </p>
-                    )}
-
-                    {/* Meta */}
-                    <div className="flex items-center gap-4 text-xs text-[#888]">
-                      {/* Date */}
-                      <span className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {event.displayDate}
-                      </span>
-
-                      {/* Location */}
-                      <span className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {event.venue}
-                      </span>
-                    </div>
-
-                    {/* Headliners */}
-                    {event.headliners && event.headliners.length > 0 && (
-                      <p className="text-[#666] text-xs mt-2">
-                        {event.headliners.join(' · ')}
-                      </p>
-                    )}
-
-                    {/* CTA */}
-                    <div className="mt-4">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-black rounded-full text-sm font-semibold transition-all">
-                        View Event
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Past Events */}
-        {past.length > 0 && (
-          <section>
-            <h2 className="text-[#F5F5F5] text-sm font-semibold uppercase tracking-wider mb-4">
-              Past Events
-            </h2>
-            <div className="space-y-3">
-              {past.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.slug}`}
-                  className="block bg-[#1A1A1A] rounded-2xl overflow-hidden opacity-70 active:scale-[0.98] transition-transform"
-                >
-                  <div className="p-4 flex items-center justify-between">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 bg-[#2C2C2E] text-[#888] text-[10px] font-medium rounded-full">
-                          Ended
-                        </span>
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Upcoming</div>
+            {upcoming.length === 0 ? (
+              <div className="basefm-panel p-8 text-center">
+                <p className="text-sm text-zinc-400">No upcoming events right now.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {upcoming.map((event) => (
+                  <Link key={event.id} href={`/events/${event.slug}`} className="basefm-panel hover:bg-zinc-950 transition-colors">
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 flex-wrap mb-4">
+                        <span className="basefm-kicker text-blue-500">In person</span>
+                        {event.tags?.slice(0, 2).map((tag) => (
+                          <span key={tag} className="text-[10px] uppercase tracking-widest text-zinc-600">
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                      <h3 className="text-[#F5F5F5] font-semibold text-base truncate">
-                        {event.title}
-                      </h3>
-                      <p className="text-[#666] text-xs mt-1">
-                        {event.displayDate} · {event.venue}
-                      </p>
+
+                      <h2 className="text-2xl font-bold uppercase tracking-tight text-white mb-2">{event.title}</h2>
+                      {event.subtitle ? (
+                        <p className="text-sm text-zinc-400 leading-relaxed mb-5">{event.subtitle}</p>
+                      ) : null}
+
+                      <div className="grid gap-3 sm:grid-cols-2 text-sm text-zinc-400 mb-5">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">Date</div>
+                          <div>{event.displayDate}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">Venue</div>
+                          <div>{event.venue}</div>
+                        </div>
+                      </div>
+
+                      {event.headliners && event.headliners.length > 0 ? (
+                        <p className="text-xs text-zinc-500 mb-5">{event.headliners.join(' · ')}</p>
+                      ) : null}
+
+                      <span className="text-[10px] uppercase tracking-widest text-zinc-500">Open event →</span>
                     </div>
-                    <svg className="w-5 h-5 text-[#666] flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {past.length > 0 ? (
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Past</div>
+              <div className="grid gap-px bg-zinc-900">
+                {past.map((event) => (
+                  <Link key={event.id} href={`/events/${event.slug}`} className="bg-black p-5 hover:bg-zinc-950 transition-colors">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold uppercase tracking-tight text-white mb-1">{event.title}</h3>
+                        <p className="text-sm text-zinc-500">{event.displayDate} · {event.venue}</p>
+                      </div>
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-600">Ended</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </section>
-        )}
-      </div>
-    </div>
+          ) : null}
+        </div>
+      </section>
+    </main>
   );
 }

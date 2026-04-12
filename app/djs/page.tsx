@@ -19,34 +19,33 @@ function DJsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>(filterParam === 'residents' ? 'residents' : 'all');
 
-  const handleFilterChange = (newFilter: Filter) => {
-    setFilter(newFilter);
-    if (newFilter === 'all') {
+  const handleFilterChange = (nextFilter: Filter) => {
+    setFilter(nextFilter);
+    if (nextFilter === 'all') {
       router.push('/djs', { scroll: false });
     } else {
-      router.push(`/djs?filter=${newFilter}`, { scroll: false });
+      router.push(`/djs?filter=${nextFilter}`, { scroll: false });
     }
   };
 
   useEffect(() => {
-    if (filterParam === 'residents') {
-      setFilter('residents');
-    } else {
-      setFilter('all');
-    }
+    setFilter(filterParam === 'residents' ? 'residents' : 'all');
   }, [filterParam]);
 
   useEffect(() => {
     async function fetchDJs() {
       try {
+        setIsLoading(true);
         const params = filter === 'residents' ? '?residents=true' : '';
-        const res = await fetch(`/api/djs${params}`);
-        if (res.ok) {
-          const data = await res.json();
-          setDJs(data.djs || []);
+        const response = await fetch(`/api/djs${params}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch DJs');
         }
-      } catch (err) {
-        console.error('Failed to fetch DJs:', err);
+
+        const data = await response.json();
+        setDJs(data.djs || []);
+      } catch (error) {
+        console.error('Failed to fetch DJs:', error);
       } finally {
         setIsLoading(false);
       }
@@ -55,180 +54,138 @@ function DJsContent() {
     fetchDJs();
   }, [filter]);
 
-  const residents = djs.filter(dj => dj.isResident);
-  const guests = djs.filter(dj => !dj.isResident);
+  const residents = djs.filter((dj) => dj.isResident);
+  const guests = djs.filter((dj) => !dj.isResident);
+  const visibleDjs = filter === 'residents' ? residents : guests;
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">DJs</h1>
-            <p className="text-[#888] text-sm mt-1">Meet the people behind the music</p>
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+        <div className="max-w-4xl space-y-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="basefm-kicker text-blue-500">DJs</span>
+            <span className="basefm-kicker text-zinc-500">People behind the station</span>
           </div>
 
-          {/* Filter */}
-          <div className="flex gap-2">
+          <div className="space-y-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter uppercase leading-[0.9]">
+              Meet the DJs.
+              <br />
+              <span className="text-zinc-700">Residents, guests, and selectors.</span>
+            </h1>
+            <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
+              The station is only as good as the people running it. Browse resident DJs, discover guests, and open each profile for shows, links, and current activity.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => handleFilterChange('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
-                filter === 'all'
-                  ? 'bg-white text-black'
-                  : 'bg-[#2C2C2E] text-[#8E8E93] hover:text-white'
-              }`}
+              className={filter === 'all' ? 'basefm-button-primary' : 'basefm-button-secondary'}
             >
-              All
+              All DJs
             </button>
             <button
               onClick={() => handleFilterChange('residents')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
-                filter === 'residents'
-                  ? 'bg-white text-black'
-                  : 'bg-[#2C2C2E] text-[#8E8E93] hover:text-white'
-              }`}
+              className={filter === 'residents' ? 'basefm-button-primary' : 'basefm-button-secondary'}
             >
               Residents
             </button>
           </div>
         </div>
+      </section>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-[#1A1A1A] rounded-xl mb-3" />
-                <div className="h-5 bg-[#1A1A1A] rounded w-3/4 mb-2" />
-                <div className="h-4 bg-[#1A1A1A] rounded w-1/2" />
-              </div>
-            ))}
-          </div>
-        ) : djs.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#888]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20 space-y-10">
+          {isLoading ? (
+            <div className="grid gap-px bg-zinc-900 md:grid-cols-2 xl:grid-cols-4">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="bg-black p-6 animate-pulse">
+                  <div className="aspect-square bg-zinc-900 mb-4" />
+                  <div className="h-4 w-32 bg-zinc-900 mb-2" />
+                  <div className="h-3 w-20 bg-zinc-900" />
+                </div>
+              ))}
             </div>
-            <h2 className="text-[#F5F5F5] text-xl font-bold mb-2">No DJs Yet</h2>
-            <p className="text-[#888] text-sm">Be the first to create a profile!</p>
-          </div>
-        ) : (
-          <>
-            {/* Residents Section */}
-            {residents.length > 0 && filter === 'all' && (
-              <section className="mb-12">
-                <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full" />
-                  Resident DJs
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {residents.map((dj) => (
-                    <DJCard key={dj.id} dj={dj} />
-                  ))}
+          ) : djs.length === 0 ? (
+            <div className="basefm-panel p-8 text-center">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">No DJs yet</div>
+              <p className="max-w-md mx-auto text-sm text-zinc-400 leading-relaxed">
+                This roster will populate as DJs create profiles and attach sets to the station.
+              </p>
+            </div>
+          ) : (
+            <>
+              {filter === 'all' && residents.length > 0 ? (
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Residents</div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {residents.map((dj) => (
+                      <DJCard key={dj.id} dj={dj} />
+                    ))}
+                  </div>
                 </div>
-              </section>
-            )}
+              ) : null}
 
-            {/* All/Guests Section */}
-            {(filter === 'residents' ? residents : guests).length > 0 && (
-              <section>
-                {filter === 'all' && guests.length > 0 && (
-                  <h2 className="text-lg font-semibold text-[#F5F5F5] mb-4">Guest DJs</h2>
-                )}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {(filter === 'residents' ? residents : guests).map((dj) => (
-                    <DJCard key={dj.id} dj={dj} />
-                  ))}
+              {visibleDjs.length > 0 ? (
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">
+                    {filter === 'residents' ? 'Resident roster' : 'Guests'}
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {visibleDjs.map((dj) => (
+                      <DJCard key={dj.id} dj={dj} />
+                    ))}
+                  </div>
                 </div>
-              </section>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </section>
+    </main>
   );
 }
 
 function DJCard({ dj }: { dj: DJ }) {
-  const hasAvatar = !!dj.avatarUrl;
+  const hasAvatar = Boolean(dj.avatarUrl);
 
   return (
-    <Link
-      href={`/djs/${dj.slug}`}
-      className="group block"
-    >
-      {/* Avatar */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-[#1A1A1A] mb-3">
+    <Link href={`/djs/${dj.slug}`} className="basefm-panel hover:bg-zinc-950 transition-colors">
+      <div className="aspect-square relative bg-black border-b border-zinc-900 overflow-hidden">
         <Image
           src={dj.avatarUrl || DEFAULT_AVATAR}
           alt={dj.name}
           fill
-          className={`transition-all duration-300 group-hover:scale-105 grayscale group-hover:grayscale-0 ${
-            hasAvatar ? 'object-cover' : 'object-contain p-8'
-          }`}
+          className={hasAvatar ? 'object-cover grayscale hover:grayscale-0 transition-all' : 'object-contain p-10'}
         />
-
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex gap-1">
-          {dj.isResident && (
-            <span className="px-2 py-0.5 bg-purple-500 text-white text-[10px] font-medium rounded">
-              Resident
-            </span>
-          )}
-          {dj.isVerified && (
-            <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-medium rounded">
-              Verified
-            </span>
-          )}
-        </div>
       </div>
-
-      {/* Info */}
-      <h3 className="text-[#F5F5F5] font-medium group-hover:text-[#3B82F6] transition-colors">
-        {dj.name}
-      </h3>
-
-      {/* Genres */}
-      {dj.genres && dj.genres.length > 0 && (
-        <p className="text-[#888] text-sm line-clamp-1">
-          {dj.genres.slice(0, 2).join(', ')}
-        </p>
-      )}
-
-      {/* Stats */}
-      <p className="text-[#666] text-xs mt-1">
-        {dj.totalShows} shows
-      </p>
+      <div className="p-5">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          {dj.isResident ? <span className="basefm-kicker text-blue-500">Resident</span> : null}
+          {dj.isVerified ? <span className="basefm-kicker text-zinc-500">Verified</span> : null}
+        </div>
+        <h2 className="text-lg font-bold uppercase tracking-tight text-white mb-2">{dj.name}</h2>
+        {dj.genres && dj.genres.length > 0 ? (
+          <p className="text-xs text-zinc-400 leading-relaxed mb-3">{dj.genres.slice(0, 3).join(' · ')}</p>
+        ) : null}
+        <div className="text-[10px] uppercase tracking-widest text-zinc-600">{dj.totalShows} shows</div>
+      </div>
     </Link>
   );
 }
 
 function DJsPageSkeleton() {
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="h-8 bg-[#1A1A1A] rounded w-24 mb-2" />
-            <div className="h-4 bg-[#1A1A1A] rounded w-48" />
-          </div>
-          <div className="flex gap-2">
-            <div className="h-10 bg-[#1A1A1A] rounded-xl w-16" />
-            <div className="h-10 bg-[#1A1A1A] rounded-xl w-24" />
-          </div>
+    <main className="min-h-screen bg-black text-white font-mono pb-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+        <div className="animate-pulse space-y-4 max-w-4xl">
+          <div className="h-6 w-28 bg-zinc-900" />
+          <div className="h-16 w-96 bg-zinc-900" />
+          <div className="h-4 w-[32rem] bg-zinc-900" />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="aspect-square bg-[#1A1A1A] rounded-xl mb-3" />
-              <div className="h-5 bg-[#1A1A1A] rounded w-3/4 mb-2" />
-              <div className="h-4 bg-[#1A1A1A] rounded w-1/2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
