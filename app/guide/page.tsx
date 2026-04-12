@@ -45,7 +45,6 @@ const quickLinks = [
   ['/events', 'Events', 'Find physical events and public dates.'],
   ['/community', 'Community', 'Open the wallet-native social layer.'],
   ['/wallet', 'Wallet', 'Check balances, support, and access state.'],
-  ['/aicloud', 'AI Cloud', 'Experimental product surfaces and automation tooling.'],
   ['https://agentbot.sh/learn', 'Agentbot Learn', 'Read the broader platform guides and operator docs.'],
 ];
 

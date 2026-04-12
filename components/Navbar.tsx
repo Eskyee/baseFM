@@ -9,33 +9,20 @@ import { WalletConnect } from './WalletConnect';
 import {
   Home,
   Calendar,
-  Image as ImageIcon,
   Archive,
-  ShoppingBag,
   Users,
-  UsersRound,
-  MessageCircle,
-  Briefcase,
   Disc3,
   Wallet,
   Mail,
   LayoutGrid,
   BookOpen,
   Ticket,
-  Cast,
   QrCode,
   Megaphone,
   ChevronDown,
   Sparkles,
-  Music,
-  Store,
   Bot,
-  Zap,
-  Cloud,
   Rss,
-  TrendingUp,
-  Wrench,
-  Layout
 } from 'lucide-react';
 
 export function Navbar() {
@@ -68,7 +55,6 @@ export function Navbar() {
         { href: '/schedule', label: 'Schedule', Icon: Calendar },
         { href: '/events', label: 'Events', Icon: Ticket },
         { href: '/djs', label: 'DJs', Icon: Disc3 },
-        { href: '/gallery', label: 'Gallery', Icon: ImageIcon },
         { href: '/archive', label: 'Archive', Icon: Archive },
       ]
     },
@@ -79,32 +65,6 @@ export function Navbar() {
       featured: false,
       links: [
         { href: '/community', label: 'Community', Icon: Users },
-        { href: '/collectives', label: 'Collectives', Icon: UsersRound },
-        { href: '/threads', label: 'Threads', Icon: MessageCircle },
-        { href: '/farcaster', label: 'Farcaster', Icon: Cast },
-      ]
-    },
-    {
-      id: 'create',
-      label: 'Create',
-      Icon: Zap,
-      featured: true,
-      links: [
-        { href: '/aicloud', label: 'AI Cloud', Icon: Cloud },
-        { href: '/aicloud/feed', label: 'Ravefeed', Icon: Rss },
-        { href: '/trading', label: 'Trading', Icon: TrendingUp },
-        { href: '/tools', label: 'Tools', Icon: Wrench },
-      ]
-    },
-    {
-      id: 'business',
-      label: 'Business',
-      Icon: Store,
-      featured: false,
-      links: [
-        { href: '/agency', label: 'Agency', Icon: Briefcase },
-        { href: '/agency/web-design', label: 'Web Design', Icon: Layout },
-        { href: 'https://shop.basefm.space', label: 'Shop', Icon: ShoppingBag, external: true },
       ]
     },
   ];
