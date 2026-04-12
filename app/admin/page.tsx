@@ -196,6 +196,18 @@ export default function AdminPage() {
           </Link>
 
           <Link
+            href="/admin/improvement"
+            className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-3 group-hover:bg-cyan-500/30 transition-colors">
+              <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="text-[#F5F5F5] font-medium text-sm">Improve</h3>
+          </Link>
+
+          <Link
             href="/dashboard"
             className="bg-[#1A1A1A] rounded-lg p-5 hover:bg-[#222] transition-colors group"
           >

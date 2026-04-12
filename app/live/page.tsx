@@ -1,13 +1,27 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLiveStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
+import { reportProductLearningEvent } from '@/lib/product-learning';
 
 export default function LivePage() {
   const { streams, isLoading, error } = useLiveStreams();
   const primary = streams[0] || null;
   const others = streams.slice(1);
+
+  useEffect(() => {
+    if (!error) return;
+
+    reportProductLearningEvent('live-page-error', {
+      eventType: 'live_page_error',
+      severity: 'error',
+      surface: 'live',
+      route: '/live',
+      details: error,
+    });
+  }, [error]);
 
   return (
     <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">

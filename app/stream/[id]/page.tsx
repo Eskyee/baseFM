@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useStream } from '@/hooks/useStream';
 import { TokenGate } from '@/components/TokenGate';
 import { TipButton } from '@/components/TipButton';
@@ -8,11 +9,40 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MuxPlayer from '@mux/mux-player-react';
 import { ListenerCount } from '@/components/ListenerCount';
+import { reportProductLearningEvent } from '@/lib/product-learning';
 
 export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
   const { state, playStream, stopStream } = usePlayer();
   const currentShow = state.currentStream;
+
+  useEffect(() => {
+    if (!error) return;
+
+    reportProductLearningEvent(`stream-error-${params.id}`, {
+      eventType: 'stream_page_error',
+      severity: 'error',
+      surface: 'stream',
+      route: `/stream/${params.id}`,
+      streamId: params.id,
+      details: error,
+    });
+  }, [error, params.id]);
+
+  useEffect(() => {
+    if (!stream) return;
+    if (!(stream.status === 'LIVE' || stream.status === 'PREPARING')) return;
+    if (stream.muxPlaybackId || stream.hlsPlaybackUrl) return;
+
+    reportProductLearningEvent(`stream-playback-missing-${stream.id}`, {
+      eventType: 'stream_playback_missing',
+      severity: 'error',
+      surface: 'stream',
+      route: `/stream/${stream.id}`,
+      streamId: stream.id,
+      details: `Status ${stream.status} without playback source`,
+    });
+  }, [stream]);
 
   if (isLoading) {
     return (
