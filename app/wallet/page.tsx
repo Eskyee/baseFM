@@ -49,6 +49,12 @@ export default function WalletPage() {
             <WalletConnect />
           </div>
         </section>
+
+        <section className="border-t border-zinc-900">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+            <TokenSurfacePanel subtitle="Connect when you want live Base balances. The token map stays visible either way so the Base-side station token and the Solana Agentbot token are both clear." />
+          </div>
+        </section>
       </main>
     );
   }
