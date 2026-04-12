@@ -7,6 +7,7 @@ import { WalletConnect } from '@/components/WalletConnect';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 import { Identity, Avatar, Name } from '@coinbase/onchainkit/identity';
 import { TransactionHistory } from '@/components/TransactionHistory';
+import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 
 export default function WalletPage() {
   const { isConnected, address } = useAccount();
@@ -42,7 +43,7 @@ export default function WalletPage() {
                 <span className="text-zinc-700">View balances and station access.</span>
               </h1>
               <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
-                Use a Base wallet to view ETH, BASEFM access, recent transactions, and the swap/onramp paths the station expects.
+                Use a Base wallet to view ETH, the Base-side RAVE/baseFM station token, recent transactions, and the wider Solana Agentbot token path that sits around the broader community layer.
               </p>
             </div>
             <WalletConnect />
@@ -117,6 +118,12 @@ export default function WalletPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <TokenSurfacePanel subtitle="This wallet screen tracks your Base-side station access directly and shows the parallel Solana Agentbot token used across the wider ecosystem." />
         </div>
       </section>
 

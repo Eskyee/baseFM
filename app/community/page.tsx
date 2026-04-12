@@ -6,6 +6,7 @@ import { Avatar, Name, Identity } from '@coinbase/onchainkit/identity';
 import { WalletConnect } from '@/components/WalletConnect';
 import Link from 'next/link';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
+import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 import { Member } from '@/types/member';
 
 const balanceOfAbi = [
@@ -342,6 +343,12 @@ export default function CommunityPage() {
               </div>
             ))}
           </div>
+
+          <TokenSurfacePanel
+            compact
+            title="Community tokens"
+            subtitle="The community layer now makes the split explicit: Base-side RAVE/baseFM for station access, plus the Solana Agentbot token for the wider network and reward path."
+          />
         </div>
       </section>
 

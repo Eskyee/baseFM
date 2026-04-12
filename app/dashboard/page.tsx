@@ -8,6 +8,7 @@ import { useStreams } from '@/hooks/useStreams';
 import { useDJAccess } from '@/hooks/useDJAccess';
 import { StreamCard } from '@/components/StreamCard';
 import { WalletConnect } from '@/components/WalletConnect';
+import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 function formatAddress(address?: string | null) {
@@ -118,6 +119,12 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+
+          <TokenSurfacePanel
+            compact
+            title="Access tokens"
+            subtitle="The DJ gate here still checks the Base-side RAVE/baseFM token. The Solana Agentbot token remains the wider ecosystem and community path around the station."
+          />
         </div>
       </section>
 

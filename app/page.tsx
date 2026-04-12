@@ -7,6 +7,7 @@ import { useLiveStreams, useStreams } from '@/hooks/useStreams';
 import { LiveShowCard } from '@/components/LiveShowCard';
 import { ShareApp } from '@/components/ShareApp';
 import { MoltxFeed } from '@/components/MoltxFeed';
+import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 import {
   getNextUpcomingEvent,
   hasAnyEvents,
@@ -250,6 +251,16 @@ export default function HomePage() {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <TokenSurfacePanel
+            compact
+            title="Token rails"
+            subtitle="BaseFM now shows both the Base-side RAVE/baseFM station token and the Solana Agentbot token so the ecosystem split is visible instead of hidden."
+          />
         </div>
       </section>
 
