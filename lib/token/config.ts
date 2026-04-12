@@ -1,9 +1,9 @@
 // baseFM Token Configuration
-// RaveCulture token for DJ access gating
+// BASEFM token for DJ access gating
 
 export const DJ_TOKEN_CONFIG = {
-  // RaveCulture token on Base
-  address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,
+  // BASEFM token on Base
+  address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`,
 
   // Minimum tokens required to DJ (1.25M tokens ≈ $5.00 overhead coverage)
   requiredAmount: 1250000,
@@ -15,8 +15,8 @@ export const DJ_TOKEN_CONFIG = {
   decimals: 18,
 
   // Display info
-  symbol: 'RAVE',
-  name: 'RaveCulture',
+  symbol: 'BASEFM',
+  name: 'baseFM',
 
   // Chain
   chainId: 8453, // Base mainnet

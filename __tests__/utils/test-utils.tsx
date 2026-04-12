@@ -255,12 +255,12 @@ export const USDC_CONFIG = {
 };
 
 /**
- * RAVE token config for testing
+ * BASEFM token config for testing
  */
 export const RAVE_CONFIG = {
-  address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5',
+  address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3',
   decimals: 18,
-  symbol: 'RAVE',
+  symbol: 'BASEFM',
 };
 
 /**

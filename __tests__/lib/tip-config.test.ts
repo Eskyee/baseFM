@@ -26,7 +26,7 @@ describe('TIP_TOKENS', () => {
 
     expect(symbols).toContain('ETH');
     expect(symbols).toContain('USDC');
-    expect(symbols).toContain('RAVE');
+    expect(symbols).toContain('BASEFM');
     expect(symbols).toContain('cbBTC');
   });
 
@@ -57,11 +57,11 @@ describe('TIP_TOKENS', () => {
    * RAVE is our community token
    * Must have correct Base mainnet address
    */
-  it('should have correct RAVE token configuration', () => {
-    const rave = TIP_TOKENS.find((t) => t.symbol === 'RAVE');
+  it('should have correct BASEFM token configuration', () => {
+    const rave = TIP_TOKENS.find((t) => t.symbol === 'BASEFM');
 
     expect(rave).toBeDefined();
-    expect(rave?.address).toBe('0xdf3c79a5759eeedb844e7481309a75037b8e86f5');
+    expect(rave?.address).toBe('0x9a4376bab717ac0a3901eeed8308a420c59c0ba3');
     expect(rave?.decimals).toBe(18);
   });
 

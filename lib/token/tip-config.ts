@@ -27,9 +27,9 @@ export const TIP_TOKENS: TipToken[] = [
     color: '#2775CA',
   },
   {
-    symbol: 'RAVE',
-    name: 'RaveCulture',
-    address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5',
+    symbol: 'BASEFM',
+    name: 'baseFM',
+    address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3',
     decimals: 18,
     icon: '🎵',
     color: '#8B5CF6',

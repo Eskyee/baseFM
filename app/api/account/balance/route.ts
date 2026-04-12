@@ -4,12 +4,12 @@ import { base } from 'viem/chains';
 
 export const dynamic = 'force-dynamic';
 
-// RAVE token configuration
-const RAVE_TOKEN = {
-  address: '0xdf3c79a5759eeedb844e7481309a75037b8e86f5' as `0x${string}`,
+// BASEFM token configuration
+const BASEFM_TOKEN = {
+  address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`,
   decimals: 18,
-  symbol: 'RAVE',
-  name: 'RaveCulture',
+  symbol: 'BASEFM',
+  name: 'baseFM',
 };
 
 // ERC20 balanceOf ABI
@@ -23,7 +23,7 @@ const ERC20_ABI = [
   },
 ] as const;
 
-// GET /api/account/balance - Check RAVE token balance
+// GET /api/account/balance - Check BASEFM token balance
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const walletAddress = searchParams.get('walletAddress');
@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
       transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org'),
     });
 
-    // Get RAVE balance
+    // Get BASEFM balance
     const balance = await client.readContract({
-      address: RAVE_TOKEN.address,
+      address: BASEFM_TOKEN.address,
       abi: ERC20_ABI,
       functionName: 'balanceOf',
       args: [walletAddress as `0x${string}`],
@@ -62,29 +62,29 @@ export async function GET(request: NextRequest) {
       address: walletAddress as `0x${string}`,
     });
 
-    const raveFormatted = formatUnits(balance, RAVE_TOKEN.decimals);
+    const tokenFormatted = formatUnits(balance, BASEFM_TOKEN.decimals);
     const ethFormatted = formatUnits(ethBalance, 18);
 
-    // Determine tier based on RAVE holdings
-    const raveAmount = parseFloat(raveFormatted);
+    // Determine tier based on BASEFM holdings
+    const tokenAmount = parseFloat(tokenFormatted);
     let tier = 'none';
-    if (raveAmount >= 1_000_000_000) {
+    if (tokenAmount >= 1_000_000_000) {
       tier = 'premium';
-    } else if (raveAmount >= 100_000) {
+    } else if (tokenAmount >= 100_000) {
       tier = 'label';
-    } else if (raveAmount >= 10_000) {
+    } else if (tokenAmount >= 10_000) {
       tier = 'pro';
-    } else if (raveAmount >= 5_000) {
+    } else if (tokenAmount >= 5_000) {
       tier = 'community';
     }
 
     return NextResponse.json({
       walletAddress,
       balances: {
-        rave: {
+        basefm: {
           raw: balance.toString(),
-          formatted: raveFormatted,
-          symbol: RAVE_TOKEN.symbol,
+          formatted: tokenFormatted,
+          symbol: BASEFM_TOKEN.symbol,
         },
         eth: {
           raw: ethBalance.toString(),
@@ -94,17 +94,17 @@ export async function GET(request: NextRequest) {
       },
       tier,
       access: {
-        community: raveAmount >= 5_000,
-        djStreaming: raveAmount >= 5_000,
-        pro: raveAmount >= 10_000,
-        label: raveAmount >= 100_000,
-        premium: raveAmount >= 1_000_000_000,
+        community: tokenAmount >= 5_000,
+        djStreaming: tokenAmount >= 5_000,
+        pro: tokenAmount >= 10_000,
+        label: tokenAmount >= 100_000,
+        premium: tokenAmount >= 1_000_000_000,
       },
       tokenInfo: {
-        address: RAVE_TOKEN.address,
-        name: RAVE_TOKEN.name,
-        symbol: RAVE_TOKEN.symbol,
-        decimals: RAVE_TOKEN.decimals,
+        address: BASEFM_TOKEN.address,
+        name: BASEFM_TOKEN.name,
+        symbol: BASEFM_TOKEN.symbol,
+        decimals: BASEFM_TOKEN.decimals,
         chain: 'base',
         chainId: 8453,
       },
