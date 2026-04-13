@@ -223,6 +223,25 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
       )}
 
+      {/* Co-Show (B2B) — Flagship Feature */}
+      <Link
+        href={`/dashboard/stream/${stream.id}/co-show`}
+        className="block bg-gradient-to-r from-amber-900/30 to-amber-800/20 border border-amber-500/40 rounded-xl p-4 sm:p-5 mb-4 sm:mb-6 hover:border-amber-400 transition-colors group"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎛️</span>
+            <div>
+              <span className="text-amber-400 font-bold text-sm sm:text-base">Co-Show (B2B)</span>
+              <p className="text-amber-200/60 text-xs mt-0.5">Invite another DJ for a back-to-back set</p>
+            </div>
+          </div>
+          <svg className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </Link>
+
       {/* Setup Mux Section - Show if stream doesn't have Mux credentials */}
       {needsMuxSetup && (
         <div className="bg-purple-900/20 border border-purple-500 rounded-lg p-6 mb-6">

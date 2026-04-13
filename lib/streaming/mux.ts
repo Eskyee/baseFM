@@ -104,6 +104,25 @@ export interface MuxWebhookEvent {
   muxStreamId: string;
 }
 
+export async function createMuxCoShowStream(baseFmStreamId: string): Promise<MuxLiveStream> {
+  const mux = getMuxClient();
+  const liveStream = await mux.video.liveStreams.create({
+    playback_policy: ['public'],
+    new_asset_settings: { playback_policy: ['public'] },
+    passthrough: baseFmStreamId,
+    latency_mode: 'low',
+    reconnect_window: 120, // 2 min for DJ handoff
+    max_continuous_duration: 43200, // 12 hours max
+  });
+  const playbackId = liveStream.playback_ids?.[0]?.id || '';
+  return {
+    id: liveStream.id,
+    streamKey: liveStream.stream_key || '',
+    playbackId,
+    rtmpUrl: `rtmps://global-live.mux.com:443/app/${liveStream.stream_key}`,
+  };
+}
+
 export function parseMuxWebhookEvent(payload: Record<string, unknown>): MuxWebhookEvent {
   const eventType = payload.type as string;
   const data = payload.data as Record<string, unknown>;
