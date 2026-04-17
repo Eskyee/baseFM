@@ -25,17 +25,18 @@ baseFM is an onchain radio platform on Base (chain ID 8453). DJs stream live mus
 
 ## Key Tokens
 
-### RAVE (Community Token)
+### BASEFM (DJ Access Token)
 ```
-Address:  0xdf3c79a5759eeedb844e7481309a75037b8e86f5
+Address:  0x9a4376bab717ac0a3901eeed8308a420c59c0ba3
 Chain:    Base (8453)
 Decimals: 18
-Symbol:   RAVE
-Name:     RaveCulture
+Symbol:   BASEFM
+Name:     baseFM
 ```
-- **5,000 RAVE** = community access + DJ streaming
-- **1B RAVE** = premium tier (custom token gating)
+- **2,500,000 BASEFM** = DJ streaming access (covers Mux USDC costs + profit)
+- **1B BASEFM** = premium tier (custom token gating)
 - Config: `lib/token/config.ts`
+- Note: Migrated from RAVE token (0xdf3c...) — old references may still say RAVE
 
 ### USDC (Payments)
 ```
