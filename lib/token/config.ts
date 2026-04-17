@@ -1,12 +1,15 @@
 // baseFM Token Configuration
 // BASEFM token for DJ access gating
+// Gate must cover Mux live-streaming USDC costs + profit margin per 2-hour session.
+// Mux encoding ~$6 + delivery ~$10 + storage ~$5 + margin = ~$25 floor.
 
 export const DJ_TOKEN_CONFIG = {
   // BASEFM token on Base
   address: '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3' as `0x${string}`,
 
-  // Minimum tokens required to DJ (1.25M tokens ≈ $5.00 overhead coverage)
-  requiredAmount: 1250000,
+  // Minimum tokens required to DJ — covers Mux USDC costs + profit
+  // 2.5M BASEFM ≈ $25+ at current prices (encoding + delivery + storage + margin)
+  requiredAmount: 2_500_000,
 
   // Premium tier - 1 billion tokens to use custom token gating
   premiumAmount: 1_000_000_000,
