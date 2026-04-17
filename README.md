@@ -262,4 +262,6 @@ Built with love by [RaveCulture](https://base.app/profile/raveculture) for Base 
 
 📻 Keep the signal alive
 
+Built with ❤️ by the community, for the community.
+
 </div>
