@@ -12,8 +12,8 @@ describe('DJ_TOKEN_CONFIG', () => {
     expect(DJ_TOKEN_CONFIG.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
   });
 
-  it('should require 5000 tokens for DJ access', () => {
-    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(5000);
+  it('should require 2500000 tokens for DJ access', () => {
+    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(2_500_000);
   });
 
   it('should require 1 billion tokens for premium tier', () => {
@@ -32,8 +32,8 @@ describe('DJ_TOKEN_CONFIG', () => {
     expect(DJ_TOKEN_CONFIG.chainId).toBe(8453);
   });
 
-  it('should have RAVE as symbol', () => {
-    expect(DJ_TOKEN_CONFIG.symbol).toBe('RAVE');
+  it('should have BASEFM as symbol', () => {
+    expect(DJ_TOKEN_CONFIG.symbol).toBe('BASEFM');
   });
 });
 
