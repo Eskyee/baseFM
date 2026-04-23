@@ -55,6 +55,18 @@ export function createAuthMessage(nonce: string): string {
   return `Sign this message to authenticate with baseFM.\n\nNonce: ${nonce}`;
 }
 
+export type StreamAction = 'setup' | 'stop';
+
+export function createStreamActionMessage(
+  action: StreamAction,
+  streamId: string,
+  nonce: string,
+  timestamp: string
+): string {
+  const verb = action === 'setup' ? 'Generate credentials for' : 'Stop';
+  return `${verb} baseFM stream ${streamId}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
+}
+
 export function generateNonce(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();

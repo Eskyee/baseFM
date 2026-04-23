@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
 import { verifyWalletSignature } from '@/lib/auth/wallet';
 import { STREAM_STATUS, STOPPABLE_STATUSES } from '@/lib/constants/stream';
+import { finalizeStreamBilling } from '@/lib/db/billing';
 
 export async function POST(
   request: NextRequest,
@@ -67,6 +68,7 @@ export async function POST(
 
     // Update status to ENDED
     const updatedStream = await updateStreamStatus(params.id, STREAM_STATUS.ENDED);
+    await finalizeStreamBilling(updatedStream);
 
     return NextResponse.json({ stream: updatedStream });
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { createServerClient } from '@/lib/supabase/client';
+import { deriveTipPlatformFee } from '@/lib/db/billing';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,8 @@ export async function GET(request: NextRequest) {
     // Transform data
     const tips = (tipsData || []).map((t: Record<string, unknown>) => {
       const djs = t.djs as Record<string, unknown> | null;
+      const amount = parseFloat(t.amount as string);
+      const fee = deriveTipPlatformFee(amount);
 
       return {
         id: t.id as string,
@@ -61,7 +64,8 @@ export async function GET(request: NextRequest) {
         toWallet: t.to_wallet as string,
         toDjName: (djs?.name as string) || 'Unknown DJ',
         token: t.token as string,
-        amount: parseFloat(t.amount as string),
+        amount,
+        ...fee,
         txHash: t.tx_hash as string,
         createdAt: t.created_at as string,
       };

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/middleware/admin-auth';
 import { createServerClient } from '@/lib/supabase/client';
+import { deriveTicketPlatformFee } from '@/lib/db/billing';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +70,7 @@ export async function GET(request: NextRequest) {
       const events = eventTickets?.events as Record<string, unknown> | null;
 
       return {
+        ...deriveTicketPlatformFee(parseFloat(p.amount_usdc as string) || 0),
         id: p.id as string,
         ticketId: p.ticket_id as string,
         ticketName: (eventTickets?.name as string) || 'Unknown',

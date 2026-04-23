@@ -8,6 +8,8 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
 // =============================================================================
 // GLOBAL MOCKS
 // =============================================================================
@@ -34,7 +36,10 @@ vi.mock('next/navigation', () => ({
  * Renders as a regular img for testing
  */
 vi.mock('next/image', () => ({
-  default: (props: any) => <img {...props} />,
+  default: (props: any) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img alt={props.alt ?? ''} {...props} />;
+  },
 }));
 
 /**
@@ -119,6 +124,11 @@ Object.defineProperty(navigator, 'clipboard', {
     writeText: vi.fn().mockResolvedValue(undefined),
     readText: vi.fn().mockResolvedValue(''),
   },
+  writable: true,
+});
+
+Object.defineProperty(navigator, 'sendBeacon', {
+  value: vi.fn().mockReturnValue(true),
   writable: true,
 });
 

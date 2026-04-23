@@ -334,7 +334,7 @@ export default function WebDesignPage() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#F5F5F5] mb-3">Get a Quote</h2>
             <p className="text-[#888]">
-              Tell us about your project and we'll get back to you within 24 hours.
+              Tell us about your project and we&apos;ll get back to you within 24 hours.
             </p>
           </div>
 

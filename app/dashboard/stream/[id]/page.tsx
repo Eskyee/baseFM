@@ -1,20 +1,162 @@
 'use client';
 
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useCallback, useEffect, useState } from 'react';
+import { parseUnits } from 'viem';
+import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { useStream } from '@/hooks/useStream';
 import { WalletConnect } from '@/components/WalletConnect';
+import { createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
+import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
 import Link from 'next/link';
+
+const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as const;
+const USDC_DECIMALS = 6;
+
+interface BillingSummary {
+  platformWallet: string;
+  pricing: {
+    streamSessionFeeUsdc: number;
+    monthlySubscriptionFeeUsdc: number;
+    meteredRateUsdcPerHour: number;
+    subscribedMeteredRateUsdcPerHour: number;
+    tipPlatformFeeBps: number;
+    ticketPlatformFeeBps: number;
+  };
+  subscription?: {
+    id: string;
+    endsAt: string;
+  } | null;
+  streamSession?: {
+    sessionFeeStatus: 'pending' | 'paid' | 'waived';
+    meteredFeeStatus: 'pending' | 'paid' | 'waived';
+    meteredFeeUsdc: number;
+    durationSeconds: number;
+  } | null;
+  canActivateStream: boolean;
+  requiresSessionPayment: boolean;
+  outstandingMeteredFeeUsdc: number;
+}
 
 export default function DJStreamControlPage({ params }: { params: { id: string } }) {
   const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const { stream, isLoading, error, refetch } = useStream(params.id);
+  const { writeContract, data: billingTxHash, isPending: isBillingPending, error: billingWriteError } = useWriteContract();
+  const { isLoading: isBillingConfirming, isSuccess: isBillingConfirmed } = useWaitForTransactionReceipt({
+    hash: billingTxHash,
+  });
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [isSettingUpMux, setIsSettingUpMux] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [billing, setBilling] = useState<BillingSummary | null>(null);
+  const [isBillingLoading, setIsBillingLoading] = useState(false);
+  const [billingAction, setBillingAction] = useState<'subscription' | 'session' | 'metered' | null>(null);
+  const [isRecordingBilling, setIsRecordingBilling] = useState(false);
+
+  const fetchBilling = useCallback(async () => {
+    if (!stream) return;
+    setIsBillingLoading(true);
+    try {
+      const response = await fetch(`/api/billing/streams/${stream.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch billing status');
+      }
+      const data = await response.json();
+      setBilling(data.billing || null);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to fetch billing status');
+    } finally {
+      setIsBillingLoading(false);
+    }
+  }, [stream]);
+
+  useEffect(() => {
+    if (stream && isConnected) {
+      void fetchBilling();
+    }
+  }, [fetchBilling, stream, isConnected]);
+
+  useEffect(() => {
+    if (billingWriteError) {
+      setActionError(billingWriteError.message || 'Billing transaction failed');
+    }
+  }, [billingWriteError]);
+
+  useEffect(() => {
+    if (!billingTxHash || !billingAction || !isBillingConfirmed || !address || !stream || isRecordingBilling) {
+      return;
+    }
+
+    const recordBilling = async () => {
+      setIsRecordingBilling(true);
+      setActionError(null);
+
+      try {
+        const endpoint =
+          billingAction === 'subscription'
+            ? '/api/billing/subscription'
+            : billingAction === 'session'
+            ? `/api/billing/streams/${stream.id}`
+            : `/api/billing/streams/${stream.id}/settle`;
+
+        const body =
+          billingAction === 'subscription'
+            ? { walletAddress: address, txHash: billingTxHash }
+            : { walletAddress: address, txHash: billingTxHash };
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to record billing payment');
+        }
+
+        setActionSuccess(
+          billingAction === 'subscription'
+            ? 'Subscription activated.'
+            : billingAction === 'session'
+            ? 'Session fee recorded. You can now generate credentials and start the stream.'
+            : 'Metered stream fee settled.'
+        );
+        await fetchBilling();
+      } catch (err) {
+        setActionError(err instanceof Error ? err.message : 'Failed to record billing payment');
+      } finally {
+        setBillingAction(null);
+        setIsRecordingBilling(false);
+      }
+    };
+
+    void recordBilling();
+  }, [address, billingAction, billingTxHash, fetchBilling, isBillingConfirmed, isRecordingBilling, stream]);
+
+  const payUsdc = (amountUsdc: number, action: 'subscription' | 'session' | 'metered') => {
+    if (!billing?.platformWallet || !amountUsdc || amountUsdc <= 0) {
+      setActionError('Billing destination is not available');
+      return;
+    }
+
+    setActionError(null);
+    setActionSuccess(null);
+    setBillingAction(action);
+
+    writeContract({
+      address: USDC_ADDRESS,
+      abi: ERC20_TRANSFER_ABI,
+      functionName: 'transfer',
+      args: [
+        billing.platformWallet as `0x${string}`,
+        parseUnits(amountUsdc.toFixed(2), USDC_DECIMALS),
+      ],
+    });
+  };
 
   if (!isConnected) {
     return (
@@ -73,17 +215,42 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         body: JSON.stringify({ djWalletAddress: address }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
+        if (response.status === 402 && data.billing) {
+          setBilling(data.billing);
+        }
         throw new Error(data.error || 'Failed to start stream');
       }
 
+      setActionSuccess('Stream marked as preparing. Start your encoder to go live.');
       refetch();
+      void fetchBilling();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsStarting(false);
     }
+  };
+
+  const createSignedPayload = async (action: StreamAction) => {
+    if (!address) {
+      throw new Error('Connect your wallet to continue');
+    }
+
+    const nonce = generateNonce();
+    const timestamp = new Date().toISOString();
+    const message = createStreamActionMessage(action, stream.id, nonce, timestamp);
+    const signature = await signMessageAsync({ message });
+
+    return {
+      djWalletAddress: address,
+      signature,
+      message,
+      nonce,
+      timestamp,
+    };
   };
 
   const handleStop = async () => {
@@ -92,10 +259,11 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setActionSuccess(null);
 
     try {
+      const signedPayload = await createSignedPayload('stop');
       const response = await fetch(`/api/streams/${stream.id}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ djWalletAddress: address }),
+        body: JSON.stringify(signedPayload),
       });
 
       if (!response.ok) {
@@ -103,7 +271,9 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         throw new Error(data.error || 'Failed to stop stream');
       }
 
+      setActionSuccess('Stream ended. Listener sessions will clear automatically.');
       refetch();
+      void fetchBilling();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -117,20 +287,25 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setActionSuccess(null);
 
     try {
+      const signedPayload = await createSignedPayload('setup');
       const response = await fetch(`/api/streams/${stream.id}/setup-mux`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ djWalletAddress: address }),
+        body: JSON.stringify(signedPayload),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 402 && data.billing) {
+          setBilling(data.billing);
+        }
         throw new Error(data.error || 'Failed to setup streaming');
       }
 
       setActionSuccess('Streaming credentials generated! You can now go live.');
       refetch();
+      void fetchBilling();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -222,6 +397,104 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           {actionSuccess}
         </div>
       )}
+
+      <div className="bg-[#111827] border border-blue-500/20 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-white">Streaming Billing</h2>
+            <p className="text-gray-400 text-xs sm:text-sm">
+              Session fee, monthly DJ subscription, and per-hour stream metering settle to the platform wallet.
+            </p>
+          </div>
+          {billing?.subscription ? (
+            <span className="px-3 py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-semibold">
+              Subscription active until {new Date(billing.subscription.endsAt).toLocaleDateString()}
+            </span>
+          ) : (
+            <span className="px-3 py-1.5 bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-semibold">
+              Pay per stream
+            </span>
+          )}
+        </div>
+
+        {isBillingLoading ? (
+          <p className="text-gray-400 text-sm">Loading billing status...</p>
+        ) : billing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="bg-black/30 rounded-lg p-3">
+                <div className="text-xs text-gray-500 mb-1">Session Fee</div>
+                <div className="text-white font-semibold">${billing.pricing.streamSessionFeeUsdc.toFixed(2)} USDC</div>
+                <div className="text-[11px] text-gray-500 mt-1">
+                  {billing.streamSession?.sessionFeeStatus === 'paid'
+                    ? 'Paid'
+                    : billing.streamSession?.sessionFeeStatus === 'waived'
+                    ? 'Waived by subscription'
+                    : 'Required before setup/start'}
+                </div>
+              </div>
+              <div className="bg-black/30 rounded-lg p-3">
+                <div className="text-xs text-gray-500 mb-1">Monthly Subscription</div>
+                <div className="text-white font-semibold">${billing.pricing.monthlySubscriptionFeeUsdc.toFixed(2)} USDC</div>
+                <div className="text-[11px] text-gray-500 mt-1">Waives session fee and lowers hourly rate</div>
+              </div>
+              <div className="bg-black/30 rounded-lg p-3">
+                <div className="text-xs text-gray-500 mb-1">Metered Rate</div>
+                <div className="text-white font-semibold">${billing.pricing.meteredRateUsdcPerHour.toFixed(2)} / hour</div>
+                <div className="text-[11px] text-gray-500 mt-1">
+                  Outstanding: ${billing.outstandingMeteredFeeUsdc.toFixed(2)}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              {!billing.subscription && (
+                <button
+                  onClick={() => payUsdc(billing.pricing.monthlySubscriptionFeeUsdc, 'subscription')}
+                  disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
+                  className="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {billingAction === 'subscription' && (isBillingPending || isBillingConfirming || isRecordingBilling)
+                    ? 'Activating subscription...'
+                    : 'Buy Monthly Subscription'}
+                </button>
+              )}
+
+              {billing.requiresSessionPayment && (
+                <button
+                  onClick={() => payUsdc(billing.pricing.streamSessionFeeUsdc, 'session')}
+                  disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
+                  className="px-5 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
+                >
+                  {billingAction === 'session' && (isBillingPending || isBillingConfirming || isRecordingBilling)
+                    ? 'Recording session fee...'
+                    : 'Pay Stream Session Fee'}
+                </button>
+              )}
+
+              {billing.outstandingMeteredFeeUsdc > 0 && stream.status === 'ENDED' && (
+                <button
+                  onClick={() => payUsdc(billing.outstandingMeteredFeeUsdc, 'metered')}
+                  disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
+                  className="px-5 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors disabled:opacity-50"
+                >
+                  {billingAction === 'metered' && (isBillingPending || isBillingConfirming || isRecordingBilling)
+                    ? 'Settling metered fee...'
+                    : `Settle ${billing.outstandingMeteredFeeUsdc.toFixed(2)} USDC Metered Fee`}
+                </button>
+              )}
+            </div>
+
+            {billing.streamSession?.durationSeconds ? (
+              <p className="text-xs text-gray-500">
+                Last billed duration: {(billing.streamSession.durationSeconds / 60).toFixed(1)} minutes
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <p className="text-gray-400 text-sm">Billing status unavailable.</p>
+        )}
+      </div>
 
       {/* Co-Show (B2B) — Flagship Feature */}
       <Link

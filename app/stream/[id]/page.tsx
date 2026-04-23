@@ -15,6 +15,8 @@ export default function StreamPage({ params }: { params: { id: string } }) {
   const { stream, isLoading, error } = useStream(params.id);
   const { state, playStream, stopStream } = usePlayer();
   const currentShow = state.currentStream;
+  const hasEnded = stream?.status === 'ENDED';
+  const isInPersistentPlayer = currentShow?.id === stream?.id;
 
   useEffect(() => {
     if (!error) return;
@@ -43,6 +45,12 @@ export default function StreamPage({ params }: { params: { id: string } }) {
       details: `Status ${stream.status} without playback source`,
     });
   }, [stream]);
+
+  useEffect(() => {
+    if (hasEnded && isInPersistentPlayer) {
+      stopStream();
+    }
+  }, [hasEnded, isInPersistentPlayer, stopStream]);
 
   if (isLoading) {
     return (
@@ -89,9 +97,6 @@ export default function StreamPage({ params }: { params: { id: string } }) {
 
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
-  const hasEnded = stream.status === 'ENDED';
-  const isInPersistentPlayer = currentShow?.id === stream.id;
-
   const enablePersistentPlayback = () => {
     const hlsUrl = stream.muxPlaybackId
       ? `https://stream.mux.com/${stream.muxPlaybackId}.m3u8`

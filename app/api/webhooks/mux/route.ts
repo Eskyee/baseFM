@@ -5,6 +5,7 @@ import {
 } from '@/lib/streaming/mux';
 import { updateStreamStatus } from '@/lib/db/streams';
 import { STREAM_STATUS } from '@/lib/constants/stream';
+import { finalizeStreamBilling, markStreamStarted } from '@/lib/db/billing';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       case 'stream_active':
         // Stream is now receiving data and is live
         await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.LIVE);
+        await markStreamStarted(event.baseFmStreamId);
         console.log(`Stream ${event.baseFmStreamId} is now LIVE`);
         break;
 
@@ -46,7 +48,8 @@ export async function POST(request: NextRequest) {
 
       case 'stream_disconnected':
         // Stream connection closed
-        await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.ENDED);
+        const endedStream = await updateStreamStatus(event.baseFmStreamId, STREAM_STATUS.ENDED);
+        await finalizeStreamBilling(endedStream);
         console.log(`Stream ${event.baseFmStreamId} has ENDED`);
         break;
 

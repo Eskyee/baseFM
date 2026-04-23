@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -46,6 +46,8 @@ interface AccountingSummary {
   totalTicketsSold: number;
   totalTips: number;
   totalTipCount: number;
+  totalPlatformFeesCollected: number;
+  totalPlatformFeesAccrued: number;
   eventBreakdown: {
     eventId: string;
     eventTitle: string;
@@ -65,6 +67,64 @@ export default function AdminAccountingPage() {
   const [selectedEvent, setSelectedEvent] = useState<string>('all');
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [summary, setSummary] = useState<AccountingSummary | null>(null);
+
+  const fetchAccountingData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const ticketsParams = new URLSearchParams();
+      if (selectedEvent !== 'all') {
+        ticketsParams.set('eventId', selectedEvent);
+      }
+      ticketsParams.set('dateRange', dateRange);
+
+      const [ticketsRes, tipsRes, billingRes] = await Promise.all([
+        adminFetch(`/api/admin/accounting/tickets?${ticketsParams}`),
+        adminFetch(`/api/admin/accounting/tips?dateRange=${dateRange}`),
+        adminFetch(`/api/admin/accounting/billing?dateRange=${dateRange}`),
+      ]);
+
+      let ticketData = { sales: [], summary: { totalRevenue: 0, totalSold: 0, eventBreakdown: [] } };
+      let tipData = { tips: [], summary: { totalAmount: 0, totalCount: 0 } };
+      let billingData = { totalCollected: 0, totalAccrued: 0 };
+
+      if (ticketsRes.ok) {
+        ticketData = await ticketsRes.json();
+      }
+      if (tipsRes.ok) {
+        tipData = await tipsRes.json();
+      }
+      if (billingRes.ok) {
+        billingData = await billingRes.json();
+      }
+
+      setSummary({
+        totalTicketRevenue: ticketData.summary?.totalRevenue || 0,
+        totalTicketsSold: ticketData.summary?.totalSold || 0,
+        totalTips: tipData.summary?.totalAmount || 0,
+        totalTipCount: tipData.summary?.totalCount || 0,
+        totalPlatformFeesCollected: billingData.totalCollected || 0,
+        totalPlatformFeesAccrued: billingData.totalAccrued || 0,
+        eventBreakdown: ticketData.summary?.eventBreakdown || [],
+        recentSales: ticketData.sales || [],
+        recentTips: tipData.tips || [],
+      });
+    } catch (err) {
+      console.error('Failed to fetch accounting data:', err);
+      setSummary({
+        totalTicketRevenue: 0,
+        totalTicketsSold: 0,
+        totalTips: 0,
+        totalTipCount: 0,
+        totalPlatformFeesCollected: 0,
+        totalPlatformFeesAccrued: 0,
+        eventBreakdown: [],
+        recentSales: [],
+        recentTips: [],
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [adminFetch, dateRange, selectedEvent]);
 
   // Fetch events
   useEffect(() => {
@@ -87,61 +147,10 @@ export default function AdminAccountingPage() {
 
   // Fetch accounting data
   useEffect(() => {
-    const fetchAccountingData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch ticket purchases
-        const ticketsParams = new URLSearchParams();
-        if (selectedEvent !== 'all') {
-          ticketsParams.set('eventId', selectedEvent);
-        }
-        ticketsParams.set('dateRange', dateRange);
-
-        const [ticketsRes, tipsRes] = await Promise.all([
-          adminFetch(`/api/admin/accounting/tickets?${ticketsParams}`),
-          adminFetch(`/api/admin/accounting/tips?dateRange=${dateRange}`),
-        ]);
-
-        let ticketData = { sales: [], summary: { totalRevenue: 0, totalSold: 0, eventBreakdown: [] } };
-        let tipData = { tips: [], summary: { totalAmount: 0, totalCount: 0 } };
-
-        if (ticketsRes.ok) {
-          ticketData = await ticketsRes.json();
-        }
-        if (tipsRes.ok) {
-          tipData = await tipsRes.json();
-        }
-
-        setSummary({
-          totalTicketRevenue: ticketData.summary?.totalRevenue || 0,
-          totalTicketsSold: ticketData.summary?.totalSold || 0,
-          totalTips: tipData.summary?.totalAmount || 0,
-          totalTipCount: tipData.summary?.totalCount || 0,
-          eventBreakdown: ticketData.summary?.eventBreakdown || [],
-          recentSales: ticketData.sales || [],
-          recentTips: tipData.tips || [],
-        });
-      } catch (err) {
-        console.error('Failed to fetch accounting data:', err);
-        // Set empty summary on error
-        setSummary({
-          totalTicketRevenue: 0,
-          totalTicketsSold: 0,
-          totalTips: 0,
-          totalTipCount: 0,
-          eventBreakdown: [],
-          recentSales: [],
-          recentTips: [],
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (isConnected) {
-      fetchAccountingData();
+      void fetchAccountingData();
     }
-  }, [isConnected, selectedEvent, dateRange]);
+  }, [fetchAccountingData, isConnected]);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -279,7 +288,7 @@ export default function AdminAccountingPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
               <div className="bg-[#1A1A1A] rounded-xl p-5">
                 <div className="text-sm text-[#888] mb-1">Ticket Revenue</div>
                 <div className="text-2xl font-bold text-green-400">
@@ -307,6 +316,15 @@ export default function AdminAccountingPage() {
                   {summary?.totalTipCount || 0}
                 </div>
                 <div className="text-xs text-[#666] mt-1">Transactions</div>
+              </div>
+              <div className="bg-[#1A1A1A] rounded-xl p-5">
+                <div className="text-sm text-[#888] mb-1">Platform Fees</div>
+                <div className="text-2xl font-bold text-blue-400">
+                  {formatCurrency(summary?.totalPlatformFeesCollected || 0)}
+                </div>
+                <div className="text-xs text-[#666] mt-1">
+                  {formatCurrency(summary?.totalPlatformFeesAccrued || 0)} accrued
+                </div>
               </div>
             </div>
 
@@ -505,7 +523,7 @@ export default function AdminAccountingPage() {
             {/* Note about direct payments */}
             <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
               <p className="text-blue-300 text-sm">
-                <strong>Note:</strong> All ticket payments are in USDC on Base and go directly to promoter wallets. Tips can be in ETH, USDC, RAVE, or cbBTC and go directly to DJ wallets. baseFM does not hold or process any funds - this page shows onchain transaction records for transparency.
+                <strong>Note:</strong> Ticket and tip payouts still settle directly to promoters and DJs. Platform billing now records collected streaming fees plus accrued revenue-share amounts so operations can reconcile what is paid versus what is still owed.
               </p>
             </div>
           </>

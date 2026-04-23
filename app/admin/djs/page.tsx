@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -19,25 +19,25 @@ export default function AdminDJsPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchDJs() {
-      try {
-        const res = await adminFetch('/api/admin/djs');
-        if (res.ok) {
-          const data = await res.json();
-          setDJs(data.djs || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch DJs:', err);
-      } finally {
-        setIsLoading(false);
+  const fetchDJs = useCallback(async () => {
+    try {
+      const res = await adminFetch('/api/admin/djs');
+      if (res.ok) {
+        const data = await res.json();
+        setDJs(data.djs || []);
       }
+    } catch (err) {
+      console.error('Failed to fetch DJs:', err);
+    } finally {
+      setIsLoading(false);
     }
+  }, [adminFetch]);
 
+  useEffect(() => {
     if (isConnected) {
-      fetchDJs();
+      void fetchDJs();
     }
-  }, [isConnected]);
+  }, [fetchDJs, isConnected]);
 
   if (!isConnected) {
     return (

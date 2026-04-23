@@ -35,6 +35,40 @@ export function GlobalPlayer() {
     player.volume = isMuted ? 0 : volume;
   }, [volume, isMuted]);
 
+  useEffect(() => {
+    if (!currentStream?.id || !currentStream.isLive) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const syncStreamStatus = async () => {
+      try {
+        const response = await fetch(`/api/streams/${currentStream.id}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const status = data?.stream?.status;
+
+        if (cancelled) return;
+
+        if (status && !['LIVE', 'PREPARING'].includes(status)) {
+          stopStream();
+        }
+      } catch (error) {
+        console.error('Failed to sync player stream status:', error);
+      }
+    };
+
+    void syncStreamStatus();
+    const intervalId = window.setInterval(syncStreamStatus, 15000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [currentStream?.id, currentStream?.isLive, stopStream]);
+
   if (!currentStream) return null;
 
   const playbackSource = currentStream.muxPlaybackId || currentStream.hlsUrl;
@@ -84,6 +118,8 @@ export function GlobalPlayer() {
                       video_title: currentStream.title,
                       viewer_user_id: 'anonymous',
                     }}
+                    onEnded={stopStream}
+                    onError={stopStream}
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
                     style={{

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -38,11 +38,7 @@ export default function AdminCommunityPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       const res = await adminFetch('/api/admin/community');
       if (res.ok) {
@@ -54,7 +50,11 @@ export default function AdminCommunityPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [adminFetch]);
+
+  useEffect(() => {
+    void fetchMembers();
+  }, [fetchMembers]);
 
   const handleAction = async (memberId: string, action: 'verify' | 'unverify' | 'feature' | 'unfeature' | 'delete') => {
     setActionLoading(memberId + action);
@@ -79,7 +79,7 @@ export default function AdminCommunityPage() {
       }
 
       setMessage({ type: 'success', text: data.message || 'Action completed' });
-      fetchMembers();
+      void fetchMembers();
     } catch (err) {
       setMessage({ type: 'error', text: 'Failed to perform action' });
     } finally {

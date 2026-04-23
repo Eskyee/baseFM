@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamWithMuxDetails } from '@/lib/db/streams';
 import { createMuxLiveStream, getMuxPlaybackUrl, isMuxConfigured } from '@/lib/streaming/mux';
 import { verifyWalletSignature } from '@/lib/auth/wallet';
+import { getBillingPricing } from '@/lib/billing/config';
+import { getStreamBillingSummary, upsertStreamBillingSession } from '@/lib/db/billing';
 
 export async function POST(
   request: NextRequest,
@@ -72,6 +74,28 @@ export async function POST(
         { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
         { status: 401 }
       );
+    }
+
+    const billing = await getStreamBillingSummary(stream);
+    if (!billing.canActivateStream) {
+      return NextResponse.json(
+        {
+          error: 'Billing required before streaming credentials can be generated',
+          billing,
+        },
+        { status: 402 }
+      );
+    }
+
+    if (billing.subscription && !billing.streamSession) {
+      await upsertStreamBillingSession({
+        streamId: stream.id,
+        djWalletAddress,
+        subscriptionId: billing.subscription.id,
+        sessionFeeUsdc: 0,
+        meteredRateUsdcPerHour: getBillingPricing().subscribedMeteredRateUsdcPerHour,
+        sessionFeeStatus: 'waived',
+      });
     }
 
     // Create Mux live stream

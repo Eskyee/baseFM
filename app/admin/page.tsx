@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -33,13 +33,7 @@ export default function AdminPage() {
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isConnected) {
-      fetchMembers();
-    }
-  }, [isConnected]);
-
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       const res = await adminFetch('/api/admin/community');
       if (res.ok) {
@@ -51,18 +45,19 @@ export default function AdminPage() {
     } finally {
       setIsLoadingMembers(false);
     }
-  };
+  }, [adminFetch]);
+
+  useEffect(() => {
+    if (isConnected) {
+      void fetchMembers();
+    }
+  }, [fetchMembers, isConnected]);
 
   const handleMemberAction = async (memberId: string, action: 'verify' | 'unverify' | 'feature' | 'unfeature' | 'delete') => {
     setActionLoading(memberId + action);
     setResult(null);
 
     try {
-      const res = await fetch('/api/admin/community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: address, memberId, action }),
-      });
       const signedRes = await adminFetch('/api/admin/community', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +71,7 @@ export default function AdminPage() {
       }
 
       setResult({ success: true, message: data.message });
-      fetchMembers();
+      void fetchMembers();
     } catch (err) {
       setResult({ error: 'Failed to perform action' });
     } finally {

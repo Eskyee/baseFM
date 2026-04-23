@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
 import { STREAM_STATUS } from '@/lib/constants/stream';
+import { getBillingPricing } from '@/lib/billing/config';
+import { getStreamBillingSummary, markStreamStarted, upsertStreamBillingSession } from '@/lib/db/billing';
 
 export async function POST(
   request: NextRequest,
@@ -33,6 +35,28 @@ export async function POST(
         { error: `Cannot start stream with status: ${stream.status}` },
         { status: 400 }
       );
+    }
+
+    const billing = await getStreamBillingSummary(stream);
+    if (!billing.canActivateStream) {
+      return NextResponse.json(
+        { error: 'Billing required before starting stream', billing },
+        { status: 402 }
+      );
+    }
+
+    if (billing.subscription && !billing.streamSession) {
+      await upsertStreamBillingSession({
+        streamId: stream.id,
+        djWalletAddress: body.djWalletAddress,
+        subscriptionId: billing.subscription.id,
+        sessionFeeUsdc: 0,
+        meteredRateUsdcPerHour: getBillingPricing().subscribedMeteredRateUsdcPerHour,
+        sessionFeeStatus: 'waived',
+        startedAt: new Date().toISOString(),
+      });
+    } else {
+      await markStreamStarted(stream.id);
     }
 
     // Update status to PREPARING

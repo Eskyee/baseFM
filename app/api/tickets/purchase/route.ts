@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTicketById, recordTicketPurchase, hasTicketForEvent } from '@/lib/db/tickets';
 import { isValidWalletAddress, isValidUUID, isValidTxHash } from '@/lib/validation';
 import { verifyUsdcTransfer } from '@/lib/onchain/verify-transaction';
+import { deriveTicketPlatformFee, recordPlatformFee } from '@/lib/db/billing';
 import type { Hash, Address } from 'viem';
 
 // POST /api/tickets/purchase - Record a ticket purchase after onchain payment
@@ -111,9 +112,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const ticketFee = deriveTicketPlatformFee(totalAmount);
+    try {
+      await recordPlatformFee({
+        sourceType: 'ticket',
+        sourceId: purchaseResult.id,
+        payerWallet: buyerWallet.toLowerCase(),
+        recipientWallet: ticket.promoterWallet,
+        tokenSymbol: 'USDC',
+        grossAmount: ticketFee.grossAmount,
+        platformFeeAmount: ticketFee.platformFeeAmount,
+        netAmount: ticketFee.netAmount,
+        status: 'accrued',
+        txHash,
+        metadata: {
+          eventId: ticket.eventId,
+          ticketId,
+          quantity: qty,
+          note: 'Recorded as accrued because ticket payments currently settle directly to the promoter wallet.',
+        },
+      });
+    } catch (feeError) {
+      console.error('Failed to record ticket platform fee:', feeError);
+    }
+
     return NextResponse.json({
       success: true,
       purchase: purchaseResult,
+      platformFee: ticketFee,
       verification: {
         verified: true,
         blockNumber: verification.blockNumber?.toString(),

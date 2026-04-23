@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/client';
 import { isValidWalletAddress, isValidUUID, validatePagination } from '@/lib/validation';
+import { deriveTipPlatformFee, recordPlatformFee } from '@/lib/db/billing';
 
 // GET - Get tips for a DJ or stream
 export async function GET(request: NextRequest) {
@@ -78,11 +79,18 @@ export async function POST(request: NextRequest) {
       streamId,
       amountWei,
       amountEth,
+      amount,
+      tokenSymbol,
+      tokenAddress,
       txHash,
       message,
     } = body;
 
-    if (!senderWallet || !recipientWallet || !amountWei || !txHash) {
+    const normalizedAmount = Number(amountEth ?? amount);
+    const normalizedAmountWei = amountWei || null;
+    const normalizedTokenSymbol = tokenSymbol || 'ETH';
+
+    if (!senderWallet || !recipientWallet || !txHash || !Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -148,8 +156,8 @@ export async function POST(request: NextRequest) {
         recipient_wallet: recipientWallet.toLowerCase(),
         dj_id: djId || null,
         stream_id: streamId || null,
-        amount_wei: amountWei,
-        amount_eth: parseFloat(amountEth),
+        amount_wei: normalizedAmountWei || String(normalizedAmount),
+        amount_eth: normalizedAmount,
         tx_hash: txHash,
         message: message || null,
         status: 'confirmed',
@@ -162,7 +170,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save tip' }, { status: 500 });
     }
 
-    return NextResponse.json({ tip: data });
+    const tipFee = deriveTipPlatformFee(normalizedAmount);
+    try {
+      await recordPlatformFee({
+        sourceType: 'tip',
+        sourceId: data.id,
+        payerWallet: senderWallet,
+        recipientWallet,
+        tokenSymbol: normalizedTokenSymbol,
+        tokenAddress,
+        grossAmount: tipFee.grossAmount,
+        platformFeeAmount: tipFee.platformFeeAmount,
+        netAmount: tipFee.netAmount,
+        status: 'accrued',
+        txHash,
+        metadata: {
+          djId,
+          streamId,
+          note: 'Recorded as accrued because tips currently settle directly to the DJ wallet.',
+        },
+      });
+    } catch (feeError) {
+      console.error('Failed to record tip platform fee:', feeError);
+    }
+
+    return NextResponse.json({ tip: data, platformFee: tipFee });
   } catch (error) {
     console.error('Tips POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

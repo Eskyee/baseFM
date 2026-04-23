@@ -782,7 +782,7 @@ const bankr = new BankrClient({
                     <span className="text-green-400 mr-2">01</span>Create a Stream
                   </h3>
                   <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
-                    <p className="text-[#666] mb-2">// POST https://basefm.space/api/streams</p>
+                    <p className="text-[#666] mb-2">{'// POST https://basefm.space/api/streams'}</p>
                     <pre className="text-[#CCC] whitespace-pre-wrap">{`const res = await fetch('https://basefm.space/api/streams', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -837,7 +837,7 @@ const { rtmpCredentials } = await startRes.json()
   "rtmps://global-live.mux.com:443/app/<KEY>"`}</pre>
                   </div>
                   <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
-                    <p className="text-[#666] mb-2">// Node.js — spawn FFmpeg</p>
+                    <p className="text-[#666] mb-2">{'// Node.js — spawn FFmpeg'}</p>
                     <pre className="text-[#CCC] whitespace-pre-wrap">{`import { spawn } from 'child_process'
 
 const proc = spawn('ffmpeg', [

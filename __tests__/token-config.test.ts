@@ -12,8 +12,8 @@ describe('DJ_TOKEN_CONFIG', () => {
     expect(DJ_TOKEN_CONFIG.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
   });
 
-  it('should require 2500000 tokens for DJ access', () => {
-    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(2_500_000);
+  it('should require 1.25M BASEFM for DJ access', () => {
+    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(1_250_000);
   });
 
   it('should require 1 billion tokens for premium tier', () => {
@@ -63,8 +63,8 @@ describe('LISTENER_CONFIG', () => {
 
 describe('formatTokenAmount', () => {
   it('should format token amount correctly', () => {
-    const amount = BigInt('5000000000000000000000'); // 5000 tokens with 18 decimals
-    expect(formatTokenAmount(amount)).toBe('5000');
+    const amount = BigInt('1250000000000000000000000'); // 1.25M tokens with 18 decimals
+    expect(formatTokenAmount(amount)).toBe('1250000');
   });
 
   it('should handle zero', () => {
@@ -79,8 +79,8 @@ describe('formatTokenAmount', () => {
 
 describe('parseTokenAmount', () => {
   it('should parse token amount correctly', () => {
-    const result = parseTokenAmount(5000);
-    expect(result).toBe(BigInt('5000000000000000000000'));
+    const result = parseTokenAmount(1_250_000);
+    expect(result).toBe(BigInt('1250000000000000000000000'));
   });
 
   it('should handle zero', () => {

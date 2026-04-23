@@ -19,6 +19,8 @@ export function ListenerCount({
   const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
+    let hasLeft = false;
+
     // Register this viewer
     const registerViewer = async () => {
       try {
@@ -34,11 +36,22 @@ export function ListenerCount({
 
     // Unregister on unmount
     const unregisterViewer = async () => {
+      if (hasLeft) return;
+      hasLeft = true;
+
+      const payload = JSON.stringify({ streamId, action: 'leave' });
+
+      if (typeof navigator.sendBeacon === 'function') {
+        const sent = navigator.sendBeacon('/api/viewers', new Blob([payload], { type: 'application/json' }));
+        if (sent) return;
+      }
+
       try {
         await fetch('/api/viewers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ streamId, action: 'leave' }),
+          body: payload,
+          keepalive: true,
         });
       } catch (error) {
         console.error('Failed to unregister viewer:', error);
@@ -61,9 +74,24 @@ export function ListenerCount({
       }
     }, 10000); // Update every 10 seconds
 
+    const handlePageHide = () => {
+      void unregisterViewer();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        void unregisterViewer();
+      }
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       clearInterval(interval);
-      unregisterViewer();
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      void unregisterViewer();
     };
   }, [streamId]);
 

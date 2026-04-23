@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { WalletConnect } from '@/components/WalletConnect';
@@ -27,25 +27,25 @@ export default function AdminPromotersPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchPromoters() {
-      try {
-        const res = await adminFetch('/api/admin/promoters');
-        if (res.ok) {
-          const data = await res.json();
-          setPromoters(data.promoters || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch promoters:', err);
-      } finally {
-        setIsLoading(false);
+  const fetchPromoters = useCallback(async () => {
+    try {
+      const res = await adminFetch('/api/admin/promoters');
+      if (res.ok) {
+        const data = await res.json();
+        setPromoters(data.promoters || []);
       }
+    } catch (err) {
+      console.error('Failed to fetch promoters:', err);
+    } finally {
+      setIsLoading(false);
     }
+  }, [adminFetch]);
 
+  useEffect(() => {
     if (isConnected) {
-      fetchPromoters();
+      void fetchPromoters();
     }
-  }, [isConnected]);
+  }, [fetchPromoters, isConnected]);
 
   if (!isConnected) {
     return (

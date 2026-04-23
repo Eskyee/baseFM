@@ -140,6 +140,18 @@ export default function POSPage() {
     setTicketResult(null);
   };
 
+  // Stop camera scanner
+  const stopCamera = useCallback(async () => {
+    if (html5QrCodeRef.current && cameraActive) {
+      try {
+        await html5QrCodeRef.current.stop();
+        setCameraActive(false);
+      } catch (err) {
+        console.error('Error stopping camera:', err);
+      }
+    }
+  }, [cameraActive]);
+
   // Start camera scanner
   const startCamera = useCallback(async () => {
     setCameraError(null);
@@ -204,19 +216,7 @@ export default function POSPage() {
           : 'Camera not available'
       );
     }
-  }, []);
-
-  // Stop camera scanner
-  const stopCamera = useCallback(async () => {
-    if (html5QrCodeRef.current && cameraActive) {
-      try {
-        await html5QrCodeRef.current.stop();
-        setCameraActive(false);
-      } catch (err) {
-        console.error('Error stopping camera:', err);
-      }
-    }
-  }, [cameraActive]);
+  }, [stopCamera]);
 
   // Cleanup camera on unmount or mode change
   useEffect(() => {
