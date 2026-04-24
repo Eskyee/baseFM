@@ -12,8 +12,8 @@ describe('DJ_TOKEN_CONFIG', () => {
     expect(DJ_TOKEN_CONFIG.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
   });
 
-  it('should require 1.25M BASEFM for DJ access', () => {
-    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(1_250_000);
+  it('should require 2.5M BASEFM for DJ access', () => {
+    expect(DJ_TOKEN_CONFIG.requiredAmount).toBe(2_500_000);
   });
 
   it('should require 1 billion tokens for premium tier', () => {
