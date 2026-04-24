@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { useSignMessage } from 'wagmi';
+import { useToastActions } from '@/components/ui/Toast';
 import { generateNonce, createAuthMessage } from '@/lib/auth/wallet';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const { signMessageAsync } = useSignMessage();
+  const toast = useToastActions();
   const [formError, setFormError] = useState<string | null>(null);
 
   const { hasAccess, isAdmin, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
