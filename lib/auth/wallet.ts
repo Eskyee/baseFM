@@ -1,4 +1,5 @@
 import { verifyMessage } from 'viem';
+import { publicClient } from '@/lib/viem/client';
 
 /**
  * Benchmarks the signature verification logic.
@@ -39,7 +40,7 @@ export async function verifyWalletSignature(
   if (!isValidWalletAddress(address)) return false;
   
   try {
-    const isValid = await verifyMessage({
+    const isValid = await publicClient.verifyMessage({
       address: address as `0x${string}`,
       message,
       signature: signature as `0x${string}`,

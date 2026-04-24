@@ -1,7 +1,7 @@
 // Admin configuration
 // Set ADMIN_WALLET_ADDRESS in your environment variables
 
-import { verifyMessage } from 'viem';
+import { publicClient } from '@/lib/viem/client';
 
 export function getAdminWallets(): string[] {
   const raw =
@@ -49,7 +49,7 @@ export async function verifyAdminSignature(
   const message = createAdminAuthMessage(nonce, timestamp);
 
   try {
-    const isValid = await verifyMessage({
+    const isValid = await publicClient.verifyMessage({
       address: walletAddress as `0x${string}`,
       message,
       signature: signature as `0x${string}`,
