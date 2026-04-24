@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { useSignMessage } from 'wagmi';
 import { generateNonce, createAuthMessage } from '@/lib/auth/wallet';
 import { useAccount } from 'wagmi';
@@ -12,6 +11,7 @@ import { useDJAccess } from '@/hooks/useDJAccess';
 import { StreamCard } from '@/components/StreamCard';
 import { WalletConnect } from '@/components/WalletConnect';
 import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
+import { useToastActions } from '@/components/ui/Toast';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 function formatAddress(address?: string | null) {
@@ -28,6 +28,7 @@ function statusClasses(kind: 'active' | 'idle' | 'error') {
 export default function DashboardPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const toast = useToastActions();
   const [broadcastName, setBroadcastName] = useState('DJ Escaba');
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
@@ -45,8 +46,6 @@ export default function DashboardPage() {
   const pastStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDED'), [streams]);
   const currentSet = liveStreams[0] || preparingStreams[0] || null;
 
-
-  const armBroadcast = async () => {
   const clearStaleStreams = async () => {
     if (!address) return;
     setIsCleaning(true);
@@ -80,6 +79,7 @@ export default function DashboardPage() {
     }
   };
 
+  const armBroadcast = async () => {
     if (!address) return;
     const name = broadcastName.trim();
     if (!name) {
@@ -332,24 +332,25 @@ export default function DashboardPage() {
                   ['Manage stream page', 'Use Check Mux Status or Start Stream from the stream control page.'],
                   ['Audio path', 'Verify your mixer master is still routed into OBS and not muted.'],
                   ['Fresh recovery', 'If the session is broken beyond repair, end it and arm a fresh set from this dashboard.'],
-
-                <div className="bg-black p-4 border border-orange-500/20">
-                  <div className="text-sm font-bold uppercase tracking-wider text-orange-400 mb-2">Emergency Reset</div>
-                  <p className="text-xs text-zinc-500 leading-relaxed mb-4">If your session is stuck or basefm.space shows you as live but you aren't, use this to force-clear your state.</p>
-                  <button 
-                    onClick={clearStaleStreams}
-                    disabled={isCleaning || !isConnected}
-                    className="w-full py-2 border border-orange-500/40 text-orange-400 text-[10px] font-bold uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all disabled:opacity-50"
-                  >
-                    {isCleaning ? 'Clearing...' : 'Clear Stale Sessions'}
-                  </button>
-                </div>
                 ].map(([title, body]) => (
                   <div key={title} className="bg-black p-4">
                     <div className="text-sm font-bold uppercase tracking-wider text-white mb-2">{title}</div>
                     <p className="text-xs text-zinc-500 leading-relaxed">{body}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4 border border-orange-500/20 bg-black p-4">
+                <div className="text-sm font-bold uppercase tracking-wider text-orange-400 mb-2">Emergency Reset</div>
+                <p className="text-xs text-zinc-500 leading-relaxed mb-4">
+                  If your session is stuck or basefm.space shows you as live but you aren&apos;t, use this to force-clear your state.
+                </p>
+                <button
+                  onClick={clearStaleStreams}
+                  disabled={isCleaning || !isConnected}
+                  className="w-full py-2 border border-orange-500/40 text-orange-400 text-[10px] font-bold uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all disabled:opacity-50"
+                >
+                  {isCleaning ? 'Clearing...' : 'Clear Stale Sessions'}
+                </button>
               </div>
             </div>
           </div>
