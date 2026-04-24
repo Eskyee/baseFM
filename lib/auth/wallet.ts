@@ -1,4 +1,3 @@
-import { verifyMessage } from 'viem';
 import { publicClient } from '@/lib/viem/client';
 
 /**
@@ -15,7 +14,7 @@ export async function benchmarkVerification(iterations: number = 100) {
   for (let i = 0; i < iterations; i++) {
     // Note: This is a placeholder for actual benchmarking logic
     // In a real run, we would use a pre-signed message
-    await verifyMessage({
+    await publicClient.verifyMessage({
       address: testAddress as `0x${string}`,
       message: testMessage,
       signature: testSignature as `0x${string}`,
@@ -40,6 +39,9 @@ export async function verifyWalletSignature(
   if (!isValidWalletAddress(address)) return false;
   
   try {
+    // publicClient.verifyMessage handles EOA + EIP-1271 (deployed smart
+    // wallets) + ERC-6492 (counterfactual/undeployed smart wallets), which
+    // is required for Coinbase Smart Wallet users.
     const isValid = await publicClient.verifyMessage({
       address: address as `0x${string}`,
       message,
