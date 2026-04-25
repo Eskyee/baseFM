@@ -49,6 +49,9 @@ export async function verifyAdminSignature(
   const message = createAdminAuthMessage(nonce, timestamp);
 
   try {
+    // publicClient.verifyMessage handles EOA + EIP-1271 (deployed smart
+    // wallets) + ERC-6492 (counterfactual/undeployed smart wallets), which
+    // is required for Coinbase Smart Wallet users.
     const isValid = await publicClient.verifyMessage({
       address: walletAddress as `0x${string}`,
       message,
