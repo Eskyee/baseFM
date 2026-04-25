@@ -1,10 +1,15 @@
 import { BillingPricing } from '@/types/billing';
 
+// Defaults derived from Mux Live Streaming rates:
+// Standard live encoding ~$0.040/min = $2.40/hr, plus delivery ~$0.00096/min/viewer.
+// For ~30 avg viewers over 1 hour: $2.40 encoding + $1.73 delivery ≈ $4.13/hr cost.
+// Session fee covers per-stream overhead; metered rate covers hourly cost + margin.
+// Subscription waives session fee and drops metered to near-cost.
 const DEFAULT_PRICING: BillingPricing = {
-  streamSessionFeeUsdc: 5,
-  monthlySubscriptionFeeUsdc: 25,
-  meteredRateUsdcPerHour: 3,
-  subscribedMeteredRateUsdcPerHour: 1.5,
+  streamSessionFeeUsdc: 2,
+  monthlySubscriptionFeeUsdc: 40,
+  meteredRateUsdcPerHour: 5,
+  subscribedMeteredRateUsdcPerHour: 3,
   tipPlatformFeeBps: 1000,
   ticketPlatformFeeBps: 500,
 };
