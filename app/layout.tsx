@@ -87,8 +87,8 @@ export default function RootLayout({
             <PlayerProvider>
               <SplashScreen>
                 <AppShell>{children}</AppShell>
-                <GlobalPlayer />
               </SplashScreen>
+              <GlobalPlayer />
             </PlayerProvider>
           </OnchainProvider>
         </ErrorBoundary>

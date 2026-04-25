@@ -33,6 +33,7 @@ export function GlobalPlayer() {
     const player = playerRef.current;
     if (!player) return;
     player.volume = isMuted ? 0 : volume;
+    player.muted = isMuted;
   }, [volume, isMuted]);
 
   useEffect(() => {
@@ -111,6 +112,7 @@ export function GlobalPlayer() {
                     src={!currentStream.muxPlaybackId ? currentStream.hlsUrl : undefined}
                     streamType="live"
                     autoPlay
+                    muted={isMuted}
                     accentColor="#8B5CF6"
                     primaryColor="#FFFFFF"
                     secondaryColor="#1A1A1A"
