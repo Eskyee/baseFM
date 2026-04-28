@@ -63,4 +63,9 @@ export interface StreamBillingSummary {
   canActivateStream: boolean;
   requiresSessionPayment: boolean;
   outstandingMeteredFeeUsdc: number;
+  // When true, the billing service is partially or fully unavailable
+  // (e.g. PLATFORM_WALLET_ADDRESS unset on the server). The UI should still
+  // render the rest of the dashboard but disable pay buttons.
+  billingUnavailable?: boolean;
+  billingUnavailableReason?: string;
 }

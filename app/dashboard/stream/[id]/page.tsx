@@ -66,6 +66,8 @@ interface BillingSummary {
   canActivateStream: boolean;
   requiresSessionPayment: boolean;
   outstandingMeteredFeeUsdc: number;
+  billingUnavailable?: boolean;
+  billingUnavailableReason?: string;
 }
 
 export default function DJStreamControlPage({ params }: { params: { id: string } }) {
@@ -101,13 +103,54 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setIsBillingLoading(true);
     try {
       const response = await fetch(`/api/billing/streams/${stream.id}`);
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error('Failed to fetch billing status');
+        // Synthesise a degraded billing summary so the rest of the dashboard
+        // keeps rendering even when /api/billing/streams/[id] is 5xx.
+        const reason = data?.reason || data?.error || 'Failed to fetch billing status';
+        console.warn('Billing fetch failed:', reason);
+        setBilling({
+          platformWallet: '',
+          pricing: {
+            streamSessionFeeUsdc: 0,
+            monthlySubscriptionFeeUsdc: 0,
+            meteredRateUsdcPerHour: 0,
+            subscribedMeteredRateUsdcPerHour: 0,
+            tipPlatformFeeBps: 0,
+            ticketPlatformFeeBps: 0,
+          },
+          subscription: null,
+          streamSession: null,
+          canActivateStream: false,
+          requiresSessionPayment: false,
+          outstandingMeteredFeeUsdc: 0,
+          billingUnavailable: true,
+          billingUnavailableReason: reason,
+        });
+        return;
       }
-      const data = await response.json();
-      setBilling(data.billing || null);
+      setBilling(data?.billing || null);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to fetch billing status');
+      const reason = err instanceof Error ? err.message : 'Failed to fetch billing status';
+      console.warn('Billing fetch threw:', reason);
+      setBilling({
+        platformWallet: '',
+        pricing: {
+          streamSessionFeeUsdc: 0,
+          monthlySubscriptionFeeUsdc: 0,
+          meteredRateUsdcPerHour: 0,
+          subscribedMeteredRateUsdcPerHour: 0,
+          tipPlatformFeeBps: 0,
+          ticketPlatformFeeBps: 0,
+        },
+        subscription: null,
+        streamSession: null,
+        canActivateStream: false,
+        requiresSessionPayment: false,
+        outstandingMeteredFeeUsdc: 0,
+        billingUnavailable: true,
+        billingUnavailableReason: reason,
+      });
     } finally {
       setIsBillingLoading(false);
     }
@@ -596,6 +639,14 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           <p className="text-gray-400 text-sm">Loading billing status...</p>
         ) : billing ? (
           <div className="space-y-4">
+            {billing.billingUnavailable && (
+              <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p className="text-yellow-300 text-xs font-semibold mb-1">Billing service unavailable</p>
+                <p className="text-yellow-200/70 text-[11px]">
+                  {billing.billingUnavailableReason || 'Server returned an error.'} Your stream controls (Mux, RTMP, relays, end set, refresh) still work — only the pay buttons are disabled until billing is back.
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-black/30 rounded-lg p-3">
                 <div className="text-xs text-gray-500 mb-1">Session Fee</div>
@@ -623,7 +674,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              {!billing.subscription && (
+              {!billing.billingUnavailable && !billing.subscription && (
                 <button
                   onClick={() => payUsdc(billing.pricing.monthlySubscriptionFeeUsdc, 'subscription')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
@@ -635,7 +686,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 </button>
               )}
 
-              {billing.requiresSessionPayment && (
+              {!billing.billingUnavailable && billing.requiresSessionPayment && (
                 <button
                   onClick={() => payUsdc(billing.pricing.streamSessionFeeUsdc, 'session')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
@@ -647,7 +698,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 </button>
               )}
 
-              {billing.outstandingMeteredFeeUsdc > 0 && stream.status === 'ENDED' && (
+              {!billing.billingUnavailable && billing.outstandingMeteredFeeUsdc > 0 && stream.status === 'ENDED' && (
                 <button
                   onClick={() => payUsdc(billing.outstandingMeteredFeeUsdc, 'metered')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}

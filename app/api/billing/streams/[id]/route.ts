@@ -20,7 +20,17 @@ export async function GET(
     return NextResponse.json({ billing: summary });
   } catch (error) {
     console.error('Error fetching stream billing summary:', error);
-    return NextResponse.json({ error: 'Failed to fetch billing summary' }, { status: 500 });
+    // Surface the underlying reason so DJs (and we) can see the cause in
+    // DevTools instead of a generic 500. getStreamBillingSummary itself
+    // degrades gracefully now, so reaching here means an unexpected throw.
+    const reason = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch billing summary',
+        reason,
+      },
+      { status: 500 }
+    );
   }
 }
 
