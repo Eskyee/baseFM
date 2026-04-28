@@ -5,9 +5,10 @@ import { parseUnits } from 'viem';
 import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { useStream } from '@/hooks/useStream';
 import { WalletConnect } from '@/components/WalletConnect';
-import { createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
+import { createAuthMessage, createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
 import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as const;
 const USDC_DECIMALS = 6;
@@ -38,6 +39,7 @@ interface BillingSummary {
 }
 
 export default function DJStreamControlPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { stream, isLoading, error, refetch } = useStream(params.id);
@@ -49,6 +51,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const [isStopping, setIsStopping] = useState(false);
   const [isSettingUpMux, setIsSettingUpMux] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [isResettingStream, setIsResettingStream] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [billing, setBilling] = useState<BillingSummary | null>(null);
@@ -342,12 +345,61 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     }
   };
 
+  const handleEmergencyReset = async () => {
+    if (!address) return;
+    const confirmed = window.confirm(
+      'Emergency reset will force-close every non-ended stream on this wallet (including this one) and remove the Mux live resources. Continue?'
+    );
+    if (!confirmed) return;
+
+    setIsResettingStream(true);
+    setActionError(null);
+    setActionSuccess(null);
+
+    try {
+      const nonce = generateNonce();
+      const timestamp = new Date().toISOString();
+      const message = createAuthMessage(nonce);
+      const signature = await signMessageAsync({ message });
+
+      const res = await fetch('/api/streams/cleanup-stale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          djWalletAddress: address,
+          signature,
+          message,
+          timestamp,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Cleanup failed');
+      }
+
+      setActionSuccess(data.message || 'Stale streams cleared.');
+      refetch();
+      router.refresh();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to reset stream');
+    } finally {
+      setIsResettingStream(false);
+    }
+  };
+
   const needsMuxSetup = !stream.muxStreamKey;
 
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
+  const isEnding = stream.status === 'ENDING';
+  const isEnded = stream.status === 'ENDED';
   const canStart = stream.status === 'CREATED';
-  const canStop = isLive || isPreparing;
+  // Allow DJs to manually end while ENDING too — Mux idle webhook can leave the
+  // stream in ENDING for several minutes before disconnect fires, and without
+  // this branch the End Stream button silently disappears mid-set.
+  const canStop = isLive || isPreparing || isEnding;
+  const canCheckStatus = !isEnded;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24">
@@ -375,7 +427,9 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 ? 'bg-red-500 text-white animate-pulse'
                 : isPreparing
                 ? 'bg-yellow-500 text-black'
-                : stream.status === 'ENDED'
+                : isEnding
+                ? 'bg-orange-500 text-black'
+                : isEnded
                 ? 'bg-gray-600 text-white'
                 : 'bg-gray-700 text-white'
             }`}
@@ -644,7 +698,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
         <h2 className="text-base sm:text-lg font-semibold text-white mb-4">Stream Controls</h2>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           {canStart && (
             <button
               onClick={handleStart}
@@ -667,32 +721,46 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 6h12v12H6z" />
               </svg>
-              {isStopping ? 'Stopping...' : 'End Stream'}
+              {isStopping ? 'Stopping...' : isEnding ? 'Force End Stream' : 'End Stream'}
             </button>
           )}
 
-          {stream.status === 'ENDED' && (
-            <p className="text-gray-400 py-3 text-center sm:text-left">This stream has ended</p>
+          {canCheckStatus && (
+            <button
+              onClick={handleCheckStatus}
+              disabled={isCheckingStatus}
+              className="w-full sm:w-auto px-4 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-[0.98] transition-all text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {isCheckingStatus ? 'Checking...' : 'Check Mux Status'}
+            </button>
+          )}
+
+          {isEnded && (
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto px-6 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 active:scale-[0.98] transition-all font-semibold flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Start a New Set
+            </Link>
           )}
         </div>
 
         {isPreparing && (
           <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-xl">
-            <p className="text-yellow-400 text-sm mb-3 flex items-center gap-2">
+            <p className="text-yellow-400 text-sm flex items-center gap-2">
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Waiting for video feed...
             </p>
-            <p className="text-gray-400 text-xs mb-3">Start streaming from OBS to go live</p>
-            <button
-              onClick={handleCheckStatus}
-              disabled={isCheckingStatus}
-              className="w-full sm:w-auto px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-[0.98] transition-all text-sm font-medium disabled:opacity-50"
-            >
-              {isCheckingStatus ? 'Checking...' : 'Check Mux Status'}
-            </button>
+            <p className="text-gray-400 text-xs mt-2">Start streaming from OBS to go live. Use Check Mux Status if your encoder is connected but the page hasn&apos;t flipped to LIVE.</p>
           </div>
         )}
 
@@ -704,8 +772,58 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
             </p>
           </div>
         )}
+
+        {isEnding && (
+          <div className="mt-4 p-4 bg-orange-900/20 border border-orange-500/30 rounded-xl">
+            <p className="text-orange-300 font-semibold flex items-center gap-2 mb-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.27 3 1.73 3z" />
+              </svg>
+              Stream is ending
+            </p>
+            <p className="text-gray-400 text-xs">
+              Mux saw your encoder go idle. If this was intentional, press <strong className="text-orange-200">Force End Stream</strong> to settle billing now. Otherwise, reconnect OBS with the same key and use <strong className="text-orange-200">Check Mux Status</strong> to recover.
+            </p>
+          </div>
+        )}
+
+        {isEnded && (
+          <div className="mt-4 p-4 bg-gray-900/40 border border-gray-700 rounded-xl">
+            <p className="text-gray-300 font-semibold mb-1">This stream has ended</p>
+            <p className="text-gray-500 text-xs">
+              Billing is finalized. The credentials and key on this page are retained for reference but a new set requires a fresh stream from the dashboard.
+            </p>
+          </div>
+        )}
       </div>
       )}
+
+      {/* Emergency Reset — always available so a DJ can self-recover from a stuck
+          state without leaving the stream page */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-orange-500/20">
+        <h2 className="text-base sm:text-lg font-semibold text-orange-400 mb-2">Emergency Reset</h2>
+        <p className="text-gray-400 text-xs sm:text-sm mb-4">
+          Force-clear every non-ended stream on this wallet and delete the Mux live resources. Use this if the page is stuck on LIVE / ENDING when you aren&apos;t actually broadcasting.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleEmergencyReset}
+            disabled={isResettingStream}
+            className="w-full sm:w-auto px-5 py-3 border border-orange-500/40 text-orange-300 rounded-xl hover:bg-orange-500 hover:text-black active:scale-[0.98] transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            {isResettingStream ? 'Clearing...' : 'Clear Stale Sessions'}
+          </button>
+          <Link
+            href="/dashboard"
+            className="w-full sm:w-auto px-5 py-3 border border-gray-700 text-gray-300 rounded-xl hover:border-gray-500 active:scale-[0.98] transition-all font-medium text-sm flex items-center justify-center gap-2"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
 
       {/* Stream Info - Mobile optimized */}
       <div className="bg-gray-800 rounded-xl p-4 sm:p-6">

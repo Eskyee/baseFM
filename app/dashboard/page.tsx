@@ -42,9 +42,12 @@ export default function DashboardPage() {
 
   const liveStreams = useMemo(() => streams.filter((stream) => stream.status === 'LIVE'), [streams]);
   const preparingStreams = useMemo(() => streams.filter((stream) => stream.status === 'PREPARING'), [streams]);
+  const endingStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDING'), [streams]);
   const scheduledStreams = useMemo(() => streams.filter((stream) => stream.status === 'CREATED'), [streams]);
   const pastStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDED'), [streams]);
-  const currentSet = liveStreams[0] || preparingStreams[0] || null;
+  // ENDING streams need DJ attention (Mux saw idle, encoder may have dropped) so
+  // surface them as the current set if nothing else is LIVE/PREPARING.
+  const currentSet = liveStreams[0] || preparingStreams[0] || endingStreams[0] || null;
 
 
   const clearStaleStreams = async () => {
@@ -275,6 +278,8 @@ export default function DashboardPage() {
                     <p className="mt-2 text-sm text-zinc-400">
                       {currentSet.status === 'LIVE'
                         ? 'Your stream is live. Use the manage page for stop/start, Mux status, and credentials.'
+                        : currentSet.status === 'ENDING'
+                        ? 'Mux saw your encoder go idle. Open the manage page to force-end the set or reconnect OBS.'
                         : 'Your stream is armed. Finish setup or check Mux status from the manage page.'}
                     </p>
                   </div>
@@ -406,11 +411,11 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-10">
-              {(liveStreams.length > 0 || preparingStreams.length > 0) && (
+              {(liveStreams.length > 0 || preparingStreams.length > 0 || endingStreams.length > 0) && (
                 <section>
                   <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Active</div>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {[...liveStreams, ...preparingStreams].map((stream) => (
+                    {[...liveStreams, ...preparingStreams, ...endingStreams].map((stream) => (
                       <StreamCard key={stream.id} stream={stream} showDJControls linkPrefix="/dashboard" />
                     ))}
                   </div>
