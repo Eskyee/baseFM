@@ -759,8 +759,10 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
       )}
 
-      {/* RTMP Credentials - Mobile optimized */}
-      {!needsMuxSetup && (canStart || isPreparing || isLive) && stream.rtmpUrl && (
+      {/* RTMP Credentials - Mobile optimized
+          Includes isEnding so the DJ can copy the same key/server back into
+          OBS to recover from a Mux idle event, as the ENDING banner suggests. */}
+      {!needsMuxSetup && (canStart || isPreparing || isLive || isEnding) && stream.rtmpUrl && (
         <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-4">RTMP Credentials</h2>
           <p className="text-gray-400 text-xs sm:text-sm mb-4">

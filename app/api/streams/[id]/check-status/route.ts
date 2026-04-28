@@ -41,9 +41,11 @@ async function buildStatusPayload(streamId: string) {
     await updateStreamStatus(streamId, newStatus);
   }
 
-  // pickupRecommended: Mux is active but our DB status hasn't flipped to LIVE.
-  // The DJ can press "Refresh Station" to force the sync.
-  const pickupRecommended = muxStatus === MUX_STATUS.ACTIVE && newStatus !== STREAM_STATUS.LIVE;
+  // pickupRecommended: Mux is active but our DB hasn't flipped to LIVE *yet*.
+  // Compare against the original stream.status (not newStatus, which we just
+  // updated to LIVE on this call), so the UI can prompt the DJ to press
+  // "Refresh Station" while the listener page is still showing PREPARING.
+  const pickupRecommended = muxStatus === MUX_STATUS.ACTIVE && stream.status !== STREAM_STATUS.LIVE;
 
   return {
     status: 200,
