@@ -11,9 +11,19 @@ interface StreamCardProps {
   stream: Stream;
   showDJControls?: boolean;
   linkPrefix?: string;
+  // When provided, render a "Dismiss" button that removes a CREATED queued
+  // stream. Disabled while another dismiss is in flight.
+  onDismiss?: (streamId: string) => void;
+  isDismissing?: boolean;
 }
 
-export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dashboard' }: StreamCardProps) {
+export function StreamCard({
+  stream,
+  showDJControls = false,
+  linkPrefix = '/dashboard',
+  onDismiss,
+  isDismissing = false,
+}: StreamCardProps) {
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
 
@@ -94,12 +104,25 @@ export function StreamCard({ stream, showDJControls = false, linkPrefix = '/dash
         {/* Actions */}
         <div className="flex gap-2">
           {showDJControls ? (
-            <Link
-              href={`${linkPrefix}/stream/${stream.id}`}
-              className="flex-1 px-4 py-2.5 bg-white text-black text-center rounded-xl transition-all text-sm font-semibold hover:bg-[#E5E5E5] active:scale-[0.97]"
-            >
-              Manage Stream
-            </Link>
+            <>
+              <Link
+                href={`${linkPrefix}/stream/${stream.id}`}
+                className="flex-1 px-4 py-2.5 bg-white text-black text-center rounded-xl transition-all text-sm font-semibold hover:bg-[#E5E5E5] active:scale-[0.97]"
+              >
+                Manage Stream
+              </Link>
+              {onDismiss && stream.status === 'CREATED' && (
+                <button
+                  type="button"
+                  onClick={() => onDismiss(stream.id)}
+                  disabled={isDismissing}
+                  className="px-3 py-2.5 border border-zinc-700 text-zinc-300 rounded-xl text-sm hover:border-red-500/40 hover:text-red-400 active:scale-[0.97] transition-all disabled:opacity-50"
+                  title="Remove this queued set"
+                >
+                  {isDismissing ? '…' : 'Dismiss'}
+                </button>
+              )}
+            </>
           ) : (
             <Link
               href={`/stream/${stream.id}`}
