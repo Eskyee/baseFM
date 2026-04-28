@@ -61,6 +61,57 @@ export async function getMuxLiveStreamStatus(muxStreamId: string) {
   return liveStream.status;
 }
 
+export interface MuxLiveStreamSnapshot {
+  id: string;
+  status: string;
+  playbackId: string | null;
+  recentAssetIds: string[];
+}
+
+// Fetch a richer snapshot of the Mux live stream including the asset IDs Mux
+// has produced so far. Used by the per-stream "Check Mux Status" surface and
+// by the "End Set" path to know which recordings to drop when archive=false.
+export async function getMuxLiveStreamSnapshot(muxStreamId: string): Promise<MuxLiveStreamSnapshot> {
+  const mux = getMuxClient();
+  const liveStream = await mux.video.liveStreams.retrieve(muxStreamId);
+  const playbackId = liveStream.playback_ids?.[0]?.id || null;
+  // recent_asset_ids is the canonical "what got recorded this connection" list.
+  const recentAssetIds: string[] = Array.isArray((liveStream as { recent_asset_ids?: string[] }).recent_asset_ids)
+    ? ((liveStream as { recent_asset_ids?: string[] }).recent_asset_ids as string[])
+    : [];
+  return {
+    id: liveStream.id,
+    status: liveStream.status || 'unknown',
+    playbackId,
+    recentAssetIds,
+  };
+}
+
+// Delete the recordings produced by a live stream. Called when a DJ chooses
+// "End Set" (without saving the replay) so Mux storage doesn't keep billing
+// for assets nobody is going to keep.
+export async function deleteMuxRecentAssets(muxStreamId: string): Promise<{ deleted: number; errors: number }> {
+  const mux = getMuxClient();
+  let deleted = 0;
+  let errors = 0;
+  try {
+    const snapshot = await getMuxLiveStreamSnapshot(muxStreamId);
+    for (const assetId of snapshot.recentAssetIds) {
+      try {
+        await mux.video.assets.delete(assetId);
+        deleted += 1;
+      } catch (err) {
+        errors += 1;
+        console.warn(`Failed to delete Mux asset ${assetId}:`, err);
+      }
+    }
+  } catch (err) {
+    console.warn(`Failed to enumerate Mux assets for ${muxStreamId}:`, err);
+    errors += 1;
+  }
+  return { deleted, errors };
+}
+
 export function getMuxPlaybackUrl(playbackId: string): string {
   return `https://stream.mux.com/${playbackId}.m3u8`;
 }

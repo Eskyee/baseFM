@@ -3,6 +3,7 @@ import { getStreamById, updateStreamStatus } from '@/lib/db/streams';
 import { verifyWalletSignature } from '@/lib/auth/wallet';
 import { STREAM_STATUS, STOPPABLE_STATUSES } from '@/lib/constants/stream';
 import { finalizeStreamBilling } from '@/lib/db/billing';
+import { deleteMuxRecentAssets } from '@/lib/streaming/mux';
 
 export async function POST(
   request: NextRequest,
@@ -10,7 +11,17 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
-    const { djWalletAddress, signature, message, nonce, timestamp } = body;
+    const { djWalletAddress, signature, message, nonce, timestamp, archive } = body as {
+      djWalletAddress?: string;
+      signature?: string;
+      message?: string;
+      nonce?: string;
+      timestamp?: string;
+      // archive=true keeps the recording on Mux (DJ pays storage),
+      // archive=false (default) deletes the recent assets so storage stops billing.
+      archive?: boolean;
+    };
+    const shouldArchive = archive === true;
 
     // Get stream
     const stream = await getStreamById(params.id);
@@ -70,7 +81,22 @@ export async function POST(
     const updatedStream = await updateStreamStatus(params.id, STREAM_STATUS.ENDED);
     await finalizeStreamBilling(updatedStream);
 
-    return NextResponse.json({ stream: updatedStream });
+    // Drop recent Mux assets unless DJ explicitly chose to archive the replay.
+    let archiveOutcome: { deleted: number; errors: number } | null = null;
+    if (!shouldArchive && stream.muxLiveStreamId) {
+      archiveOutcome = await deleteMuxRecentAssets(stream.muxLiveStreamId);
+    }
+
+    return NextResponse.json({
+      stream: updatedStream,
+      archive: shouldArchive,
+      mux: archiveOutcome,
+      message: shouldArchive
+        ? 'Set ended. Replay retained on Mux (storage will keep billing while it lives).'
+        : archiveOutcome
+          ? `Set ended. Removed ${archiveOutcome.deleted} recent Mux asset${archiveOutcome.deleted === 1 ? '' : 's'} to stop storage billing.`
+          : 'Set ended.',
+    });
   } catch (error) {
     console.error('Error stopping stream:', error);
     return NextResponse.json(

@@ -12,7 +12,13 @@ import { deleteMuxLiveStream } from '@/lib/streaming/mux';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { djWalletAddress, signature, message, timestamp } = body;
+    const { djWalletAddress, signature, message, timestamp, mode } = body as {
+      djWalletAddress?: string;
+      signature?: string;
+      message?: string;
+      timestamp?: string;
+      mode?: 'all' | 'queued';
+    };
 
     if (!djWalletAddress || !signature || !message) {
       return NextResponse.json(
@@ -28,27 +34,35 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Prevent Replay (10 min window)
-    const requestTime = new Date(timestamp).getTime();
-    if (Math.abs(Date.now() - requestTime) > 10 * 60 * 1000) {
+    const requestTime = new Date(timestamp ?? '').getTime();
+    if (Number.isNaN(requestTime) || Math.abs(Date.now() - requestTime) > 10 * 60 * 1000) {
       return NextResponse.json({ error: 'Timestamp expired' }, { status: 401 });
     }
 
     const supabase = createServerClient();
     const wallet = djWalletAddress.toLowerCase();
+    // 'queued' clears only CREATED streams (unused queued sets) without touching
+    // any LIVE/PREPARING/ENDING set in flight. 'all' is the previous behaviour.
+    const cleanupMode: 'all' | 'queued' = mode === 'queued' ? 'queued' : 'all';
 
-    // 3. Find all non-ended streams for this DJ
-    const { data: staleStreams, error: fetchError } = await supabase
+    // 3. Find streams for this DJ matching the requested cleanup mode
+    let query = supabase
       .from('streams')
       .select('id, mux_live_stream_id, status')
-      .eq('dj_wallet_address', wallet)
-      .neq('status', 'ENDED');
+      .eq('dj_wallet_address', wallet);
+    query = cleanupMode === 'queued'
+      ? query.eq('status', 'CREATED')
+      : query.neq('status', 'ENDED');
+    const { data: staleStreams, error: fetchError } = await query;
 
     if (fetchError) throw fetchError;
 
     if (!staleStreams || staleStreams.length === 0) {
-      return NextResponse.json({ 
-        success: true, 
-        message: 'No stale streams found for this wallet.' 
+      return NextResponse.json({
+        success: true,
+        message: cleanupMode === 'queued'
+          ? 'No queued sets found for this wallet.'
+          : 'No stale streams found for this wallet.'
       });
     }
 
@@ -65,19 +79,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update all to ENDED
-    const { error: updateError } = await supabase
+    // Apply the same status filter when updating so queued cleanup never
+    // touches a LIVE/PREPARING/ENDING set.
+    let updateQuery = supabase
       .from('streams')
       .update({ status: 'ENDED', actual_end_time: new Date().toISOString() })
-      .eq('dj_wallet_address', wallet)
-      .neq('status', 'ENDED');
+      .eq('dj_wallet_address', wallet);
+    updateQuery = cleanupMode === 'queued'
+      ? updateQuery.eq('status', 'CREATED')
+      : updateQuery.neq('status', 'ENDED');
+    const { error: updateError } = await updateQuery;
 
     if (updateError) throw updateError;
 
     return NextResponse.json({
       success: true,
-      message: `Successfully cleared ${staleStreams.length} stale streams and ${muxCount} Mux resources.`,
-      count: staleStreams.length
+      message: cleanupMode === 'queued'
+        ? `Cleared ${staleStreams.length} queued set${staleStreams.length === 1 ? '' : 's'} and ${muxCount} Mux resources.`
+        : `Successfully cleared ${staleStreams.length} stale streams and ${muxCount} Mux resources.`,
+      count: staleStreams.length,
+      mode: cleanupMode,
     });
 
   } catch (error) {
