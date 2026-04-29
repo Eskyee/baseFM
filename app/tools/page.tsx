@@ -33,6 +33,13 @@ const AICLOUD_DASHBOARD_URL = '/aicloud/dashboard';
 
 type Tab = 'tokens' | 'agents' | 'bankr' | 'trading';
 
+/**
+ * Render the Tools page with tabbed sections for Token Deploy, AI Agents, and Bankr and keep the active tab synced with the URL.
+ *
+ * The component reads the `tab` query parameter to initialize and update the active tab, updates the URL when the user switches tabs, and conditionally renders the corresponding tab content (tokens, agents, or bankr).
+ *
+ * @returns The page JSX for the Tools interface, including tab navigation and the content for the selected tab.
+ */
 function ToolsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -314,6 +321,15 @@ const token = await Clanker.deploy({
   );
 }
 
+/**
+ * Render the "AI Agents" section with pricing plans, deployment actions, and a deployment progress modal.
+ *
+ * Renders plan cards (Starter, Pro, Scale, Enterprise) with features and pricing, provides "Deploy in 60s"
+ * actions that start a simulated deployment flow, and displays a modal showing deployment steps. When a
+ * deployment finishes it opens the Agentbot deployment URL for the selected plan in a new tab.
+ *
+ * @returns The React element representing the Agents section UI.
+ */
 function AgentsSection() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deploymentStep, setDeploymentStep] = useState(0);
