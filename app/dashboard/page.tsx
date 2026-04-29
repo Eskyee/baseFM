@@ -32,6 +32,8 @@ export default function DashboardPage() {
   const [broadcastName, setBroadcastName] = useState('DJ Escaba');
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [isClearingQueued, setIsClearingQueued] = useState(false);
+  const [dismissingStreamId, setDismissingStreamId] = useState<string | null>(null);
   const { signMessageAsync } = useSignMessage();
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -42,9 +44,12 @@ export default function DashboardPage() {
 
   const liveStreams = useMemo(() => streams.filter((stream) => stream.status === 'LIVE'), [streams]);
   const preparingStreams = useMemo(() => streams.filter((stream) => stream.status === 'PREPARING'), [streams]);
+  const endingStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDING'), [streams]);
   const scheduledStreams = useMemo(() => streams.filter((stream) => stream.status === 'CREATED'), [streams]);
   const pastStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDED'), [streams]);
-  const currentSet = liveStreams[0] || preparingStreams[0] || null;
+  // ENDING streams need DJ attention (Mux saw idle, encoder may have dropped) so
+  // surface them as the current set if nothing else is LIVE/PREPARING.
+  const currentSet = liveStreams[0] || preparingStreams[0] || endingStreams[0] || null;
 
   const clearStaleStreams = async () => {
     if (!address) return;
@@ -76,6 +81,77 @@ export default function DashboardPage() {
       toast.error(error instanceof Error ? error.message : 'Failed to clear stale streams');
     } finally {
       setIsCleaning(false);
+    }
+  };
+
+  // Clears CREATED-only rows. Safer than the full Emergency Reset because it
+  // never touches LIVE / PREPARING / ENDING streams.
+  const clearQueuedStreams = async () => {
+    if (!address) return;
+    setIsClearingQueued(true);
+    try {
+      const nonce = generateNonce();
+      const timestamp = new Date().toISOString();
+      const message = createAuthMessage(nonce);
+      const signature = await signMessageAsync({ message });
+
+      const res = await fetch('/api/streams/cleanup-stale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          djWalletAddress: address,
+          signature,
+          message,
+          timestamp,
+          mode: 'queued',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Cleanup failed');
+
+      toast.success(data.message || 'Queued sets cleared.');
+      router.refresh();
+    } catch (error) {
+      console.error('Clear queued error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to clear queued sets');
+    } finally {
+      setIsClearingQueued(false);
+    }
+  };
+
+  // Dismiss a single CREATED row. Wallet-signed because DELETE /api/streams/[id]
+  // requires a fresh signature per delete.
+  const dismissStream = async (streamId: string) => {
+    if (!address) return;
+    setDismissingStreamId(streamId);
+    try {
+      const nonce = generateNonce();
+      const timestamp = new Date().toISOString();
+      const message = createAuthMessage(nonce);
+      const signature = await signMessageAsync({ message });
+
+      const res = await fetch(`/api/streams/${streamId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          djWalletAddress: address,
+          signature,
+          message,
+          timestamp,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Failed to dismiss stream');
+
+      toast.success('Queued set dismissed.');
+      router.refresh();
+    } catch (error) {
+      console.error('Dismiss error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to dismiss queued set');
+    } finally {
+      setDismissingStreamId(null);
     }
   };
 
@@ -274,6 +350,8 @@ export default function DashboardPage() {
                     <p className="mt-2 text-sm text-zinc-400">
                       {currentSet.status === 'LIVE'
                         ? 'Your stream is live. Use the manage page for stop/start, Mux status, and credentials.'
+                        : currentSet.status === 'ENDING'
+                        ? 'Mux saw your encoder go idle. Open the manage page to force-end the set or reconnect OBS.'
                         : 'Your stream is armed. Finish setup or check Mux status from the manage page.'}
                     </p>
                   </div>
@@ -404,11 +482,11 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-10">
-              {(liveStreams.length > 0 || preparingStreams.length > 0) && (
+              {(liveStreams.length > 0 || preparingStreams.length > 0 || endingStreams.length > 0) && (
                 <section>
                   <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Active</div>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {[...liveStreams, ...preparingStreams].map((stream) => (
+                    {[...liveStreams, ...preparingStreams, ...endingStreams].map((stream) => (
                       <StreamCard key={stream.id} stream={stream} showDJControls linkPrefix="/dashboard" />
                     ))}
                   </div>
@@ -417,10 +495,33 @@ export default function DashboardPage() {
 
               {scheduledStreams.length > 0 && (
                 <section>
-                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Queued</div>
+                  <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600">
+                      Queued <span className="text-zinc-500">({scheduledStreams.length})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={clearQueuedStreams}
+                      disabled={isClearingQueued || !isConnected}
+                      className="px-3 py-1.5 border border-zinc-700 text-zinc-300 rounded text-[10px] uppercase tracking-widest hover:border-red-500/40 hover:text-red-400 transition-all disabled:opacity-50"
+                      title="Remove every queued (CREATED) set in one go. Live / preparing / ending sets are untouched."
+                    >
+                      {isClearingQueued ? 'Clearing…' : 'Clear Queued'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-zinc-500 mb-4">
+                    Sets you armed but never started. Dismiss the ones you don&apos;t plan to use — they don&apos;t auto-clean.
+                  </p>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {scheduledStreams.map((stream) => (
-                      <StreamCard key={stream.id} stream={stream} showDJControls linkPrefix="/dashboard" />
+                      <StreamCard
+                        key={stream.id}
+                        stream={stream}
+                        showDJControls
+                        linkPrefix="/dashboard"
+                        onDismiss={dismissStream}
+                        isDismissing={dismissingStreamId === stream.id}
+                      />
                     ))}
                   </div>
                 </section>

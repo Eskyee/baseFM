@@ -7,8 +7,14 @@ export const STREAM_STATUS = {
   ENDED: 'ENDED',
 } as const;
 
-// Stream statuses that can be stopped
-export const STOPPABLE_STATUSES = [STREAM_STATUS.PREPARING, STREAM_STATUS.LIVE] as const;
+// Stream statuses that can be stopped (ENDING included so DJs can force-end a stream
+// stuck in the Mux idle window when their encoder dropped or the auto-disconnect
+// webhook hasn't fired yet)
+export const STOPPABLE_STATUSES = [
+  STREAM_STATUS.PREPARING,
+  STREAM_STATUS.LIVE,
+  STREAM_STATUS.ENDING,
+] as const;
 
 // Mux stream statuses
 export const MUX_STATUS = {

@@ -371,14 +371,44 @@ export async function getStreamBillingSummary(stream: Stream): Promise<StreamBil
   const pricing = getBillingPricing();
   const platformWallet = getPlatformWalletAddress();
 
+  // Degrade gracefully when the platform wallet env isn't configured. The DJ
+  // dashboard should still render so the DJ can manage Mux / RTMP / relays
+  // even if billing is offline. Pay buttons hide via billingUnavailable.
   if (!platformWallet) {
-    throw new Error('Platform wallet is not configured');
+    return {
+      platformWallet: '',
+      pricing,
+      subscription: null,
+      streamSession: null,
+      canActivateStream: false,
+      requiresSessionPayment: false,
+      outstandingMeteredFeeUsdc: 0,
+      billingUnavailable: true,
+      billingUnavailableReason: 'PLATFORM_WALLET_ADDRESS / ADMIN_WALLET_ADDRESS env not configured on the server',
+    };
   }
 
-  const [subscription, streamSession] = await Promise.all([
-    getActiveSubscription(stream.djWalletAddress),
-    getStreamBillingSession(stream.id),
-  ]);
+  let subscription: DJSubscription | null = null;
+  let streamSession: StreamBillingSession | null = null;
+  try {
+    [subscription, streamSession] = await Promise.all([
+      getActiveSubscription(stream.djWalletAddress),
+      getStreamBillingSession(stream.id),
+    ]);
+  } catch (err) {
+    console.error('Billing data fetch failed, returning degraded summary:', err);
+    return {
+      platformWallet,
+      pricing,
+      subscription: null,
+      streamSession: null,
+      canActivateStream: false,
+      requiresSessionPayment: false,
+      outstandingMeteredFeeUsdc: 0,
+      billingUnavailable: true,
+      billingUnavailableReason: err instanceof Error ? err.message : 'Billing data fetch failed',
+    };
+  }
 
   const effectiveMeterRate = subscription
     ? pricing.subscribedMeteredRateUsdcPerHour

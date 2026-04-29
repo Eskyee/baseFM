@@ -95,6 +95,36 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Wallet-signed auth: prevents arbitrary callers from deleting streams by ID.
+    let djWalletAddress: string | undefined;
+    let signature: string | undefined;
+    let message: string | undefined;
+    let timestamp: string | undefined;
+
+    const url = new URL(request.url);
+    if (request.headers.get('content-length') && request.headers.get('content-type')?.includes('application/json')) {
+      try {
+        const body = await request.json();
+        djWalletAddress = body.djWalletAddress;
+        signature = body.signature;
+        message = body.message;
+        timestamp = body.timestamp;
+      } catch {
+        // fall through to query-string params
+      }
+    }
+    djWalletAddress = djWalletAddress || url.searchParams.get('djWalletAddress') || undefined;
+    signature = signature || url.searchParams.get('signature') || undefined;
+    message = message || url.searchParams.get('message') || undefined;
+    timestamp = timestamp || url.searchParams.get('timestamp') || undefined;
+
+    if (!djWalletAddress || !signature || !message || !timestamp) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing signature credentials. Required: djWalletAddress, signature, message, timestamp' },
+        { status: 401 }
+      );
+    }
+
     // Verify stream exists
     const stream = await getStreamById(params.id);
     if (!stream) {
@@ -104,9 +134,39 @@ export async function DELETE(
       );
     }
 
+    // DJ ownership check
+    if (djWalletAddress.toLowerCase() !== stream.djWalletAddress.toLowerCase()) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
+    // Verify signature
+    const isValidSignature = await verifyWalletSignature(djWalletAddress, message, signature);
+    if (!isValidSignature) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid signature' },
+        { status: 403 }
+      );
+    }
+
+    // Replay protection (5 minute window)
+    const requestTime = new Date(timestamp).getTime();
+    if (Number.isNaN(requestTime) || Math.abs(Date.now() - requestTime) > 5 * 60 * 1000) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
+        { status: 401 }
+      );
+    }
+
     // Delete Mux live stream if exists
     if (stream.muxLiveStreamId) {
-      await deleteMuxLiveStream(stream.muxLiveStreamId);
+      try {
+        await deleteMuxLiveStream(stream.muxLiveStreamId);
+      } catch (muxErr) {
+        console.warn(`Failed to delete Mux stream ${stream.muxLiveStreamId}:`, muxErr);
+      }
     }
 
     // Delete from database

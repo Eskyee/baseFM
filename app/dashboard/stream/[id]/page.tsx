@@ -5,12 +5,43 @@ import { parseUnits } from 'viem';
 import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { useStream } from '@/hooks/useStream';
 import { WalletConnect } from '@/components/WalletConnect';
-import { createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
+import { createAuthMessage, createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
 import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as const;
 const USDC_DECIMALS = 6;
+
+interface MuxStatusData {
+  muxStatus?: string;
+  currentStatus?: string;
+  previousStatus?: string;
+  updated?: boolean;
+  mux?: {
+    id?: string;
+    status?: string;
+    playbackId?: string | null;
+    recentAssetIds?: string[];
+  };
+  streamHealth?: 'good' | 'waiting' | 'bad';
+  pickupRecommended?: boolean;
+}
+
+interface RelayInfo {
+  id: string;
+  key: string;
+  name: string;
+  type: 'origin' | 'first-party' | 'youtube' | 'other';
+  required: boolean;
+  enabled: boolean;
+  status: 'healthy' | 'pending' | 'degraded' | 'failed' | 'offline';
+  viewerUrl: string | null;
+  probeUrl: string | null;
+  lastHealthyAt: string | null;
+  lastErrorAt: string | null;
+  lastErrorMessage: string | null;
+}
 
 interface BillingSummary {
   platformWallet: string;
@@ -35,9 +66,12 @@ interface BillingSummary {
   canActivateStream: boolean;
   requiresSessionPayment: boolean;
   outstandingMeteredFeeUsdc: number;
+  billingUnavailable?: boolean;
+  billingUnavailableReason?: string;
 }
 
 export default function DJStreamControlPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { stream, isLoading, error, refetch } = useStream(params.id);
@@ -47,8 +81,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   });
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [isSettingUpMux, setIsSettingUpMux] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [isRefreshingStation, setIsRefreshingStation] = useState(false);
+  const [isResettingStream, setIsResettingStream] = useState(false);
+  const [muxStatusData, setMuxStatusData] = useState<MuxStatusData | null>(null);
+  const [relays, setRelays] = useState<RelayInfo[]>([]);
+  const [relaysLoading, setRelaysLoading] = useState(true);
+  const [probingRelayKey, setProbingRelayKey] = useState<string | null>(null);
+  const [relayActionMessage, setRelayActionMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [billing, setBilling] = useState<BillingSummary | null>(null);
@@ -61,13 +103,54 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setIsBillingLoading(true);
     try {
       const response = await fetch(`/api/billing/streams/${stream.id}`);
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error('Failed to fetch billing status');
+        // Synthesise a degraded billing summary so the rest of the dashboard
+        // keeps rendering even when /api/billing/streams/[id] is 5xx.
+        const reason = data?.reason || data?.error || 'Failed to fetch billing status';
+        console.warn('Billing fetch failed:', reason);
+        setBilling({
+          platformWallet: '',
+          pricing: {
+            streamSessionFeeUsdc: 0,
+            monthlySubscriptionFeeUsdc: 0,
+            meteredRateUsdcPerHour: 0,
+            subscribedMeteredRateUsdcPerHour: 0,
+            tipPlatformFeeBps: 0,
+            ticketPlatformFeeBps: 0,
+          },
+          subscription: null,
+          streamSession: null,
+          canActivateStream: false,
+          requiresSessionPayment: false,
+          outstandingMeteredFeeUsdc: 0,
+          billingUnavailable: true,
+          billingUnavailableReason: reason,
+        });
+        return;
       }
-      const data = await response.json();
-      setBilling(data.billing || null);
+      setBilling(data?.billing || null);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to fetch billing status');
+      const reason = err instanceof Error ? err.message : 'Failed to fetch billing status';
+      console.warn('Billing fetch threw:', reason);
+      setBilling({
+        platformWallet: '',
+        pricing: {
+          streamSessionFeeUsdc: 0,
+          monthlySubscriptionFeeUsdc: 0,
+          meteredRateUsdcPerHour: 0,
+          subscribedMeteredRateUsdcPerHour: 0,
+          tipPlatformFeeBps: 0,
+          ticketPlatformFeeBps: 0,
+        },
+        subscription: null,
+        streamSession: null,
+        canActivateStream: false,
+        requiresSessionPayment: false,
+        outstandingMeteredFeeUsdc: 0,
+        billingUnavailable: true,
+        billingUnavailableReason: reason,
+      });
     } finally {
       setIsBillingLoading(false);
     }
@@ -78,6 +161,29 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       void fetchBilling();
     }
   }, [fetchBilling, stream, isConnected]);
+
+  // Load distribution / relay state alongside billing.
+  useEffect(() => {
+    let active = true;
+    const loadRelays = async () => {
+      setRelaysLoading(true);
+      try {
+        const res = await fetch('/api/relays', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!active) return;
+        setRelays(Array.isArray(data?.relays) ? data.relays : []);
+      } catch {
+        // non-fatal — distribution panel will show empty state
+      } finally {
+        if (active) setRelaysLoading(false);
+      }
+    };
+    void loadRelays();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (billingWriteError) {
@@ -253,8 +359,12 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     };
   };
 
-  const handleStop = async () => {
-    setIsStopping(true);
+  const handleStop = async (archive: boolean = false) => {
+    if (archive) {
+      setIsArchiving(true);
+    } else {
+      setIsStopping(true);
+    }
     setActionError(null);
     setActionSuccess(null);
 
@@ -263,23 +373,32 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       const response = await fetch(`/api/streams/${stream.id}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signedPayload),
+        body: JSON.stringify({ ...signedPayload, archive }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Failed to stop stream');
       }
 
-      setActionSuccess('Stream ended. Listener sessions will clear automatically.');
+      setActionSuccess(
+        data.message ||
+          (archive
+            ? 'Set ended. Replay retained on Mux.'
+            : 'Stream ended. Listener sessions will clear automatically.')
+      );
       refetch();
       void fetchBilling();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsStopping(false);
+      setIsArchiving(false);
     }
   };
+
+  const handleArchiveStop = () => handleStop(true);
 
   const handleSetupMux = async () => {
     setIsSettingUpMux(true);
@@ -319,16 +438,15 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setActionSuccess(null);
 
     try {
-      const response = await fetch(`/api/streams/${stream.id}/check-status`, {
-        method: 'POST',
-      });
+      const response = await fetch(`/api/streams/${stream.id}/check-status`);
 
-      const data = await response.json();
+      const data: MuxStatusData = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to check status');
+        throw new Error((data as unknown as { error?: string }).error || 'Failed to check status');
       }
 
+      setMuxStatusData(data);
       if (data.updated) {
         setActionSuccess(`Status updated: ${data.previousStatus} → ${data.currentStatus}`);
       } else {
@@ -342,12 +460,110 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     }
   };
 
+  // Forces a Mux→station re-sync. Use this if Mux says the feed is active but
+  // the page still says PREPARING (the listener experience is broken until the
+  // status flips to LIVE).
+  const handleRefreshStation = async () => {
+    setIsRefreshingStation(true);
+    setActionError(null);
+    setActionSuccess(null);
+
+    try {
+      const response = await fetch(`/api/streams/${stream.id}/check-status`, {
+        method: 'POST',
+      });
+      const data: MuxStatusData = await response.json();
+      if (!response.ok) {
+        throw new Error((data as unknown as { error?: string }).error || 'Failed to refresh station');
+      }
+      setMuxStatusData(data);
+      setActionSuccess(
+        data.updated
+          ? `Station synced: ${data.previousStatus} → ${data.currentStatus}`
+          : 'Station refreshed (no change).'
+      );
+      refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsRefreshingStation(false);
+    }
+  };
+
+  const handleProbeRelay = async (key: string) => {
+    setProbingRelayKey(key);
+    setRelayActionMessage(null);
+    try {
+      const res = await fetch(`/api/relays/${key}/probe`, { method: 'POST' });
+      const data = await res.json();
+      if (data?.relay) {
+        setRelays((prev) => prev.map((r) => (r.key === key ? data.relay : r)));
+      }
+      setRelayActionMessage(
+        data.ok ? `${key} relay probe succeeded.` : `${key} relay probe failed: ${data.error || 'unknown error'}`
+      );
+    } catch (err) {
+      setRelayActionMessage(err instanceof Error ? err.message : 'Probe failed');
+    } finally {
+      setProbingRelayKey(null);
+    }
+  };
+
+  const handleEmergencyReset = async () => {
+    if (!address) return;
+    const confirmed = window.confirm(
+      'Emergency reset will force-close every non-ended stream on this wallet (including this one) and remove the Mux live resources. Continue?'
+    );
+    if (!confirmed) return;
+
+    setIsResettingStream(true);
+    setActionError(null);
+    setActionSuccess(null);
+
+    try {
+      const nonce = generateNonce();
+      const timestamp = new Date().toISOString();
+      const message = createAuthMessage(nonce);
+      const signature = await signMessageAsync({ message });
+
+      const res = await fetch('/api/streams/cleanup-stale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          djWalletAddress: address,
+          signature,
+          message,
+          timestamp,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Cleanup failed');
+      }
+
+      setActionSuccess(data.message || 'Stale streams cleared.');
+      refetch();
+      router.refresh();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to reset stream');
+    } finally {
+      setIsResettingStream(false);
+    }
+  };
+
   const needsMuxSetup = !stream.muxStreamKey;
 
   const isLive = stream.status === 'LIVE';
   const isPreparing = stream.status === 'PREPARING';
+  const isEnding = stream.status === 'ENDING';
+  const isEnded = stream.status === 'ENDED';
   const canStart = stream.status === 'CREATED';
-  const canStop = isLive || isPreparing;
+  // Allow DJs to manually end while ENDING too — Mux idle webhook can leave the
+  // stream in ENDING for several minutes before disconnect fires, and without
+  // this branch the End Stream button silently disappears mid-set.
+  const canStop = isLive || isPreparing || isEnding;
+  const canCheckStatus = !isEnded;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24">
@@ -375,7 +591,9 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 ? 'bg-red-500 text-white animate-pulse'
                 : isPreparing
                 ? 'bg-yellow-500 text-black'
-                : stream.status === 'ENDED'
+                : isEnding
+                ? 'bg-orange-500 text-black'
+                : isEnded
                 ? 'bg-gray-600 text-white'
                 : 'bg-gray-700 text-white'
             }`}
@@ -421,6 +639,14 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           <p className="text-gray-400 text-sm">Loading billing status...</p>
         ) : billing ? (
           <div className="space-y-4">
+            {billing.billingUnavailable && (
+              <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <p className="text-yellow-300 text-xs font-semibold mb-1">Billing service unavailable</p>
+                <p className="text-yellow-200/70 text-[11px]">
+                  {billing.billingUnavailableReason || 'Server returned an error.'} Your stream controls (Mux, RTMP, relays, end set, refresh) still work — only the pay buttons are disabled until billing is back.
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-black/30 rounded-lg p-3">
                 <div className="text-xs text-gray-500 mb-1">Session Fee</div>
@@ -448,7 +674,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              {!billing.subscription && (
+              {!billing.billingUnavailable && !billing.subscription && (
                 <button
                   onClick={() => payUsdc(billing.pricing.monthlySubscriptionFeeUsdc, 'subscription')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
@@ -460,7 +686,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 </button>
               )}
 
-              {billing.requiresSessionPayment && (
+              {!billing.billingUnavailable && billing.requiresSessionPayment && (
                 <button
                   onClick={() => payUsdc(billing.pricing.streamSessionFeeUsdc, 'session')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
@@ -472,7 +698,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
                 </button>
               )}
 
-              {billing.outstandingMeteredFeeUsdc > 0 && stream.status === 'ENDED' && (
+              {!billing.billingUnavailable && billing.outstandingMeteredFeeUsdc > 0 && stream.status === 'ENDED' && (
                 <button
                   onClick={() => payUsdc(billing.outstandingMeteredFeeUsdc, 'metered')}
                   disabled={isBillingPending || isBillingConfirming || isRecordingBilling}
@@ -533,8 +759,10 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
       )}
 
-      {/* RTMP Credentials - Mobile optimized */}
-      {!needsMuxSetup && (canStart || isPreparing || isLive) && stream.rtmpUrl && (
+      {/* RTMP Credentials - Mobile optimized
+          Includes isEnding so the DJ can copy the same key/server back into
+          OBS to recover from a Mux idle event, as the ENDING banner suggests. */}
+      {!needsMuxSetup && (canStart || isPreparing || isLive || isEnding) && stream.rtmpUrl && (
         <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-4">RTMP Credentials</h2>
           <p className="text-gray-400 text-xs sm:text-sm mb-4">
@@ -644,7 +872,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
         <h2 className="text-base sm:text-lg font-semibold text-white mb-4">Stream Controls</h2>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           {canStart && (
             <button
               onClick={handleStart}
@@ -660,39 +888,82 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
 
           {canStop && (
             <button
-              onClick={handleStop}
-              disabled={isStopping}
+              onClick={() => handleStop(false)}
+              disabled={isStopping || isArchiving}
               className="w-full sm:w-auto px-6 py-4 bg-red-600 text-white rounded-xl hover:bg-red-700 active:scale-[0.98] transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              title="End the set and drop the recent Mux recordings to stop storage billing."
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 6h12v12H6z" />
               </svg>
-              {isStopping ? 'Stopping...' : 'End Stream'}
+              {isStopping ? 'Stopping...' : isEnding ? 'Force End Stream' : 'End Set'}
             </button>
           )}
 
-          {stream.status === 'ENDED' && (
-            <p className="text-gray-400 py-3 text-center sm:text-left">This stream has ended</p>
+          {canStop && (
+            <button
+              onClick={handleArchiveStop}
+              disabled={isStopping || isArchiving}
+              className="w-full sm:w-auto px-6 py-4 bg-amber-500/20 border border-amber-500/40 text-amber-200 rounded-xl hover:bg-amber-500/30 hover:border-amber-400 active:scale-[0.98] transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              title="End the set but keep the Mux recording for replay (Mux storage keeps billing while it lives)."
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+              </svg>
+              {isArchiving ? 'Saving Replay...' : 'End Set + Save Replay'}
+            </button>
+          )}
+
+          {canCheckStatus && (
+            <button
+              onClick={handleCheckStatus}
+              disabled={isCheckingStatus}
+              className="w-full sm:w-auto px-4 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-[0.98] transition-all text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {isCheckingStatus ? 'Checking...' : 'Check Mux Status'}
+            </button>
+          )}
+
+          {canCheckStatus && (
+            <button
+              onClick={handleRefreshStation}
+              disabled={isRefreshingStation}
+              className="w-full sm:w-auto px-4 py-4 bg-zinc-800 border border-zinc-700 text-zinc-200 rounded-xl hover:border-zinc-500 active:scale-[0.98] transition-all text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              title="Force a Mux→station re-sync if Mux is active but the page hasn't flipped to LIVE."
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {isRefreshingStation ? 'Refreshing...' : 'Refresh Station'}
+            </button>
+          )}
+
+          {isEnded && (
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto px-6 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 active:scale-[0.98] transition-all font-semibold flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Start a New Set
+            </Link>
           )}
         </div>
 
         {isPreparing && (
           <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-xl">
-            <p className="text-yellow-400 text-sm mb-3 flex items-center gap-2">
+            <p className="text-yellow-400 text-sm flex items-center gap-2">
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Waiting for video feed...
             </p>
-            <p className="text-gray-400 text-xs mb-3">Start streaming from OBS to go live</p>
-            <button
-              onClick={handleCheckStatus}
-              disabled={isCheckingStatus}
-              className="w-full sm:w-auto px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-[0.98] transition-all text-sm font-medium disabled:opacity-50"
-            >
-              {isCheckingStatus ? 'Checking...' : 'Check Mux Status'}
-            </button>
+            <p className="text-gray-400 text-xs mt-2">Start streaming from OBS to go live. Use Check Mux Status if your encoder is connected but the page hasn&apos;t flipped to LIVE.</p>
           </div>
         )}
 
@@ -704,8 +975,274 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
             </p>
           </div>
         )}
+
+        {isEnding && (
+          <div className="mt-4 p-4 bg-orange-900/20 border border-orange-500/30 rounded-xl">
+            <p className="text-orange-300 font-semibold flex items-center gap-2 mb-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.27 3 1.73 3z" />
+              </svg>
+              Stream is ending
+            </p>
+            <p className="text-gray-400 text-xs">
+              Mux saw your encoder go idle. If this was intentional, press <strong className="text-orange-200">Force End Stream</strong> to settle billing now. Otherwise, reconnect OBS with the same key and use <strong className="text-orange-200">Check Mux Status</strong> to recover.
+            </p>
+          </div>
+        )}
+
+        {isEnded && (
+          <div className="mt-4 p-4 bg-gray-900/40 border border-gray-700 rounded-xl">
+            <p className="text-gray-300 font-semibold mb-1">This stream has ended</p>
+            <p className="text-gray-500 text-xs">
+              Billing is finalized. The credentials and key on this page are retained for reference but a new set requires a fresh stream from the dashboard.
+            </p>
+          </div>
+        )}
+
+        {/* Mux Status mini-grid: surfaces what Mux currently sees vs what the
+            station thinks. Mirrors agentbot's Broadcast Rack status block. */}
+        {muxStatusData && (
+          <div className="mt-4 p-4 bg-gray-900/50 border border-gray-700 rounded-xl">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] uppercase tracking-widest text-zinc-500">Mux Status</span>
+              <span
+                className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded ${
+                  muxStatusData.streamHealth === 'good'
+                    ? 'bg-green-500/15 text-green-300 border border-green-500/30'
+                    : muxStatusData.streamHealth === 'waiting'
+                    ? 'bg-yellow-500/15 text-yellow-300 border border-yellow-500/30'
+                    : 'bg-red-500/15 text-red-300 border border-red-500/30'
+                }`}
+              >
+                {muxStatusData.streamHealth || 'unknown'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <span className="block text-zinc-500 mb-0.5">Mux Stream</span>
+                <span className="text-zinc-200 font-mono break-all">{muxStatusData.mux?.id || '—'}</span>
+              </div>
+              <div>
+                <span className="block text-zinc-500 mb-0.5">Mux State</span>
+                <span className="text-zinc-200">{muxStatusData.mux?.status || muxStatusData.muxStatus || '—'}</span>
+              </div>
+              <div>
+                <span className="block text-zinc-500 mb-0.5">Station</span>
+                <span className="text-zinc-200">{muxStatusData.currentStatus || stream.status}</span>
+              </div>
+              <div>
+                <span className="block text-zinc-500 mb-0.5">Playback ID</span>
+                <span className="text-zinc-200 font-mono break-all">{muxStatusData.mux?.playbackId || '—'}</span>
+              </div>
+            </div>
+            {muxStatusData.pickupRecommended && (
+              <p className="mt-3 text-xs text-yellow-300">
+                Mux is active but the station hasn&apos;t picked up the feed. Press <strong>Refresh Station</strong>.
+              </p>
+            )}
+          </div>
+        )}
       </div>
       )}
+
+      {/* Pioneer Mode — Rekordbox-friendly framing of what each surface in
+          baseFM is doing relative to a Pioneer / Rekordbox booth. */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base sm:text-lg font-semibold text-white">Pioneer Mode</h2>
+          <span className="text-[10px] uppercase tracking-widest text-zinc-500 border border-zinc-700 rounded px-2 py-0.5">
+            DJ-friendly framing
+          </span>
+        </div>
+        <p className="text-gray-400 text-xs sm:text-sm mb-4">
+          Treat baseFM like the broadcast rack <em>after</em> your mixer — not a CDJ, not a controller. Your decks, EQ,
+          loops and cue work all stay on Pioneer / Rekordbox. baseFM only handles the encode + relay.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Source</span>
+            <p className="text-zinc-200 mt-1">Pioneer decks + Rekordbox</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Mixer</span>
+            <p className="text-zinc-200 mt-1">EQ, cue, master out</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Encoder</span>
+            <p className="text-zinc-200 mt-1">OBS / Larix → Mux RTMP</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Station</span>
+            <p className="text-zinc-200 mt-1">basefm.space + relays</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Distribution / Station Health — every relay baseFM pushes the master
+          feed to. Required relays drive the station health pill. */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base sm:text-lg font-semibold text-white">Distribution / Station Health</h2>
+          <span
+            className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border ${
+              relays.some((r) => r.required && r.status === 'failed')
+                ? 'bg-red-500/15 text-red-300 border-red-500/30'
+                : relays.some((r) => r.required && r.status !== 'healthy')
+                ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30'
+                : 'bg-green-500/15 text-green-300 border-green-500/30'
+            }`}
+          >
+            {relays.some((r) => r.required && r.status === 'failed')
+              ? 'degraded'
+              : relays.some((r) => r.required && r.status !== 'healthy')
+              ? 'pending'
+              : 'healthy'}
+          </span>
+        </div>
+        <p className="text-gray-400 text-xs sm:text-sm mb-4">
+          The places baseFM pushes your master feed to. Required relays gate &ldquo;station healthy&rdquo;.
+          YouTube and other optional relays can be wired up by an admin.
+        </p>
+
+        {relaysLoading ? (
+          <p className="text-zinc-500 text-xs">Loading relays…</p>
+        ) : relays.length === 0 ? (
+          <p className="text-zinc-500 text-xs">No relays registered yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {relays.map((relay) => (
+              <li
+                key={relay.id}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-900/50 rounded-lg p-3 border border-zinc-800"
+              >
+                <div className="flex items-start gap-3 min-w-0">
+                  <span
+                    className={`mt-1 inline-block w-2 h-2 rounded-full flex-shrink-0 ${
+                      relay.status === 'healthy'
+                        ? 'bg-green-400'
+                        : relay.status === 'failed'
+                        ? 'bg-red-400'
+                        : relay.status === 'degraded'
+                        ? 'bg-yellow-400'
+                        : 'bg-zinc-500'
+                    }`}
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-zinc-200 text-sm font-medium">{relay.name}</span>
+                      <span className="text-[10px] uppercase tracking-widest text-zinc-500 border border-zinc-700 rounded px-1.5 py-0.5">
+                        {relay.type}
+                      </span>
+                      {relay.required && (
+                        <span className="text-[10px] uppercase tracking-widest text-orange-300 border border-orange-500/30 rounded px-1.5 py-0.5">
+                          required
+                        </span>
+                      )}
+                    </div>
+                    {relay.viewerUrl && (
+                      <a
+                        href={relay.viewerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-zinc-500 text-xs hover:text-blue-400 break-all"
+                      >
+                        {relay.viewerUrl}
+                      </a>
+                    )}
+                    {relay.lastErrorMessage && relay.status !== 'healthy' && (
+                      <p className="text-red-400 text-xs mt-1">{relay.lastErrorMessage}</p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleProbeRelay(relay.key)}
+                  disabled={probingRelayKey === relay.key}
+                  className="self-start sm:self-auto px-3 py-1.5 text-xs border border-zinc-700 text-zinc-200 rounded hover:border-zinc-500 disabled:opacity-50"
+                >
+                  {probingRelayKey === relay.key ? 'Probing…' : 'Probe'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {relayActionMessage && (
+          <p className="mt-3 text-xs text-zinc-300">{relayActionMessage}</p>
+        )}
+
+        <details className="mt-4 group">
+          <summary className="cursor-pointer text-xs text-zinc-400 hover:text-zinc-200">
+            Optional YouTube / external relay (admin only)
+          </summary>
+          <p className="mt-2 text-xs text-zinc-500">
+            Wire up a YouTube Live or other RTMP relay by adding a row to the <code className="font-mono text-zinc-300">relays</code> table
+            (or call <code className="font-mono text-zinc-300">POST /api/relays</code> with an admin wallet).
+            Listeners never see RTMP push keys — only the public <em>viewer URL</em>.
+          </p>
+        </details>
+      </div>
+
+      {/* Encoder / OBS Settings — the "audio-only or etc" guidance the user
+          asked about. Hard-coded recommendations that match what Mux expects. */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-white mb-3">Encoder / OBS Settings</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Encoder Mode</span>
+            <p className="text-zinc-200 mt-1">Custom RTMP (not platform presets)</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Audio</span>
+            <p className="text-zinc-200 mt-1">256–320 kbps · AAC · 44.1 kHz Stereo</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Server</span>
+            <p className="text-zinc-200 mt-1 font-mono break-all">rtmps://global-live.mux.com:443/app</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3 border border-zinc-800">
+            <span className="block text-[10px] uppercase tracking-widest text-zinc-500">Deck / Mixer Model</span>
+            <p className="text-zinc-200 mt-1">Decks + EQ + cue on Pioneer, broadcast out via baseFM</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Pioneer / Rekordbox Quick Notes */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-white mb-3">Pioneer / Rekordbox Quick Notes</h2>
+        <ol className="list-decimal list-inside space-y-2 text-xs text-zinc-400">
+          <li>Keep cue, beatmatch, loops, hot cues, and EQ work on your Pioneer hardware or Rekordbox.</li>
+          <li>Use the mixer master as the source feed for OBS / Larix.</li>
+          <li>Treat baseFM like the broadcast rack <em>after</em> the mixer, not a CDJ or mixer replacement.</li>
+          <li>If you already know Pioneer workflow, you only need the go-live, end set, and refresh controls here.</li>
+        </ol>
+      </div>
+
+      {/* Emergency Reset — always available so a DJ can self-recover from a stuck
+          state without leaving the stream page */}
+      <div className="bg-gray-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border border-orange-500/20">
+        <h2 className="text-base sm:text-lg font-semibold text-orange-400 mb-2">Emergency Reset</h2>
+        <p className="text-gray-400 text-xs sm:text-sm mb-4">
+          Force-clear every non-ended stream on this wallet and delete the Mux live resources. Use this if the page is stuck on LIVE / ENDING when you aren&apos;t actually broadcasting.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleEmergencyReset}
+            disabled={isResettingStream}
+            className="w-full sm:w-auto px-5 py-3 border border-orange-500/40 text-orange-300 rounded-xl hover:bg-orange-500 hover:text-black active:scale-[0.98] transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+            {isResettingStream ? 'Clearing...' : 'Clear Stale Sessions'}
+          </button>
+          <Link
+            href="/dashboard"
+            className="w-full sm:w-auto px-5 py-3 border border-gray-700 text-gray-300 rounded-xl hover:border-gray-500 active:scale-[0.98] transition-all font-medium text-sm flex items-center justify-center gap-2"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
 
       {/* Stream Info - Mobile optimized */}
       <div className="bg-gray-800 rounded-xl p-4 sm:p-6">
@@ -725,6 +1262,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           <div className="bg-gray-900/50 rounded-lg p-3">
             <span className="text-gray-500 text-xs">Token Gated</span>
             <p className="text-white font-medium mt-1">{stream.isGated ? 'Yes' : 'No'}</p>
+          </div>
+          <div className="bg-gray-900/50 rounded-lg p-3">
+            <span className="text-gray-500 text-xs">Gate Source</span>
+            <p className="text-white font-medium mt-1">
+              {stream.isGated && stream.requiredTokenAddress
+                ? stream.requiredTokenAddress.toLowerCase() === '0x9a4376bab717ac0a3901eeed8308a420c59c0ba3'.toLowerCase()
+                  ? 'BASEFM token'
+                  : 'Custom token'
+                : 'Community pass'}
+            </p>
           </div>
           <div className="bg-gray-900/50 rounded-lg p-3">
             <span className="text-gray-500 text-xs">Created</span>
