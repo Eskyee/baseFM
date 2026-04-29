@@ -15,6 +15,7 @@ export default function CoShowPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const fetchCoShow = useCallback(async () => {
     try {
@@ -30,11 +31,8 @@ export default function CoShowPage({ params }: { params: { id: string } }) {
     }
   }, [params.id]);
 
-  useEffect(() => {
-    fetchCoShow();
-  }, [fetchCoShow]);
+  useEffect(() => { fetchCoShow(); }, [fetchCoShow]);
 
-  // Poll when pending to detect co-DJ joining
   useEffect(() => {
     if (coShow?.status !== 'pending') return;
     const interval = setInterval(fetchCoShow, 5000);
@@ -48,10 +46,7 @@ export default function CoShowPage({ params }: { params: { id: string } }) {
       const res = await fetch(`/api/streams/${params.id}/co-show`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          djWalletAddress: address,
-          djName: stream?.djName,
-        }),
+        body: JSON.stringify({ djWalletAddress: address, djName: stream?.djName }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create co-show');
@@ -63,50 +58,79 @@ export default function CoShowPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const copyInvite = (url: string) => {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // ── Not connected ───────────────────────────────────────────────
   if (!isConnected) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center font-mono">
-        <h1 className="text-2xl font-bold text-white mb-4">Co-Show (B2B)</h1>
-        <p className="text-zinc-400 mb-8">Connect your wallet to manage co-shows</p>
-        <WalletConnect />
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="basefm-kicker text-amber-400">Co-Show</div>
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter uppercase leading-[0.92]">
+              Connect wallet.
+            </h1>
+            <p className="text-sm text-zinc-400">Connect your wallet to manage co-shows.</p>
+            <WalletConnect />
+          </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Loading ─────────────────────────────────────────────────────
   if (streamLoading || loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 font-mono">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-zinc-800 rounded w-1/3" />
-          <div className="h-64 bg-zinc-800 rounded" />
-        </div>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+          <div className="max-w-3xl space-y-6 animate-pulse">
+            <div className="h-6 w-48 bg-zinc-900" />
+            <div className="h-64 bg-zinc-900" />
+          </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Not found ───────────────────────────────────────────────────
   if (!stream) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center font-mono">
-        <h1 className="text-2xl font-bold text-white mb-4">Stream Not Found</h1>
-        <Link href="/dashboard" className="text-amber-400 hover:underline">
-          Back to Dashboard
-        </Link>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-4">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600">Error</div>
+            <h1 className="text-3xl font-bold tracking-tighter uppercase">Stream Not Found</h1>
+            <Link href="/dashboard" className="inline-block text-[10px] uppercase tracking-widest text-blue-500 border border-blue-500/30 px-4 py-2 hover:bg-blue-500/10 transition-colors">
+              Back to Dashboard
+            </Link>
+          </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Unauthorized ────────────────────────────────────────────────
   if (stream.djWalletAddress.toLowerCase() !== address?.toLowerCase()) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center font-mono">
-        <h1 className="text-2xl font-bold text-white mb-4">Unauthorized</h1>
-        <Link href="/dashboard" className="text-amber-400 hover:underline">
-          Back to Dashboard
-        </Link>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-4">
+            <div className="text-[10px] uppercase tracking-widest text-red-400">Unauthorized</div>
+            <h1 className="text-3xl font-bold tracking-tighter uppercase">Not Your Stream</h1>
+            <Link href="/dashboard" className="inline-block text-[10px] uppercase tracking-widest text-blue-500 border border-blue-500/30 px-4 py-2 hover:bg-blue-500/10 transition-colors">
+              Back to Dashboard
+            </Link>
+          </div>
+        </section>
+      </main>
     );
   }
 
-  // Active co-show — render studio
+  // ── Active co-show — render studio ──────────────────────────────
   if (coShow?.status === 'active') {
     return (
       <CoShowStudio
@@ -119,80 +143,112 @@ export default function CoShowPage({ params }: { params: { id: string } }) {
     );
   }
 
-  // Pending co-show — show invite
-  if (coShow?.status === 'pending') {
-    const inviteUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/co-show/${coShow.inviteCode}`;
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8 font-mono">
-        <Link
-          href={`/dashboard/stream/${params.id}`}
-          className="text-zinc-400 hover:text-white mb-6 inline-flex items-center gap-2 text-sm"
-        >
-          &larr; Back to Stream
-        </Link>
+  const inviteUrl = coShow ? `${typeof window !== 'undefined' ? window.location.origin : ''}/co-show/${coShow.inviteCode}` : '';
 
-        <div className="mt-6 border border-zinc-800 bg-zinc-950 rounded p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="w-3 h-3 rounded-full bg-amber-400 animate-pulse" />
-            <h2 className="text-lg font-bold uppercase tracking-tighter text-white">
-              WAITING FOR CO-DJ TO CONNECT...
-            </h2>
-          </div>
-
-          <p className="text-zinc-400 text-sm mb-4">
-            Share this link with your co-DJ. Valid for 24 hours.
-          </p>
-
-          <div className="bg-black border border-zinc-800 rounded p-4 mb-4">
-            <code className="text-amber-400 text-sm break-all">{inviteUrl}</code>
-          </div>
-
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(inviteUrl);
-            }}
-            className="w-full py-3 bg-amber-400 text-black font-bold uppercase tracking-tighter rounded text-sm hover:bg-amber-300 transition-colors"
-          >
-            COPY INVITE LINK
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // No co-show — create one
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 font-mono">
-      <Link
-        href={`/dashboard/stream/${params.id}`}
-        className="text-zinc-400 hover:text-white mb-6 inline-flex items-center gap-2 text-sm"
-      >
-        &larr; Back to Stream
-      </Link>
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      {/* Hero */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+        <div className="max-w-3xl space-y-6">
+          <Link href={`/dashboard/stream/${params.id}`} className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Stream
+          </Link>
 
-      <div className="mt-6 border border-zinc-800 bg-zinc-950 rounded p-6">
-        <h2 className="text-xl font-bold uppercase tracking-tighter text-white mb-4">
-          START A B2B CO-SHOW
-        </h2>
-        <p className="text-zinc-400 text-sm mb-6">
-          Invite another DJ to share this stream. They get the same RTMP credentials and can take
-          over when you hand off. Pirate radio style.
-        </p>
-
-        {error && (
-          <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded mb-4 text-sm">
-            {error}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="basefm-kicker text-amber-400">Co-Show</span>
+            <span className="basefm-kicker text-zinc-500">B2B</span>
           </div>
-        )}
 
-        <button
-          onClick={handleCreate}
-          disabled={creating}
-          className="w-full py-4 bg-amber-400 text-black font-bold uppercase tracking-tighter rounded text-sm hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {creating ? 'CREATING...' : 'CREATE CO-SHOW'}
-        </button>
-      </div>
-    </div>
+          <div className="space-y-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter uppercase leading-[0.92]">
+              {coShow?.status === 'pending' ? 'Waiting for co-DJ.' : 'Start a B2B co-show.'}
+            </h1>
+            <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
+              {coShow?.status === 'pending'
+                ? 'Share the invite link below. Valid for 24 hours.'
+                : 'Invite another DJ to share this stream. They get the same RTMP credentials and can take over when you hand off. Pirate radio style.'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+          <div className="max-w-3xl space-y-px">
+            {error && (
+              <div className="border border-red-500/30 bg-red-500/10 p-4 text-xs text-red-300">
+                {error}
+              </div>
+            )}
+
+            {/* Pending — show invite */}
+            {coShow?.status === 'pending' && (
+              <>
+                <div className="border border-zinc-800 bg-zinc-950 p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] uppercase tracking-widest text-amber-400">Waiting for co-DJ to connect</span>
+                  </div>
+
+                  <div className="border border-zinc-800 bg-black p-4 mb-4">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Invite Link</div>
+                    <code className="block text-xs text-amber-400 break-all select-all">{inviteUrl}</code>
+                  </div>
+
+                  <button onClick={() => copyInvite(inviteUrl)} className="w-full py-3 text-[10px] font-bold uppercase tracking-widest border border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-black transition-all">
+                    {copied ? 'Copied!' : 'Copy Invite Link'}
+                  </button>
+                </div>
+
+                <div className="border border-zinc-800 bg-zinc-950 p-6">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">How it works</div>
+                  <div className="grid gap-px bg-zinc-900 sm:grid-cols-3">
+                    {[
+                      ['Share link', 'Send the invite to your co-DJ. They open it and connect their wallet.'],
+                      ['Both stream', 'You both get the same RTMP credentials. Whoever is live feeds the station.'],
+                      ['Hand off', 'Take turns. One DJ plays while the other prepares the next track.'],
+                    ].map(([label, body]) => (
+                      <div key={label} className="bg-black p-4">
+                        <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">{label}</div>
+                        <p className="text-xs text-zinc-500 leading-relaxed">{body}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* No co-show — create one */}
+            {!coShow && (
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Create Co-Show</div>
+
+                <div className="grid gap-px bg-zinc-900 sm:grid-cols-2 mb-6">
+                  {[
+                    ['Shared credentials', 'Both DJs get the same RTMP stream key and server URL.'],
+                    ['Pirate radio style', 'Take turns playing sets. One DJ decks, the other prepares.'],
+                    ['Same gate', 'Your co-DJ needs the same token access as you.'],
+                    ['24h invite', 'The invite link expires after 24 hours. Resend if needed.'],
+                  ].map(([label, body]) => (
+                    <div key={label} className="bg-black p-4">
+                      <div className="text-sm font-bold uppercase tracking-wider text-white mb-2">{label}</div>
+                      <p className="text-xs text-zinc-500 leading-relaxed">{body}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={handleCreate} disabled={creating} className="w-full py-3 text-[10px] font-bold uppercase tracking-widest border border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {creating ? 'Creating...' : 'Create Co-Show'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
