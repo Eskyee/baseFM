@@ -77,105 +77,145 @@ export default function ShowPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pb-20">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="aspect-video bg-[#1A1A1A] skeleton rounded-xl mb-6" />
-          <div className="h-8 w-2/3 skeleton rounded mb-4" />
-          <div className="h-4 w-1/3 skeleton rounded" />
-        </div>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+          <div className="max-w-4xl space-y-6">
+            <div className="aspect-video bg-zinc-900 animate-pulse" />
+            <div className="h-6 w-2/3 bg-zinc-900 animate-pulse" />
+            <div className="h-4 w-1/3 bg-zinc-900 animate-pulse" />
+          </div>
+        </section>
+      </main>
     );
   }
 
   if (error || !show) {
     return (
-      <div className="min-h-screen pb-20 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-[#F5F5F5] mb-4">{error || 'Show not found'}</h1>
-          <Link href="/archive" className="text-blue-400 hover:underline">
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-sm uppercase tracking-widest text-zinc-500">
+            {error || 'Show not found'}
+          </h1>
+          <Link
+            href="/archive"
+            className="inline-block text-[10px] uppercase tracking-widest text-blue-500 border border-blue-500/30 px-4 py-2 hover:bg-blue-500/10 transition-colors"
+          >
             Back to archive
           </Link>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Back link */}
-        <Link
-          href="/archive"
-          className="inline-flex items-center gap-2 text-[#888] hover:text-[#F5F5F5] mb-6 text-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to archive
-        </Link>
-
-        {/* Video Player */}
-        <div className="rounded-xl overflow-hidden bg-black mb-6">
-          <MuxPlayer
-            playbackId={show.playbackId}
-            metadata={{
-              video_title: show.title,
-              viewer_user_id: 'anonymous',
-            }}
-            accentColor="#3B82F6"
-            className="w-full aspect-video"
-          />
-        </div>
-
-        {/* Show Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#F5F5F5] mb-2">
-              {show.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-4 text-sm text-[#888]">
-              <span>{formatDate(show.recordedAt)}</span>
-              <span>·</span>
-              <span>{formatDuration(show.duration)}</span>
-              {show.genre && (
-                <>
-                  <span>·</span>
-                  <span className="px-2 py-0.5 bg-[#1A1A1A] rounded">{show.genre}</span>
-                </>
-              )}
-            </div>
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      {/* Hero */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+        <div className="max-w-4xl space-y-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/archive"
+              className="basefm-kicker text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              ← Archive
+            </Link>
+            {show.genre && (
+              <span className="basefm-kicker text-blue-500">{show.genre}</span>
+            )}
           </div>
 
-          {show.description && (
-            <p className="text-[#888] leading-relaxed">{show.description}</p>
-          )}
+          <div className="space-y-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter uppercase leading-[0.9]">
+              {show.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-4 text-[10px] uppercase tracking-widest text-zinc-600">
+              <span>{formatDate(show.recordedAt)}</span>
+              <span className="text-zinc-800">·</span>
+              <span>{formatDuration(show.duration)}</span>
+              <span className="text-zinc-800">·</span>
+              <span>{show.viewCount} views</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          {/* DJ Card */}
-          <Link
-            href={`/djs/${show.djSlug}`}
-            className="flex items-center gap-4 p-4 bg-[#1A1A1A] rounded-xl hover:bg-[#222] transition-colors"
-          >
-            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-[#333]">
-              <Image
-                src={show.djAvatar || DEFAULT_AVATAR}
-                alt={show.djName}
-                fill
-                className={show.djAvatar ? 'object-cover' : 'object-contain p-2'}
+      {/* Player */}
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 sm:py-20">
+          <div className="max-w-4xl">
+            <div className="overflow-hidden bg-black border border-zinc-900">
+              <MuxPlayer
+                playbackId={show.playbackId}
+                metadata={{
+                  video_title: show.title,
+                  viewer_user_id: 'anonymous',
+                }}
+                accentColor="#3B82F6"
+                className="w-full aspect-video"
               />
             </div>
-            <div className="flex-1">
-              <h3 className="text-[#F5F5F5] font-medium">{show.djName}</h3>
-              {show.djBio && (
-                <p className="text-sm text-[#888] line-clamp-1">{show.djBio}</p>
-              )}
+
+            {/* Description */}
+            {show.description && (
+              <div className="mt-8 border-t border-zinc-900 pt-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">
+                  About this set
+                </div>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  {show.description}
+                </p>
+              </div>
+            )}
+
+            {/* DJ Card */}
+            <div className="mt-8 border-t border-zinc-900 pt-8">
+              <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">
+                Performed by
+              </div>
+              <Link
+                href={`/djs/${show.djSlug}`}
+                className="group flex items-center gap-5 p-5 border border-zinc-900 hover:border-zinc-700 transition-colors"
+              >
+                <div className="relative w-12 h-12 overflow-hidden bg-zinc-900 flex-shrink-0">
+                  <Image
+                    src={show.djAvatar || DEFAULT_AVATAR}
+                    alt={show.djName}
+                    fill
+                    className={
+                      show.djAvatar
+                        ? 'object-cover grayscale group-hover:grayscale-0 transition-all duration-500'
+                        : 'object-contain p-2 opacity-30'
+                    }
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm uppercase tracking-widest text-zinc-300 group-hover:text-white transition-colors">
+                    {show.djName}
+                  </h3>
+                  {show.djBio && (
+                    <p className="text-xs text-zinc-600 line-clamp-1 mt-1">
+                      {show.djBio}
+                    </p>
+                  )}
+                </div>
+                <svg
+                  className="w-4 h-4 text-zinc-700 group-hover:text-zinc-400 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Link>
             </div>
-            <svg className="w-5 h-5 text-[#888]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
