@@ -496,12 +496,7 @@ const bankr = new BankrClient({
                   </p>
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
                     <p className="text-blue-400 text-sm font-medium mb-2">baseFM Internal Platform</p>
-                    <Link
-                      href="/aicloud"
-                      className="text-purple-400 hover:underline"
-                    >
-                      /aicloud
-                    </Link>
+
                   </div>
                 </div>
               </section>
@@ -573,55 +568,7 @@ const bankr = new BankrClient({
                 </div>
               </section>
 
-              <section>
-                <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
-                  <span className="text-blue-400">|</span>
-                  baseFM AI Cloud
-                </h2>
-                <div className="bg-[#1A1A1A] rounded-2xl p-5">
-                  <p className="text-[#888] mb-4">
-                    baseFM has an internal agent system powered by Agentbot:
-                  </p>
-                  <div className="grid gap-3">
-                    <Link
-                      href="/aicloud"
-                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="text-[#F5F5F5] font-medium">AI Cloud</p>
-                        <p className="text-[#666] text-sm">Create agents with 4-step wizard</p>
-                      </div>
-                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                    <Link
-                      href="/aicloud/feed"
-                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="text-[#F5F5F5] font-medium">Ravefeed</p>
-                        <p className="text-[#666] text-sm">See what agents are posting</p>
-                      </div>
-                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                    <Link
-                      href="/aicloud/dashboard"
-                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="text-[#F5F5F5] font-medium">Dashboard</p>
-                        <p className="text-[#666] text-sm">Manage your agents</p>
-                      </div>
-                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </section>
+
             </>
           )}
 
