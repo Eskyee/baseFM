@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
 import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { useStream } from '@/hooks/useStream';
+import { useDJAccess } from '@/hooks/useDJAccess';
 import { WalletConnect } from '@/components/WalletConnect';
 import { createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
 import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
@@ -56,6 +57,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { stream, isLoading, error, refetch } = useStream(params.id);
+  const { isAdmin } = useDJAccess();
   const { writeContract, data: billingTxHash, isPending: isBillingPending, error: billingWriteError } = useWriteContract();
   const { isLoading: isBillingConfirming, isSuccess: isBillingConfirmed } = useWaitForTransactionReceipt({
     hash: billingTxHash,
@@ -88,8 +90,8 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
   }, [stream]);
 
   useEffect(() => {
-    if (stream && isConnected) void fetchBilling();
-  }, [fetchBilling, stream, isConnected]);
+    if (stream && isConnected && !isAdmin) void fetchBilling();
+  }, [fetchBilling, stream, isConnected, isAdmin]);
 
   useEffect(() => {
     if (billingWriteError) setActionError(billingWriteError.message || 'Billing transaction failed');
@@ -344,6 +346,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
             <span className={`basefm-kicker ${isLive ? 'text-red-400' : isPreparing ? 'text-amber-400' : 'text-zinc-500'}`}>
               {stream.status}
             </span>
+            {isAdmin && <span className="basefm-kicker text-green-400">Admin</span>}
           </div>
 
           <div className="space-y-4">
@@ -372,7 +375,8 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         </div>
       </section>
 
-      {/* Billing */}
+      {/* Billing — hidden for admins */}
+      {!isAdmin && (
       <section className="border-t border-zinc-900">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
           <div className="max-w-3xl">
@@ -459,6 +463,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
           </div>
         </div>
       </section>
+      )}
 
       {/* Mux Setup */}
       {needsMuxSetup && (

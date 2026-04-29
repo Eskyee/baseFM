@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/client';
 import { getBillingPricing, getPlatformWalletAddress, calculatePlatformFee, calculateStreamMeteredFee, roundUsd } from '@/lib/billing/config';
 import { DJSubscription, PlatformFeeRecord, StreamBillingSession, StreamBillingSummary } from '@/types/billing';
 import { Stream } from '@/types/stream';
+import { isAdminWallet } from '@/lib/admin/config';
 
 function mapSubscription(row: Record<string, unknown>): DJSubscription {
   return {
@@ -389,8 +390,9 @@ export async function getStreamBillingSummary(stream: Stream): Promise<StreamBil
     ? seededSession.meteredFeeUsdc
     : 0;
 
-  const requiresSessionPayment = !subscription && seededSession?.sessionFeeStatus !== 'paid';
-  const canActivateStream = Boolean(subscription) || seededSession?.sessionFeeStatus === 'paid';
+  const isAdmin = isAdminWallet(stream.djWalletAddress);
+  const requiresSessionPayment = !isAdmin && !subscription && seededSession?.sessionFeeStatus !== 'paid';
+  const canActivateStream = isAdmin || Boolean(subscription) || seededSession?.sessionFeeStatus === 'paid';
 
   return {
     platformWallet,
