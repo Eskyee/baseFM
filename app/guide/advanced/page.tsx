@@ -319,7 +319,7 @@ export default function AdvancedGuidePage() {
                     <p className="text-2xl font-bold text-blue-400 mb-2">≈ $25 <span className="text-sm text-[#888] font-normal">USD equiv.</span></p>
                     <p className="text-[#888] text-xs mb-3">
                       Same value as RAVE, on the Solana side. Useful if your wallet lives there or
-                      you're already in the Agentbot ecosystem.
+                      youyou're alreadyapos;re already in the Agentbot ecosystem.
                     </p>
                     <ul className="text-[#666] text-xs space-y-1">
                       <li>• Solana SPL token</li>
@@ -371,7 +371,7 @@ export default function AdvancedGuidePage() {
                 <div className="bg-[#0A0A0A] rounded-xl p-4 mt-4">
                   <p className="text-[#F5F5F5] text-sm font-medium mb-2">When to pick what</p>
                   <ul className="text-[#888] text-xs space-y-1">
-                    <li><span className="text-purple-400">RAVE / AGENTBOT</span> — you're crypto-native and want one-time access tied to a holding (no recurring charge).</li>
+                    <li><span className="text-purple-400">RAVE / AGENTBOT</span> — youyou're crypto-nativeapos;re crypto-native and want one-time access tied to a holding (no recurring charge).</li>
                     <li><span className="text-green-400">USDC pay-as-you-go</span> — you DJ a few times a month and don't want to lock up tokens.</li>
                     <li><span className="text-yellow-400">$40 subscription (Stripe or USDC)</span> — you DJ regularly; cheapest per hour after ~5 hours/month.</li>
                   </ul>
@@ -401,7 +401,7 @@ export default function AdvancedGuidePage() {
                     audience, we host the stream.
                   </p>
                   <p className="text-[#888] text-sm">
-                    Codes are issued by admin only. If you've been sent one, redeem it from the access
+                    Codes are issued by admin only. If youyou've been sentapos;ve been sent one, redeem it from the access
                     modal on the DJ dashboard. Default grants <strong className="text-[#F5F5F5]">30
                     days of free streaming</strong> on the same gate everyone else uses.
                   </p>
@@ -421,7 +421,7 @@ export default function AdvancedGuidePage() {
                     </div>
                     <div className="flex gap-3">
                       <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">03</span>
-                      <p>Headliner opens the DJ dashboard, picks <em className="not-italic">"Have an invite code?"</em>, and redeems with a wallet signature.</p>
+                      <p>Headliner opens the DJ dashboard, picks <em className="not-italic">"Have an invite code?"quot;Have an invite code?"Have an invite code?"quot;</em>, and redeems with a wallet signature.</p>
                     </div>
                     <div className="flex gap-3">
                       <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">04</span>

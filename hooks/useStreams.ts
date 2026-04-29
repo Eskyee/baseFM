@@ -59,6 +59,7 @@ export function useStreams(options: UseStreamsOptions = {}) {
     }
 
     // Subscribe to realtime updates
+    let realtimeFailed = false;
     const channel = supabase
       .channel('streams-changes')
       .on(
@@ -85,12 +86,19 @@ export function useStreams(options: UseStreamsOptions = {}) {
       )
       .subscribe((status, err) => {
         if (err) {
-          console.error('Streams subscription error:', err);
+          console.warn('Streams realtime subscription failed, using polling fallback:', err);
+          realtimeFailed = true;
         }
       });
 
+    // Fallback polling when realtime is unavailable
+    const fallbackPoll = !options.pollInterval && !realtimeFailed
+      ? setInterval(() => { if (realtimeFailed) fetchStreams(); }, 15000)
+      : null;
+
     return () => {
       if (pollTimer) clearInterval(pollTimer);
+      if (fallbackPoll) clearInterval(fallbackPoll);
       supabase.removeChannel(channel);
     };
   }, [fetchStreams, options.pollInterval]);
