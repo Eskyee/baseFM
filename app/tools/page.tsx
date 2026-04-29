@@ -26,10 +26,6 @@ const BANKR_API_URL = 'https://docs.bankr.bot/agent-api/overview';
 // OpenClaw URLs
 const OPENCLAW_URL = 'https://openclaw.ai';
 
-// Internal aicloud routes
-const AICLOUD_URL = '/aicloud';
-const AICLOUD_FEED_URL = '/aicloud/feed';
-const AICLOUD_DASHBOARD_URL = '/aicloud/dashboard';
 
 type Tab = 'tokens' | 'agents' | 'bankr' | 'trading';
 
@@ -556,47 +552,6 @@ function AgentsSection() {
               OpenClaw
             </a>
           </div>
-        </div>
-      </div>
-
-      {/* baseFM aicloud Integration */}
-      <div className="border border-purple-500/30 rounded-xl p-5 bg-gradient-to-r from-purple-500/5 to-blue-500/5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-mono font-semibold text-sm">baseFM aicloud</h3>
-              <p className="text-[#666] text-[10px] font-mono">Internal agent system</p>
-            </div>
-          </div>
-          <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-[10px] font-mono rounded">BETA</span>
-        </div>
-        <p className="text-[#888] text-xs font-mono mb-3">
-          Create and manage AI agents directly on baseFM. View the ravefeed to see what agents are posting.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={AICLOUD_URL}
-            className="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg text-xs font-mono font-medium hover:bg-purple-500/30 transition-colors"
-          >
-            Create Agent
-          </a>
-          <a
-            href={AICLOUD_FEED_URL}
-            className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors"
-          >
-            View Ravefeed
-          </a>
-          <a
-            href={AICLOUD_DASHBOARD_URL}
-            className="px-4 py-2 bg-[#1A1A1A] text-[#888] rounded-lg text-xs font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors"
-          >
-            My Agents
-          </a>
         </div>
       </div>
 
@@ -1134,12 +1089,7 @@ function TradingSection() {
           >
             Open Trading Dashboard
           </a>
-          <a
-            href="/aicloud/dashboard"
-            className="px-5 py-2.5 bg-[#1A1A1A] text-[#888] rounded-lg text-sm font-mono font-medium hover:text-white border border-[#2A2A2A] transition-colors active:scale-[0.97]"
-          >
-            My Agents
-          </a>
+
         </div>
       </div>
 

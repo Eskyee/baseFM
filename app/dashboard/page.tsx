@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { useSignMessage } from 'wagmi';
-import { useToastActions } from '@/components/ui/Toast';
 import { generateNonce, createAuthMessage } from '@/lib/auth/wallet';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
@@ -12,6 +11,7 @@ import { useDJAccess } from '@/hooks/useDJAccess';
 import { StreamCard } from '@/components/StreamCard';
 import { WalletConnect } from '@/components/WalletConnect';
 import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
+import { useToastActions } from '@/components/ui/Toast';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
 
 function formatAddress(address?: string | null) {
@@ -28,11 +28,11 @@ function statusClasses(kind: 'active' | 'idle' | 'error') {
 export default function DashboardPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const toast = useToastActions();
   const [broadcastName, setBroadcastName] = useState('DJ Escaba');
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const { signMessageAsync } = useSignMessage();
-  const toast = useToastActions();
   const [formError, setFormError] = useState<string | null>(null);
 
   const { hasAccess, isAdmin, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
@@ -45,7 +45,6 @@ export default function DashboardPage() {
   const scheduledStreams = useMemo(() => streams.filter((stream) => stream.status === 'CREATED'), [streams]);
   const pastStreams = useMemo(() => streams.filter((stream) => stream.status === 'ENDED'), [streams]);
   const currentSet = liveStreams[0] || preparingStreams[0] || null;
-
 
   const clearStaleStreams = async () => {
     if (!address) return;
@@ -340,8 +339,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-
-              <div className="mt-4 bg-black p-4 border border-orange-500/20">
+              <div className="mt-4 border border-orange-500/20 bg-black p-4">
                 <div className="text-sm font-bold uppercase tracking-wider text-orange-400 mb-2">Emergency Reset</div>
                 <p className="text-xs text-zinc-500 leading-relaxed mb-4">
                   If your session is stuck or basefm.space shows you as live but you aren&apos;t, use this to force-clear your state.

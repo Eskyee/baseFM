@@ -29,33 +29,32 @@ export async function POST(
       );
     }
 
-    // Require signature verification for stopping stream
-    if (!signature || !message || !nonce || !timestamp) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Missing signature credentials. Required: signature, message, nonce, timestamp' },
-        { status: 401 }
-      );
-    }
+    const hasSignaturePayload = Boolean(signature && message && nonce && timestamp);
 
-    // Verify the wallet signature
-    const isValidSignature = await verifyWalletSignature(djWalletAddress, message, signature);
-    if (!isValidSignature) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Invalid signature' },
-        { status: 403 }
-      );
-    }
+    if (hasSignaturePayload) {
+      // Verify the wallet signature when present.
+      const isValidSignature = await verifyWalletSignature(djWalletAddress, message, signature);
+      if (!isValidSignature) {
+        return NextResponse.json(
+          { error: 'Unauthorized: Invalid signature' },
+          { status: 403 }
+        );
+      }
 
-    // Check timestamp to prevent replay attacks (allow 5 minute window)
-    const requestTime = new Date(timestamp).getTime();
-    const now = Date.now();
-    const fiveMinutes = 5 * 60 * 1000;
-    
-    if (Math.abs(now - requestTime) > fiveMinutes) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
-        { status: 401 }
-      );
+      // Check timestamp to prevent replay attacks (allow 5 minute window)
+      const requestTime = new Date(timestamp).getTime();
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (Math.abs(now - requestTime) > fiveMinutes) {
+        return NextResponse.json(
+          { error: 'Unauthorized: Request timestamp expired. Please refresh and try again.' },
+          { status: 401 }
+        );
+      }
+    } else {
+      // Backward-compatible fallback for older deployed clients that only send djWalletAddress.
+      console.warn(`[streams.stop] Legacy unsigned stop request accepted for stream ${params.id}`);
     }
 
     // Check stream can be stopped

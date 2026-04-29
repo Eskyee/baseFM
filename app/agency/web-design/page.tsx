@@ -26,7 +26,7 @@ const portfolioProjects = [
     name: 'AI Cloud Dashboard',
     description: 'AI agent management and analytics platform',
     tech: ['Next.js', 'TypeScript', 'Tailwind', 'Charts'],
-    url: '/aicloud',
+    url: '/tools',
     category: 'webapp',
   },
   {

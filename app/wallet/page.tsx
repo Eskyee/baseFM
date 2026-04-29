@@ -117,15 +117,15 @@ export default function WalletPage() {
             <div className="bg-black p-6 sm:p-8">
               <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Next moves</div>
               <div className="space-y-3">
-                <Link href={fundUrl} target="_blank" rel="noopener noreferrer" className="block border border-zinc-800 p-4 hover:border-zinc-600 transition-colors">
+                <Link href={fundUrl} target="_blank" rel="noopener noreferrer" className="basefm-panel block p-4 hover:bg-zinc-950 transition-colors">
                   <div className="text-sm font-bold uppercase tracking-wider text-white mb-1">Buy crypto</div>
                   <p className="text-xs text-zinc-500 leading-relaxed">Onramp to Base and top up your wallet cleanly.</p>
                 </Link>
-                <Link href={swapUrl} target="_blank" rel="noopener noreferrer" className="block border border-zinc-800 p-4 hover:border-zinc-600 transition-colors">
+                <Link href={swapUrl} target="_blank" rel="noopener noreferrer" className="basefm-panel block p-4 hover:bg-zinc-950 transition-colors">
                   <div className="text-sm font-bold uppercase tracking-wider text-white mb-1">Swap tokens</div>
                   <p className="text-xs text-zinc-500 leading-relaxed">Use Uniswap for ETH, USDC, and {DJ_TOKEN_CONFIG.symbol}.</p>
                 </Link>
-                <Link href={geckoUrl} target="_blank" rel="noopener noreferrer" className="block border border-zinc-800 p-4 hover:border-zinc-600 transition-colors">
+                <Link href={geckoUrl} target="_blank" rel="noopener noreferrer" className="basefm-panel block p-4 hover:bg-zinc-950 transition-colors">
                   <div className="text-sm font-bold uppercase tracking-wider text-white mb-1">Token chart</div>
                   <p className="text-xs text-zinc-500 leading-relaxed">Open GeckoTerminal for price and pair context.</p>
                 </Link>

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         code: existingCode.code,
-        referralUrl: `https://basefm.space/aicloud?ref=${existingCode.code}`,
+        referralUrl: `https://basefm.space/?ref=${existingCode.code}`,
         stats: {
           totalReferrals: totalReferrals || 0,
           totalRewardsEarned: totalRewards,
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       code,
-      referralUrl: `https://basefm.space/aicloud?ref=${code}`,
+      referralUrl: `https://basefm.space/?ref=${code}`,
       stats: {
         totalReferrals: 0,
         totalRewardsEarned: 0,
