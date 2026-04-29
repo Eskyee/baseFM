@@ -23,7 +23,6 @@ export default function CreatePromoterPage() {
   const [existingPromoter, setExistingPromoter] = useState<Promoter | null>(null);
   const [isCheckingExisting, setIsCheckingExisting] = useState(true);
 
-  // Form state
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [type, setType] = useState<PromoterType>('promoter');
@@ -36,21 +35,14 @@ export default function CreatePromoterPage() {
   const [twitterUrl, setTwitterUrl] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
 
-  // Check if user already has a promoter profile
   useEffect(() => {
     async function checkExisting() {
-      if (!address) {
-        setIsCheckingExisting(false);
-        return;
-      }
-
+      if (!address) { setIsCheckingExisting(false); return; }
       try {
         const res = await fetch(`/api/promoters?wallet=${address}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.promoter) {
-            setExistingPromoter(data.promoter);
-          }
+          if (data.promoter) setExistingPromoter(data.promoter);
         }
       } catch (err) {
         console.error('Failed to check existing promoter:', err);
@@ -58,7 +50,6 @@ export default function CreatePromoterPage() {
         setIsCheckingExisting(false);
       }
     }
-
     checkExisting();
   }, [address]);
 
@@ -66,7 +57,6 @@ export default function CreatePromoterPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
     try {
       const res = await fetch('/api/promoters', {
         method: 'POST',
@@ -86,14 +76,8 @@ export default function CreatePromoterPage() {
           logoUrl: logoUrl || undefined,
         }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to create profile');
-      }
-
-      // Redirect to the new profile
+      if (!res.ok) throw new Error(data.error || 'Failed to create profile');
       router.push(`/collectives/${data.promoter.slug}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create profile');
@@ -102,273 +86,207 @@ export default function CreatePromoterPage() {
     }
   };
 
+  // ── Not connected ───────────────────────────────────────────────
   if (!isConnected) {
     return (
-      <div className="min-h-screen pb-20 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <h1 className="text-2xl font-bold text-[#F5F5F5] mb-3">Create Profile</h1>
-          <p className="text-[#888] mb-8">Connect your wallet to create a promoter profile</p>
-          <WalletConnect />
-        </div>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="basefm-kicker text-purple-400">Collectives</div>
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter uppercase leading-[0.92]">
+              Connect wallet.
+            </h1>
+            <p className="text-sm text-zinc-400">Connect your wallet to create a promoter profile.</p>
+            <WalletConnect />
+          </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Checking ────────────────────────────────────────────────────
   if (isCheckingExisting) {
     return (
-      <div className="min-h-screen pb-20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[#888]">Checking existing profile...</p>
-        </div>
-      </div>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-4">
+            <div className="w-6 h-6 border-2 border-zinc-600 border-t-blue-500 animate-spin mx-auto" />
+            <p className="text-[10px] uppercase tracking-widest text-zinc-600">Checking existing profile</p>
+          </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Already exists ──────────────────────────────────────────────
   if (existingPromoter) {
     return (
-      <div className="min-h-screen pb-20 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 sm:py-24 text-center">
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="text-[10px] uppercase tracking-widest text-green-400">Profile Exists</div>
+            <h1 className="text-3xl font-bold tracking-tighter uppercase">{existingPromoter.name}</h1>
+            <p className="text-sm text-zinc-400">You already have a promoter profile.</p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Link href={`/collectives/${existingPromoter.slug}`} className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-purple-500/40 text-purple-400 hover:bg-purple-500 hover:text-black transition-all">
+                View Profile
+              </Link>
+              <Link href="/events/submit" className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-white transition-all">
+                Submit Event
+              </Link>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-[#F5F5F5] mb-3">Profile Exists</h1>
-          <p className="text-[#888] mb-8">
-            You already have a profile: <strong className="text-[#F5F5F5]">{existingPromoter.name}</strong>
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Link
-              href={`/collectives/${existingPromoter.slug}`}
-              className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:from-purple-500 hover:to-blue-500 transition-all active:scale-[0.98]"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              View Profile
-            </Link>
-            <Link
-              href="/events/submit"
-              className="group inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] border border-[#333] text-[#F5F5F5] rounded-full font-semibold hover:bg-[#252525] hover:border-purple-500/50 transition-all active:scale-[0.98]"
-            >
-              <svg className="w-5 h-5 text-[#888] group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Submit Event
-            </Link>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     );
   }
 
+  // ── Create form ─────────────────────────────────────────────────
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        {/* Back Link */}
-        <Link
-          href="/collectives"
-          className="text-[#888] hover:text-[#F5F5F5] mb-6 inline-flex items-center gap-2 text-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Collectives
-        </Link>
+    <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+      {/* Hero */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+        <div className="max-w-3xl space-y-6">
+          <Link href="/collectives" className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Collectives
+          </Link>
 
-        <h1 className="text-2xl font-bold text-[#F5F5F5] mb-2">Create Profile</h1>
-        <p className="text-[#888] text-sm mb-8">
-          Create a profile for your collective, venue, label, or organization.
-        </p>
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Type Selection */}
-          <div>
-            <label className="block text-sm text-[#888] mb-3">Type *</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {TYPE_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setType(option.value)}
-                  className={`p-3 rounded-lg text-left transition-colors ${
-                    type === option.value
-                      ? 'bg-purple-500/20 border border-purple-500'
-                      : 'bg-[#1A1A1A] border border-[#333] hover:border-[#444]'
-                  }`}
-                >
-                  <span className={`block font-medium text-sm ${
-                    type === option.value ? 'text-purple-300' : 'text-[#F5F5F5]'
-                  }`}>
-                    {option.label}
-                  </span>
-                  <span className="block text-xs text-[#888] mt-0.5">
-                    {option.description}
-                  </span>
-                </button>
-              ))}
-            </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="basefm-kicker text-purple-400">Create Profile</span>
           </div>
 
-          {/* Basic Info */}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Name *</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="Your collective or organization name"
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Bio</label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={3}
-                placeholder="Tell us about your collective..."
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500 resize-none"
-              />
-            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tighter uppercase leading-[0.92]">
+              Create profile.
+            </h1>
+            <p className="max-w-2xl text-sm md:text-base text-zinc-400 leading-relaxed">
+              Create a profile for your collective, venue, label, or organization.
+            </p>
           </div>
+        </div>
+      </section>
 
-          {/* Location */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#888] mb-2">City</label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g., London"
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Country</label>
-              <input
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="e.g., UK"
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Genres */}
-          <div>
-            <label className="block text-sm text-[#888] mb-2">Genres</label>
-            <input
-              type="text"
-              value={genres}
-              onChange={(e) => setGenres(e.target.value)}
-              placeholder="Comma-separated: Techno, House, Drum & Bass"
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-            />
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-[#F5F5F5]">Contact & Links</h2>
-
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="contact@example.com"
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#888] mb-2">Website</label>
-              <input
-                type="url"
-                value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Instagram URL</label>
-                <input
-                  type="url"
-                  value={instagramUrl}
-                  onChange={(e) => setInstagramUrl(e.target.value)}
-                  placeholder="https://instagram.com/..."
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-                />
+      {/* Form */}
+      <section className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+          <div className="max-w-3xl">
+            {error && (
+              <div className="border border-red-500/30 bg-red-500/10 p-4 text-xs text-red-300 mb-px">
+                {error}
               </div>
-              <div>
-                <label className="block text-sm text-[#888] mb-2">Twitter/X URL</label>
-                <input
-                  type="url"
-                  value={twitterUrl}
-                  onChange={(e) => setTwitterUrl(e.target.value)}
-                  placeholder="https://x.com/..."
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Logo */}
-          <div>
-            <label className="block text-sm text-[#888] mb-2">Logo URL</label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#333] rounded-lg text-[#F5F5F5] placeholder-[#666] focus:outline-none focus:border-purple-500"
-            />
-            <p className="text-[#666] text-xs mt-1">Direct link to your logo image</p>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting || !name}
-            className="group w-full py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-[length:200%_100%] rounded-2xl text-white font-bold text-lg shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:bg-right transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-3"
-          >
-            {isSubmitting ? (
-              <>
-                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Creating Profile...
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-                Create Profile
-              </>
             )}
-          </button>
-        </form>
-      </div>
-    </div>
+
+            <form onSubmit={handleSubmit} className="space-y-px">
+              {/* Type Selection */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Type *</div>
+                <div className="grid gap-px bg-zinc-900 sm:grid-cols-3 lg:grid-cols-5">
+                  {TYPE_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setType(option.value)}
+                      className={`bg-black p-4 text-left transition-colors ${
+                        type === option.value
+                          ? 'bg-purple-500/10 border border-purple-500/30'
+                          : 'hover:bg-zinc-950'
+                      }`}
+                    >
+                      <span className={`block text-sm font-bold uppercase tracking-wider ${
+                        type === option.value ? 'text-purple-300' : 'text-zinc-300'
+                      }`}>
+                        {option.label}
+                      </span>
+                      <span className="block text-[10px] text-zinc-500 mt-1">{option.description}</span>
+                      {type === option.value && <div className="mt-2 h-2 w-2 bg-purple-500" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Basic Info */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Basic Info</div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Name *</label>
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Your collective or organization name" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Bio</label>
+                    <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Tell us about your collective..." className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono resize-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Location</div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">City</label>
+                    <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="London" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Country</label>
+                    <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="UK" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Genres */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Genres</div>
+                <input type="text" value={genres} onChange={(e) => setGenres(e.target.value)} placeholder="Techno, House, Drum & Bass" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                <p className="text-[10px] text-zinc-600 mt-2">Comma-separated</p>
+              </div>
+
+              {/* Contact & Links */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Contact & Links</div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@example.com" className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Website</label>
+                    <input type="url" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://..." className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Instagram URL</label>
+                      <input type="url" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Twitter/X URL</label>
+                      <input type="url" value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Logo */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">Logo</div>
+                <label className="block text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Logo URL</label>
+                <input type="url" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://..." className="w-full bg-black border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono" />
+                <p className="text-[10px] text-zinc-600 mt-2">Direct link to your logo image</p>
+              </div>
+
+              {/* Submit */}
+              <div className="border border-zinc-800 bg-zinc-950 p-6">
+                <button type="submit" disabled={isSubmitting || !name} className="w-full py-3 text-[10px] font-bold uppercase tracking-widest border border-purple-500/40 text-purple-400 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
