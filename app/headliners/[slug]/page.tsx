@@ -196,5 +196,5 @@ function hasSocials(s: HeadlinerSocials): boolean {
 }
 
 function socialEntries(s: HeadlinerSocials): Array<[string, string]> {
-  return Object.entries(s).filter(([, v]): v is string => typeof v === 'string' && v.length > 0);
+  return Object.entries(s).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].length > 0);
 }

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Stripe webhook not configured' }, { status: 503 });
   }
 
-  const stripe = new Stripe(cfg.secretKey, { apiVersion: '2024-06-20' });
+  const stripe = new Stripe(cfg.secretKey, { apiVersion: '2026-04-22.dahlia' });
   const sig = req.headers.get('stripe-signature') ?? '';
   const raw = await req.text();
 
@@ -73,8 +73,9 @@ async function handleCheckoutCompleted(stripe: Stripe, session: Stripe.Checkout.
   if (!subscriptionId) throw new Error('No subscription on completed checkout');
 
   const sub = await stripe.subscriptions.retrieve(subscriptionId);
-  const startedAt = new Date(sub.current_period_start * 1000).toISOString();
-  const endsAt = new Date(sub.current_period_end * 1000).toISOString();
+  const firstItem = sub.items.data[0];
+  const startedAt = firstItem ? new Date(firstItem.current_period_start * 1000).toISOString() : new Date().toISOString();
+  const endsAt = firstItem ? new Date(firstItem.current_period_end * 1000).toISOString() : new Date(Date.now() + 30 * 86400000).toISOString();
 
   const pricing = getBillingPricing();
   const platformWallet = getPlatformWalletAddress() ?? '';
@@ -119,7 +120,7 @@ async function handleSubscriptionChange(sub: Stripe.Subscription) {
     .from('dj_subscriptions')
     .update({
       status,
-      ends_at: new Date(sub.current_period_end * 1000).toISOString(),
+      ends_at: new Date((sub.items.data[0]?.current_period_end ?? Math.floor(Date.now() / 1000) + 30 * 86400) * 1000).toISOString(),
     })
     .eq('stripe_subscription_id', sub.id);
 }

@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'walletAddress required' }, { status: 400 });
   }
 
-  const stripe = new Stripe(cfg.secretKey, { apiVersion: '2024-06-20' });
+  const stripe = new Stripe(cfg.secretKey, { apiVersion: '2026-04-22.dahlia' });
 
   const origin =
     req.headers.get('origin') ??
