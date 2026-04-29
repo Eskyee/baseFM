@@ -1,4 +1,8 @@
-import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
+import {
+  DJ_TOKEN_CONFIG,
+  AGENTBOT_TOKEN_CONFIG,
+  ACCESS_USD_FLOOR,
+} from '@/lib/token/config';
 
 export type TokenSurface = {
   id: string;
@@ -14,33 +18,33 @@ export type TokenSurface = {
   secondaryLabel: string;
 };
 
-export const AGENTBOT_SOLANA_TOKEN_MINT = '9V4m199eohMgy7bB7MbXhDacUur6NzpgZVrhfux5pump';
+export const AGENTBOT_SOLANA_TOKEN_MINT = AGENTBOT_TOKEN_CONFIG.mint;
 
 export const TOKEN_SURFACES: TokenSurface[] = [
   {
     id: 'rave-base',
-    name: 'RAVE / baseFM',
+    name: 'RAVE / RaveCulture',
     symbol: DJ_TOKEN_CONFIG.symbol,
     network: 'Base',
     contract: DJ_TOKEN_CONFIG.address,
-    purpose: 'Base-side station token for DJ access, tips, and the wallet-native radio path.',
-    detail: `The public baseFM DJ gate currently checks ${DJ_TOKEN_CONFIG.requiredAmount.toLocaleString()}+ ${DJ_TOKEN_CONFIG.symbol} on Base.`,
-    primaryHref: `https://basescan.org/token/${DJ_TOKEN_CONFIG.address}`,
-    primaryLabel: 'BaseScan',
+    purpose: `Base-side access token — ${DJ_TOKEN_CONFIG.requiredAmount.toLocaleString()} ${DJ_TOKEN_CONFIG.symbol} (~$${ACCESS_USD_FLOOR}) gates a 2-hour DJ session.`,
+    detail: `Public DJ gate checks ${DJ_TOKEN_CONFIG.requiredAmount.toLocaleString()}+ ${DJ_TOKEN_CONFIG.symbol} on Base. Amount auto-scales to maintain the $${ACCESS_USD_FLOOR} USD floor as price moves.`,
+    primaryHref: DJ_TOKEN_CONFIG.geckoPoolUrl,
+    primaryLabel: 'GeckoTerminal (V4 pool)',
     secondaryHref: `https://app.uniswap.org/#/swap?chain=base&outputCurrency=${DJ_TOKEN_CONFIG.address}`,
     secondaryLabel: 'Swap on Base',
   },
   {
     id: 'agentbot-solana',
     name: 'Agentbot',
-    symbol: 'AGENTBOT',
+    symbol: AGENTBOT_TOKEN_CONFIG.symbol,
     network: 'Solana',
-    contract: AGENTBOT_SOLANA_TOKEN_MINT,
-    purpose: 'Solana community token for the wider Agentbot identity, perks, and free-credit path.',
-    detail: 'This is the parallel community token that connects baseFM listeners and DJs to the wider Agentbot ecosystem.',
-    primaryHref: `https://solscan.io/token/${AGENTBOT_SOLANA_TOKEN_MINT}`,
-    primaryLabel: 'Solscan',
-    secondaryHref: 'https://agentbot.sh/dashboard/community',
-    secondaryLabel: 'Agentbot Community',
+    contract: AGENTBOT_TOKEN_CONFIG.mint,
+    purpose: `Solana-side access token — equivalent ~$${ACCESS_USD_FLOOR} value gates the same DJ rights as RAVE.`,
+    detail: 'Parallel community token for the wider Agentbot identity, perks, and free-credit path. Same DJ access as RAVE when held at $25 USD equivalent.',
+    primaryHref: AGENTBOT_TOKEN_CONFIG.tokenInfoUrl,
+    primaryLabel: 'agentbot.sh/token',
+    secondaryHref: `https://solscan.io/token/${AGENTBOT_TOKEN_CONFIG.mint}`,
+    secondaryLabel: 'Solscan',
   },
 ];

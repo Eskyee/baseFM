@@ -119,9 +119,32 @@ export default function AdvancedGuidePage() {
               <section>
                 <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
                   <span className="text-purple-400">|</span>
-                  RAVE Token
+                  Access Tokens
                 </h2>
-                <div className="bg-[#1A1A1A] rounded-2xl p-5">
+
+                {/* Why access costs went up */}
+                <div className="bg-[#1A1A1A] rounded-2xl p-5 mb-4">
+                  <p className="text-[#888] text-sm mb-3">
+                    baseFM has grown — live encoding, edge delivery, recording storage, agent compute,
+                    and the AI Cloud all run on paid infrastructure. Access is gated by tokens so the
+                    network can cover its own costs.
+                  </p>
+                  <p className="text-[#888] text-sm">
+                    We accept <strong className="text-[#F5F5F5]">two equivalent paths</strong> to the
+                    same USD value: hold <span className="text-purple-400 font-mono">RAVE</span> on
+                    Base, or hold <span className="text-blue-400 font-mono">AGENTBOT</span> on Solana.
+                    Each path targets a <strong className="text-[#F5F5F5]">~$25 USD floor</strong> per
+                    DJ session — the cost of a 2-hour Mux stream (encoding, delivery, storage) plus a
+                    small margin to keep the lights on.
+                  </p>
+                </div>
+
+                {/* Path A — RAVE on Base */}
+                <div className="bg-[#1A1A1A] rounded-2xl p-5 mb-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-xs font-mono">PATH A</span>
+                    <span className="text-[#F5F5F5] font-medium">RAVE — Base</span>
+                  </div>
                   <div className="grid gap-3 text-sm">
                     <div className="flex justify-between items-center py-2 border-b border-[#222]">
                       <span className="text-[#666]">Contract</span>
@@ -144,11 +167,15 @@ export default function AdvancedGuidePage() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-[#222]">
                       <span className="text-[#666]">DJ Access</span>
-                      <span className="text-green-400">5,000 RAVE</span>
+                      <span className="text-green-400 font-mono">50,000 RAVE</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">Target value</span>
+                      <span className="text-[#F5F5F5]">≈ $25 USD</span>
                     </div>
                     <div className="flex justify-between items-center py-2">
                       <span className="text-[#666]">View on</span>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap justify-end">
                         <a
                           href="https://basescan.org/token/0xdf3c79a5759eeedb844e7481309a75037b8e86f5"
                           target="_blank"
@@ -159,17 +186,304 @@ export default function AdvancedGuidePage() {
                         </a>
                         <span className="text-[#333]">|</span>
                         <a
-                          href="https://www.geckoterminal.com/base/pools/0xdf3c79a5759eeedb844e7481309a75037b8e86f5"
+                          href="https://www.geckoterminal.com/base/pools/0xd54464bb6e5a0e1c49beddde0e02cd03e3239a49c71362902d48a034cd119894"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 text-sm hover:underline"
                         >
-                          GeckoTerminal
+                          GeckoTerminal (V4 pool)
+                        </a>
+                        <span className="text-[#333]">|</span>
+                        <a
+                          href="https://app.uniswap.org/#/swap?chain=base&outputCurrency=0xdf3c79a5759eeedb844e7481309a75037b8e86f5"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 text-sm hover:underline"
+                        >
+                          Swap
                         </a>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Path B — Agentbot on Solana */}
+                <div className="bg-[#1A1A1A] rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-xs font-mono">PATH B</span>
+                    <span className="text-[#F5F5F5] font-medium">AGENTBOT — Solana</span>
+                  </div>
+                  <div className="grid gap-3 text-sm">
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">Mint</span>
+                      <a
+                        href="https://solscan.io/token/9V4m199eohMgy7bB7MbXhDacUur6NzpgZVrhfux5pump"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 font-mono text-xs sm:text-sm break-all hover:underline"
+                      >
+                        9V4m...pump
+                      </a>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">Chain</span>
+                      <span className="text-[#F5F5F5]">Solana</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">Symbol</span>
+                      <span className="text-blue-400 font-mono">AGENTBOT</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">DJ Access</span>
+                      <span className="text-green-400 font-mono">≈ $25 USD equivalent</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#222]">
+                      <span className="text-[#666]">Equivalence</span>
+                      <span className="text-[#F5F5F5]">Same value as Path A</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-[#666]">View on</span>
+                      <div className="flex gap-2 flex-wrap justify-end">
+                        <a
+                          href="https://agentbot.sh/token"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 text-sm hover:underline"
+                        >
+                          agentbot.sh/token
+                        </a>
+                        <span className="text-[#333]">|</span>
+                        <a
+                          href="https://solscan.io/token/9V4m199eohMgy7bB7MbXhDacUur6NzpgZVrhfux5pump"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 text-sm hover:underline"
+                        >
+                          Solscan
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pricing footnote */}
+                <p className="text-[#666] text-xs mt-3 px-1">
+                  Token amounts auto-adjust to track the $25 USD floor — if RAVE or AGENTBOT moves on
+                  the open market, the gate scales the required token count so listeners and DJs always
+                  pay the same effective cost. Both paths grant identical DJ rights.
+                </p>
+              </section>
+
+              {/* ─── Choose Your Access ─── */}
+              <section>
+                <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
+                  <span className="text-purple-400">|</span>
+                  Choose Your Access
+                </h2>
+                <div className="bg-[#1A1A1A] rounded-2xl p-5 mb-4">
+                  <p className="text-[#888] text-sm">
+                    Pick the payment rail that fits you. All four options unlock the same DJ rights —
+                    we equalise on the underlying USD cost so nobody overpays for picking a different
+                    rail.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+
+                  {/* Option 1 — RAVE on Base */}
+                  <div className="bg-[#1A1A1A] rounded-xl p-4 border border-purple-500/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-purple-300 text-xs font-mono">TOKEN — BASE</span>
+                      <span className="text-[#666] text-xs">no recurring</span>
+                    </div>
+                    <p className="text-[#F5F5F5] font-medium mb-1">Hold RAVE</p>
+                    <p className="text-2xl font-bold text-purple-400 mb-2">50,000 <span className="text-sm text-[#888] font-normal">RAVE</span></p>
+                    <p className="text-[#888] text-xs mb-3">
+                      Hold the equivalent of ~$25 USD in RAVE. Gate is read-only — no transaction
+                      needed once you hold.
+                    </p>
+                    <ul className="text-[#666] text-xs space-y-1">
+                      <li>• Uniswap v4 pool on Base</li>
+                      <li>• Wallet check, gas-free verification</li>
+                      <li>• Tradeable any time</li>
+                    </ul>
+                  </div>
+
+                  {/* Option 2 — AGENTBOT on Solana */}
+                  <div className="bg-[#1A1A1A] rounded-xl p-4 border border-blue-500/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-blue-300 text-xs font-mono">TOKEN — SOLANA</span>
+                      <span className="text-[#666] text-xs">no recurring</span>
+                    </div>
+                    <p className="text-[#F5F5F5] font-medium mb-1">Hold AGENTBOT</p>
+                    <p className="text-2xl font-bold text-blue-400 mb-2">≈ $25 <span className="text-sm text-[#888] font-normal">USD equiv.</span></p>
+                    <p className="text-[#888] text-xs mb-3">
+                      Same value as RAVE, on the Solana side. Useful if your wallet lives there or
+                      you're already in the Agentbot ecosystem.
+                    </p>
+                    <ul className="text-[#666] text-xs space-y-1">
+                      <li>• Solana SPL token</li>
+                      <li>• Equivalent perks to RAVE path</li>
+                      <li>• <a href="https://agentbot.sh/token" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">agentbot.sh/token</a></li>
+                    </ul>
+                  </div>
+
+                  {/* Option 3 — USDC pay-as-you-go */}
+                  <div className="bg-[#1A1A1A] rounded-xl p-4 border border-green-500/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-green-300 text-xs font-mono">USDC — PAY AS YOU GO</span>
+                      <span className="text-[#666] text-xs">per session</span>
+                    </div>
+                    <p className="text-[#F5F5F5] font-medium mb-1">USDC on Base</p>
+                    <p className="text-2xl font-bold text-green-400 mb-2">$2 <span className="text-sm text-[#888] font-normal">+ $5/hr metered</span></p>
+                    <p className="text-[#888] text-xs mb-3">
+                      $2 session fee, then $5 USDC/hr while live. Settles automatically against the
+                      platform wallet at stream end.
+                    </p>
+                    <ul className="text-[#666] text-xs space-y-1">
+                      <li>• No commitment</li>
+                      <li>• Pay only when you stream</li>
+                      <li>• Best for occasional DJs</li>
+                    </ul>
+                  </div>
+
+                  {/* Option 4 — Stripe / fiat subscription */}
+                  <div className="bg-[#1A1A1A] rounded-xl p-4 border border-yellow-500/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-yellow-300 text-xs font-mono">STRIPE / USDC SUB</span>
+                      <span className="text-[#666] text-xs">monthly</span>
+                    </div>
+                    <p className="text-[#F5F5F5] font-medium mb-1">DJ Subscription</p>
+                    <p className="text-2xl font-bold text-yellow-400 mb-2">$40 <span className="text-sm text-[#888] font-normal">/ month</span></p>
+                    <p className="text-[#888] text-xs mb-3">
+                      Waives session fees, drops metered to $3/hr. Pay with credit card via Stripe
+                      <em className="not-italic"> or </em>USDC on Base — same $40 either way.
+                    </p>
+                    <ul className="text-[#666] text-xs space-y-1">
+                      <li>• Stripe checkout (Visa, Mastercard, Apple Pay)</li>
+                      <li>• Or USDC self-custody on Base</li>
+                      <li>• Best for regular DJs</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Comparison line */}
+                <div className="bg-[#0A0A0A] rounded-xl p-4 mt-4">
+                  <p className="text-[#F5F5F5] text-sm font-medium mb-2">When to pick what</p>
+                  <ul className="text-[#888] text-xs space-y-1">
+                    <li><span className="text-purple-400">RAVE / AGENTBOT</span> — you're crypto-native and want one-time access tied to a holding (no recurring charge).</li>
+                    <li><span className="text-green-400">USDC pay-as-you-go</span> — you DJ a few times a month and don't want to lock up tokens.</li>
+                    <li><span className="text-yellow-400">$40 subscription (Stripe or USDC)</span> — you DJ regularly; cheapest per hour after ~5 hours/month.</li>
+                  </ul>
+                </div>
+
+                <p className="text-[#666] text-xs mt-3 px-1">
+                  All four rails route into the same gate. The DJ dashboard and `/api/billing/*`
+                  endpoints accept any combination — hold the token <em className="not-italic">or</em>
+                  pay the session fee <em className="not-italic">or</em> have an active subscription.
+                </p>
+              </section>
+
+              {/* ─── Headliner Invite Codes ─── */}
+              <section>
+                <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
+                  <span className="text-pink-400">|</span>
+                  Headliner Invite Codes
+                </h2>
+
+                <div className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-2xl p-5 mb-4">
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-xs font-mono">PROMO — ADMIN ONLY</span>
+                  </div>
+                  <p className="text-[#F5F5F5] text-sm mb-3">
+                    Selected headliners get free DJ access via single-use invite codes. baseFM covers
+                    the underlying infra cost as a marketing expense — the headliner brings the
+                    audience, we host the stream.
+                  </p>
+                  <p className="text-[#888] text-sm">
+                    Codes are issued by admin only. If you've been sent one, redeem it from the access
+                    modal on the DJ dashboard. Default grants <strong className="text-[#F5F5F5]">30
+                    days of free streaming</strong> on the same gate everyone else uses.
+                  </p>
+                </div>
+
+                {/* Headliner: how it works */}
+                <div className="bg-[#1A1A1A] rounded-xl p-5 mb-3">
+                  <p className="text-[#F5F5F5] text-sm font-medium mb-3">How it works</p>
+                  <div className="space-y-2 text-[#888] text-sm">
+                    <div className="flex gap-3">
+                      <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">01</span>
+                      <p>Admin issues a code via <code className="text-pink-300 bg-[#0A0A0A] px-1.5 py-0.5 rounded text-xs">POST /api/admin/headliner-codes</code> (signed by an admin wallet).</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">02</span>
+                      <p>Admin shares the code with the headliner directly (DM, email, in person).</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">03</span>
+                      <p>Headliner opens the DJ dashboard, picks <em className="not-italic">"Have an invite code?"</em>, and redeems with a wallet signature.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="text-pink-400 font-mono text-xs flex-shrink-0 w-6">04</span>
+                      <p>Their wallet gets a 30-day free-access window. The gate treats it identically to a paid plan.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Code anatomy */}
+                <div className="grid gap-3 sm:grid-cols-2 mb-3">
+                  <div className="bg-[#1A1A1A] rounded-xl p-4">
+                    <p className="text-[#F5F5F5] text-sm font-medium mb-2">Code anatomy</p>
+                    <div className="font-mono text-xs space-y-1">
+                      <p><span className="text-[#666]">Format:</span> <span className="text-pink-300">HEADLINER-XXXX</span></p>
+                      <p><span className="text-[#666]">Default uses:</span> <span className="text-[#F5F5F5]">1</span></p>
+                      <p><span className="text-[#666]">Default duration:</span> <span className="text-[#F5F5F5]">30 days</span></p>
+                      <p><span className="text-[#666]">Expiry:</span> <span className="text-[#F5F5F5]">optional</span></p>
+                      <p><span className="text-[#666]">Revocable:</span> <span className="text-green-400">yes</span></p>
+                    </div>
+                  </div>
+                  <div className="bg-[#1A1A1A] rounded-xl p-4">
+                    <p className="text-[#F5F5F5] text-sm font-medium mb-2">Admin endpoints</p>
+                    <div className="font-mono text-xs space-y-1">
+                      <p><span className="text-green-400">POST</span> <span className="text-[#888]">/api/admin/headliner-codes</span></p>
+                      <p className="text-[#666] pl-10 text-[10px]">issue or revoke</p>
+                      <p><span className="text-blue-400">GET</span> <span className="text-[#888]">/api/admin/headliner-codes</span></p>
+                      <p className="text-[#666] pl-10 text-[10px]">list all codes</p>
+                      <p><span className="text-green-400">POST</span> <span className="text-[#888]">/api/headliner-codes/redeem</span></p>
+                      <p className="text-[#666] pl-10 text-[10px]">public redeem flow</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Admin: issue example */}
+                <div className="bg-[#0A0A0A] rounded-xl p-4 font-mono text-xs overflow-x-auto">
+                  <p className="text-[#666] mb-2">{'// Admin: issue a single-use 30-day code'}</p>
+                  <pre className="text-[#CCC] whitespace-pre-wrap">{`const nonce = crypto.randomUUID();
+const timestamp = new Date().toISOString();
+const message = \`Issue baseFM headliner code\\nNonce: \${nonce}\\nTimestamp: \${timestamp}\`;
+const signature = await wallet.signMessage({ message });
+
+const res = await fetch('/api/admin/headliner-codes', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    adminWallet: ADMIN_WALLET,
+    signature, message, nonce, timestamp,
+    notes: '@djsuperstar — Coachella afterparty',
+    maxRedemptions: 1,
+    durationDays: 30,
+  }),
+});
+const { code } = await res.json();
+// → { code: 'HEADLINER-K7QX', ... }`}</pre>
+                </div>
+
+                <p className="text-[#666] text-xs mt-3 px-1">
+                  Cost coverage: every redemption is an entry in <code className="text-pink-300">platform_fee_records</code>
+                  with status <code className="text-yellow-300">accrued</code> + sourceType
+                  <code className="text-yellow-300"> headliner_promo</code>, so the marketing spend stays
+                  visible in the admin accounting view.
+                </p>
               </section>
 
               <section>
@@ -181,7 +495,8 @@ export default function AdvancedGuidePage() {
                   {[
                     { symbol: 'ETH', name: 'Ethereum', decimals: 18, color: 'text-blue-400', use: 'Tips, Gas' },
                     { symbol: 'USDC', name: 'USD Coin', decimals: 6, color: 'text-green-400', use: 'Tickets, Tips' },
-                    { symbol: 'RAVE', name: 'RaveCulture', decimals: 18, color: 'text-purple-400', use: 'Access, Tips' },
+                    { symbol: 'RAVE', name: 'RaveCulture (Base)', decimals: 18, color: 'text-purple-400', use: 'DJ Access, Tips' },
+                    { symbol: 'AGENTBOT', name: 'Agentbot (Solana)', decimals: 6, color: 'text-blue-300', use: 'DJ Access (equiv.)' },
                     { symbol: 'cbBTC', name: 'Coinbase BTC', decimals: 8, color: 'text-orange-400', use: 'Tips' },
                   ].map((token) => (
                     <div key={token.symbol} className="bg-[#1A1A1A] rounded-xl p-4">
@@ -496,7 +811,12 @@ const bankr = new BankrClient({
                   </p>
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
                     <p className="text-blue-400 text-sm font-medium mb-2">baseFM Internal Platform</p>
-
+                    <Link
+                      href="/aicloud"
+                      className="text-purple-400 hover:underline"
+                    >
+                      /aicloud
+                    </Link>
                   </div>
                 </div>
               </section>
@@ -568,7 +888,55 @@ const bankr = new BankrClient({
                 </div>
               </section>
 
-
+              <section>
+                <h2 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
+                  <span className="text-blue-400">|</span>
+                  baseFM AI Cloud
+                </h2>
+                <div className="bg-[#1A1A1A] rounded-2xl p-5">
+                  <p className="text-[#888] mb-4">
+                    baseFM has an internal agent system powered by Agentbot:
+                  </p>
+                  <div className="grid gap-3">
+                    <Link
+                      href="/aicloud"
+                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-[#F5F5F5] font-medium">AI Cloud</p>
+                        <p className="text-[#666] text-sm">Create agents with 4-step wizard</p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link
+                      href="/aicloud/feed"
+                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-[#F5F5F5] font-medium">Ravefeed</p>
+                        <p className="text-[#666] text-sm">See what agents are posting</p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link
+                      href="/aicloud/dashboard"
+                      className="bg-[#0A0A0A] rounded-xl p-4 hover:bg-[#151515] transition-colors group flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="text-[#F5F5F5] font-medium">Dashboard</p>
+                        <p className="text-[#666] text-sm">Manage your agents</p>
+                      </div>
+                      <svg className="w-5 h-5 text-[#666] group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </section>
             </>
           )}
 
@@ -670,7 +1038,12 @@ const bankr = new BankrClient({
                 </h2>
                 <div className="bg-[#1A1A1A] rounded-2xl p-5">
                   <p className="text-[#888] mb-4">
-                    To start streaming, you need 5,000 RAVE tokens in your wallet. Once verified, access the DJ dashboard.
+                    Pick any payment rail to unlock streaming — hold
+                    <span className="text-purple-400 font-mono"> 50,000 RAVE</span> on Base or
+                    equivalent <span className="text-blue-400 font-mono">AGENTBOT</span> on Solana,
+                    pay <span className="text-green-400 font-mono">$2 USDC + $5/hr</span> per session,
+                    or run the <span className="text-yellow-400 font-mono">$40/mo</span> subscription
+                    via Stripe or USDC. The dashboard verifies whichever you have and lets you go live.
                   </p>
                   <Link
                     href="/dashboard"
@@ -710,7 +1083,7 @@ const bankr = new BankrClient({
                   <h3 className="text-sm font-bold text-[#F5F5F5] mb-3">Prerequisites</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: 'EVM wallet on Base', note: '$RAVE or Agentbot token' },
+                      { label: 'Wallet w/ $25 access', note: '50k RAVE (Base) or AGENTBOT (Solana)' },
                       { label: 'FFmpeg', note: 'brew install ffmpeg' },
                       { label: 'Node.js + viem', note: 'npm install viem' },
                       { label: 'Audio source', note: 'MP3, WAV, or stream URL' },
