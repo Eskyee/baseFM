@@ -33,6 +33,44 @@ interface PlatformStats {
   recentErrors: number;
 }
 
+interface AnalyticsOverview {
+  totalStreams: number;
+  streamsLast30d: number;
+  streamsLast7d: number;
+  totalDjs: number;
+  totalMembers: number;
+  totalViewers: number;
+  avgViewers: number;
+  liveNow: number;
+  totalDuration: number;
+  totalTipsAmount: number;
+  chatMessages7d: number;
+}
+
+interface DailyBreakdown {
+  date: string;
+  streams: number;
+  viewers: number;
+}
+
+interface TopStream {
+  id: string;
+  title: string;
+  djName: string;
+  peakViewers: number;
+  status: string;
+  createdAt: string;
+}
+
+interface TopDj {
+  id: string;
+  name: string;
+  slug: string;
+  totalShows: number;
+  totalListeners: number;
+  isVerified: boolean;
+}
+
 function formatBalance(balance: number): string {
   if (balance >= 1000000) return `${(balance / 1000000).toFixed(1)}M`;
   if (balance >= 1000) return `${(balance / 1000).toFixed(1)}K`;
@@ -56,15 +94,20 @@ export default function AdminPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [activeStreams, setActiveStreams] = useState<ActiveStream[]>([]);
   const [stats, setStats] = useState<PlatformStats>({ totalStreams: 0, activeStreams: 0, totalMembers: 0, recentErrors: 0 });
+  const [analytics, setAnalytics] = useState<AnalyticsOverview | null>(null);
+  const [dailyBreakdown, setDailyBreakdown] = useState<DailyBreakdown[]>([]);
+  const [topStreams, setTopStreams] = useState<TopStream[]>([]);
+  const [topDjs, setTopDjs] = useState<TopDj[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const [membersRes, streamsRes, improvementRes] = await Promise.allSettled([
+      const [membersRes, streamsRes, improvementRes, analyticsRes] = await Promise.allSettled([
         adminFetch('/api/admin/community'),
         fetch('/api/streams?status=PREPARING&status=ARMED&status=LIVE'),
         adminFetch('/api/admin/improvement'),
+        adminFetch('/api/admin/analytics'),
       ]);
 
       if (membersRes.status === 'fulfilled' && membersRes.value.ok) {
@@ -83,6 +126,14 @@ export default function AdminPage() {
       if (improvementRes.status === 'fulfilled' && improvementRes.value.ok) {
         const data = await improvementRes.value.json();
         setStats(s => ({ ...s, recentErrors: (data.insights || []).filter((i: { severity: string }) => i.severity === 'error').length }));
+      }
+
+      if (analyticsRes.status === 'fulfilled' && analyticsRes.value.ok) {
+        const data = await analyticsRes.value.json();
+        setAnalytics(data.overview);
+        setDailyBreakdown(data.dailyBreakdown || []);
+        setTopStreams(data.topStreams || []);
+        setTopDjs(data.topDjs || []);
       }
     } catch (err) {
       console.error('Failed to fetch admin data:', err);
@@ -222,6 +273,102 @@ export default function AdminPage() {
           )}
         </div>
       </section>
+
+      {/* Analytics */}
+      {analytics && (
+        <section className="border-t border-zinc-900">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 py-10 sm:py-14">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-4">30-day analytics</div>
+
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-900 mb-8">
+              <StatCard label="Total viewers" value={analytics.totalViewers.toLocaleString()} color="text-green-400" />
+              <StatCard label="Avg viewers/stream" value={analytics.avgViewers} color="text-blue-400" />
+              <StatCard label="Total tips" value={`$${analytics.totalTipsAmount}`} color="text-purple-400" />
+              <StatCard label="Chat messages" value={analytics.chatMessages7d.toLocaleString()} color="text-cyan-400" />
+            </div>
+
+            {/* Daily Breakdown */}
+            {dailyBreakdown.length > 0 && (
+              <div className="mb-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">7-day activity</div>
+                <div className="grid grid-cols-7 gap-px bg-zinc-900">
+                  {dailyBreakdown.map(day => {
+                    const maxStreams = Math.max(...dailyBreakdown.map(d => d.streams), 1);
+                    const height = Math.max(4, (day.streams / maxStreams) * 60);
+                    return (
+                      <div key={day.date} className="bg-black p-3 flex flex-col items-center">
+                        <div className="w-full flex items-end justify-center" style={{ height: '60px' }}>
+                          <div
+                            className="w-full bg-blue-500/30 border border-blue-500/20"
+                            style={{ height: `${height}px` }}
+                          />
+                        </div>
+                        <div className="text-[10px] uppercase tracking-widest text-zinc-600 mt-2">
+                          {day.streams}
+                        </div>
+                        <div className="text-[10px] uppercase tracking-widest text-zinc-700">
+                          {new Date(day.date).toLocaleDateString('en', { weekday: 'short' })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Top Streams */}
+            {topStreams.length > 0 && (
+              <div className="mb-8">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">Top streams by viewers</div>
+                <div className="grid gap-px bg-zinc-900">
+                  {topStreams.slice(0, 5).map((stream, i) => (
+                    <div key={stream.id} className="bg-black p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] uppercase tracking-widest text-zinc-700 w-4">{i + 1}</span>
+                        <div>
+                          <div className="text-sm text-white">{stream.title}</div>
+                          <div className="text-[10px] uppercase tracking-widest text-zinc-600 mt-0.5">{stream.djName}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-white font-medium">{stream.peakViewers}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-zinc-600">peak viewers</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Top DJs */}
+            {topDjs.length > 0 && (
+              <div>
+                <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">Top DJs by shows</div>
+                <div className="grid gap-px bg-zinc-900">
+                  {topDjs.slice(0, 5).map((dj, i) => (
+                    <Link key={dj.id} href={`/djs/${dj.slug}`} className="bg-black p-4 flex items-center justify-between hover:bg-zinc-950 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] uppercase tracking-widest text-zinc-700 w-4">{i + 1}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-white">{dj.name}</span>
+                            {dj.isVerified && (
+                              <span className="text-[10px] uppercase tracking-widest px-1.5 py-0.5 border border-blue-500/30 text-blue-400">Verified</span>
+                            )}
+                          </div>
+                          <div className="text-[10px] uppercase tracking-widest text-zinc-600 mt-0.5">{dj.totalListeners.toLocaleString()} total listeners</div>
+                        </div>
+                      </div>
+                      <div className="text-sm text-white font-medium">{dj.totalShows} shows</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Active Streams */}
       {activeStreams.length > 0 && (
