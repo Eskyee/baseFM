@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import {
   createAdminAuthMessage,
@@ -25,19 +25,22 @@ let inFlight: Promise<Record<string, string>> | null = null;
 export function useAdminAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const cacheRef = useRef<CachedHeaders | null>(null);
+  const inFlightRef = useRef<Promise<Record<string, string>> | null>(null);
 
   // Clear cached signature when the wallet disconnects or switches.
   // Without this, signing out and reconnecting the same wallet within the
   // 4-min cache window would skip re-signing — a stale admin session.
   useEffect(() => {
+    const current = cacheRef.current;
     if (!address) {
-      cachedHeaders = null;
-      inFlight = null;
+      cacheRef.current = null;
+      inFlightRef.current = null;
       return;
     }
-    if (cachedHeaders && cachedHeaders.wallet.toLowerCase() !== address.toLowerCase()) {
-      cachedHeaders = null;
-      inFlight = null;
+    if (current && current.wallet.toLowerCase() !== address.toLowerCase()) {
+      cacheRef.current = null;
+      inFlightRef.current = null;
     }
   }, [address]);
 
@@ -58,8 +61,8 @@ export function useAdminAuth() {
     // Single-flight: if a signature request is already in progress for this
     // wallet, every concurrent caller awaits the same promise instead of
     // popping its own wallet window.
-    if (inFlight) {
-      return inFlight;
+    if (inFlightRef.current) {
+      return inFlightRef.current;
     }
 
     const promise = (async () => {
@@ -75,7 +78,7 @@ export function useAdminAuth() {
         'x-timestamp': timestamp,
       };
 
-      cachedHeaders = {
+      cacheRef.current = {
         wallet: address,
         expiresAt: Date.now() + ADMIN_AUTH_CACHE_MS,
         headers,
@@ -84,11 +87,11 @@ export function useAdminAuth() {
       return headers;
     })();
 
-    inFlight = promise;
+    inFlightRef.current = promise;
     try {
       return await promise;
     } finally {
-      inFlight = null;
+      inFlightRef.current = null;
     }
   }, [address, signMessageAsync]);
 
