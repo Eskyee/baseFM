@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import {
   createAdminAuthMessage,
@@ -14,55 +14,52 @@ type CachedHeaders = {
   headers: Record<string, string>;
 };
 
-const ADMIN_AUTH_CACHE_MS = 4 * 60 * 1000;
+const ADMIN_AUTH_CACHE_MS = 20 * 60 * 1000; // 20 minutes
+const STORAGE_KEY = 'basefm_admin_session';
 
-// Module-level state so the cached signature survives navigation between
-// admin pages (which each remount their own component). Without this, every
-// nav would drop the cache and prompt a fresh sign popup.
-let cachedHeaders: CachedHeaders | null = null;
-let inFlight: Promise<Record<string, string>> | null = null;
+function loadFromStorage(): CachedHeaders | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedHeaders;
+    if (parsed.expiresAt > Date.now()) return parsed;
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function saveToStorage(cache: CachedHeaders): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+  } catch {
+    // localStorage full or unavailable — ignore
+  }
+}
 
 export function useAdminAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const cacheRef = useRef<CachedHeaders | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
-  // Clear cached signature when the wallet disconnects or switches.
-  // Without this, signing out and reconnecting the same wallet within the
-  // 4-min cache window would skip re-signing — a stale admin session.
+  // Load cached session on mount
   useEffect(() => {
-    if (!address) {
-      cachedHeaders = null;
-      inFlight = null;
-      return;
-    }
-    if (cachedHeaders && cachedHeaders.wallet.toLowerCase() !== address.toLowerCase()) {
-      cachedHeaders = null;
-      inFlight = null;
+    const cached = loadFromStorage();
+    if (cached && address && cached.wallet.toLowerCase() === address.toLowerCase()) {
+      cacheRef.current = cached;
+      setIsAuthenticated(true);
     }
   }, [address]);
 
-  const buildAdminHeaders = useCallback(async () => {
-    if (!address) {
-      throw new Error('Connect your admin wallet first');
-    }
+  const signIn = useCallback(async () => {
+    if (!address) throw new Error('Connect your admin wallet first');
+    if (isSigningIn) return;
 
-    const now = Date.now();
-    if (
-      cachedHeaders &&
-      cachedHeaders.wallet.toLowerCase() === address.toLowerCase() &&
-      cachedHeaders.expiresAt > now
-    ) {
-      return cachedHeaders.headers;
-    }
-
-    // Single-flight: if a signature request is already in progress for this
-    // wallet, every concurrent caller awaits the same promise instead of
-    // popping its own wallet window.
-    if (inFlight) {
-      return inFlight;
-    }
-
-    const promise = (async () => {
+    setIsSigningIn(true);
+    try {
       const nonce = generateAdminNonce();
       const timestamp = getAdminAuthTimestamp();
       const message = createAdminAuthMessage(nonce, timestamp);
@@ -75,22 +72,45 @@ export function useAdminAuth() {
         'x-timestamp': timestamp,
       };
 
-      cachedHeaders = {
+      const cached: CachedHeaders = {
         wallet: address,
         expiresAt: Date.now() + ADMIN_AUTH_CACHE_MS,
         headers,
       };
 
-      return headers;
-    })();
-
-    inFlight = promise;
-    try {
-      return await promise;
+      cacheRef.current = cached;
+      saveToStorage(cached);
+      setIsAuthenticated(true);
     } finally {
-      inFlight = null;
+      setIsSigningIn(false);
     }
-  }, [address, signMessageAsync]);
+  }, [address, signMessageAsync, isSigningIn]);
+
+  const buildAdminHeaders = useCallback(async () => {
+    if (!address) throw new Error('Connect your admin wallet first');
+
+    // Try in-memory cache
+    const now = Date.now();
+    if (
+      cacheRef.current &&
+      cacheRef.current.wallet.toLowerCase() === address.toLowerCase() &&
+      cacheRef.current.expiresAt > now
+    ) {
+      return cacheRef.current.headers;
+    }
+
+    // Try localStorage
+    const stored = loadFromStorage();
+    if (stored && stored.wallet.toLowerCase() === address.toLowerCase()) {
+      cacheRef.current = stored;
+      setIsAuthenticated(true);
+      return stored.headers;
+    }
+
+    // Need fresh signature
+    await signIn();
+    return cacheRef.current!.headers;
+  }, [address, signIn]);
 
   const adminFetch = useCallback(async (input: RequestInfo | URL, init: RequestInit = {}) => {
     const authHeaders = await buildAdminHeaders();
@@ -100,15 +120,22 @@ export function useAdminAuth() {
       headers.set(key, value);
     }
 
-    return fetch(input, {
-      ...init,
-      headers,
-    });
+    return fetch(input, { ...init, headers });
   }, [buildAdminHeaders]);
+
+  const signOut = useCallback(() => {
+    cacheRef.current = null;
+    localStorage.removeItem(STORAGE_KEY);
+    setIsAuthenticated(false);
+  }, []);
 
   return {
     address,
     adminFetch,
     buildAdminHeaders,
+    signIn,
+    signOut,
+    isAuthenticated,
+    isSigningIn,
   };
 }

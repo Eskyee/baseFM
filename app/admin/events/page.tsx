@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { WalletConnect } from '@/components/WalletConnect';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import Link from 'next/link';
 import type { Event } from '@/types/event';
 
@@ -88,6 +89,7 @@ function SelectInput(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 
 export default function AdminEventsPage() {
   const { address, isConnected } = useAccount();
+  const { adminFetch, signIn, isAuthenticated, isSigningIn } = useAdminAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -99,7 +101,7 @@ export default function AdminEventsPage() {
   const checkAdmin = useCallback(async () => {
     if (!address) return;
     try {
-      const res = await fetch(`/api/admin/check?wallet=${address}`);
+      const res = await adminFetch(`/api/admin/check?wallet=${address}`);
       if (res.ok) {
         const data = await res.json();
         setIsAdmin(data.isAdmin);
@@ -107,7 +109,7 @@ export default function AdminEventsPage() {
     } catch {
       setIsAdmin(false);
     }
-  }, [address]);
+  }, [address, adminFetch]);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -124,11 +126,11 @@ export default function AdminEventsPage() {
   }, []);
 
   useEffect(() => {
-    if (isConnected && address) {
+    if (isConnected && isAuthenticated && address) {
       void checkAdmin();
       void fetchEvents();
     }
-  }, [isConnected, address, checkAdmin, fetchEvents]);
+  }, [isConnected, isAuthenticated, address, checkAdmin, fetchEvents]);
 
   const resetForm = () => {
     setForm(DEFAULT_FORM);
@@ -230,6 +232,29 @@ export default function AdminEventsPage() {
               </p>
             </div>
             <WalletConnect />
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+          <div className="basefm-panel p-8 text-center">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">Admin only</div>
+            <h1 className="text-3xl font-bold tracking-tight mb-4">Sign in to manage events</h1>
+            <p className="max-w-md mx-auto text-sm text-zinc-400 leading-relaxed mb-6">
+              Sign a message to verify your admin wallet.
+            </p>
+            <button
+              onClick={signIn}
+              disabled={isSigningIn}
+              className="basefm-button-primary"
+            >
+              {isSigningIn ? 'Check your wallet...' : 'Sign in as admin'}
+            </button>
           </div>
         </section>
       </main>

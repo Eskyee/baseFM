@@ -8,10 +8,10 @@ import { useStreams } from '@/hooks/useStreams';
 import { useDJAccess } from '@/hooks/useDJAccess';
 import { StreamCard } from '@/components/StreamCard';
 import { WalletConnect } from '@/components/WalletConnect';
+import { reportProductLearningEvent } from '@/lib/product-learning';
 import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 import { useToastActions } from '@/components/ui/Toast';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
-import { reportProductLearningEvent } from '@/lib/product-learning';
 
 function formatAddress(address?: string | null) {
   if (!address) return '';
@@ -42,6 +42,15 @@ export default function DashboardPage() {
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [xStreamKey, setXStreamKey] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('basefm_x_stream_key') || '';
+    return '';
+  });
+  const [youtubeRelayUrl, setYoutubeRelayUrl] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('basefm_youtube_relay_url') || '';
+    return '';
+  });
+  const [relaySaved, setRelaySaved] = useState(false);
 
   const { hasAccess, isAdmin, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
   const { streams, isLoading } = useStreams({
@@ -454,6 +463,8 @@ export default function DashboardPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <input
                     type="text"
+                    value={youtubeRelayUrl}
+                    onChange={(e) => setYoutubeRelayUrl(e.target.value)}
                     placeholder="https://youtube.com/@yourchannel/live"
                     className="w-full bg-zinc-950 border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono"
                   />
@@ -467,8 +478,15 @@ export default function DashboardPage() {
                   <p className="text-xs text-zinc-500">
                     Save the viewer/probe destination here. RTMP key management stays external for now.
                   </p>
-                  <button className="border border-zinc-700 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white">
-                    Save YouTube Relay
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('basefm_youtube_relay_url', youtubeRelayUrl);
+                      setRelaySaved(true);
+                      setTimeout(() => setRelaySaved(false), 2000);
+                    }}
+                    className="border border-zinc-700 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+                  >
+                    {relaySaved ? 'Saved!' : 'Save YouTube Relay'}
                   </button>
                 </div>
               </div>
@@ -494,11 +512,20 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-3">
                     <input
                       type="text"
+                      value={xStreamKey}
+                      onChange={(e) => setXStreamKey(e.target.value)}
                       placeholder="Your X stream key from studio.twitter.com"
                       className="flex-1 bg-zinc-950 border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono"
                     />
-                    <button className="border border-zinc-700 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white">
-                      Save
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('basefm_x_stream_key', xStreamKey);
+                        setRelaySaved(true);
+                        setTimeout(() => setRelaySaved(false), 2000);
+                      }}
+                      className="border border-zinc-700 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+                    >
+                      {relaySaved ? 'Saved!' : 'Save'}
                     </button>
                   </div>
                 </div>

@@ -88,7 +88,7 @@ function StatCard({ label, value, color }: { label: string; value: string | numb
 
 export default function AdminPage() {
   const { address, isConnected } = useAccount();
-  const { adminFetch } = useAdminAuth();
+  const { adminFetch, signIn, isAuthenticated, isSigningIn } = useAdminAuth();
   const [isClearing, setIsClearing] = useState(false);
   const [result, setResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -143,8 +143,8 @@ export default function AdminPage() {
   }, [adminFetch]);
 
   useEffect(() => {
-    if (isConnected) void fetchData();
-  }, [fetchData, isConnected]);
+    if (isConnected && isAuthenticated) void fetchData();
+  }, [fetchData, isConnected, isAuthenticated]);
 
   const handleMemberAction = async (memberId: string, action: 'verify' | 'unverify' | 'feature' | 'unfeature' | 'delete') => {
     setActionLoading(memberId + action);
@@ -208,6 +208,29 @@ export default function AdminPage() {
               Connect an admin wallet to manage the station.
             </p>
             <WalletConnect />
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen bg-black text-white font-mono pb-20 selection:bg-blue-500/30">
+        <section className="max-w-5xl mx-auto px-5 sm:px-6 py-16 sm:py-24">
+          <div className="basefm-panel p-8 text-center">
+            <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-3">Admin only</div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter uppercase mb-4">Admin Panel</h1>
+            <p className="max-w-md mx-auto text-sm text-zinc-400 leading-relaxed mb-6">
+              Sign a message to verify you're an admin. You'll only need to do this once every 20 minutes.
+            </p>
+            <button
+              onClick={signIn}
+              disabled={isSigningIn}
+              className="basefm-button-primary"
+            >
+              {isSigningIn ? 'Check your wallet...' : 'Sign in as admin'}
+            </button>
           </div>
         </section>
       </main>
