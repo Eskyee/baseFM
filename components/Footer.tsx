@@ -77,7 +77,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-zinc-900 text-center">
           <p className="text-[10px] uppercase tracking-widest text-zinc-600">
-            Created by RaveCulture for baseFM · powered by Agentbot · MIT License · 2026
+            Created by RaveCulture for baseFM · powered by Agentbot · OpenClaw 2026.4.27 · MIT License · 2026
           </p>
         </div>
 
