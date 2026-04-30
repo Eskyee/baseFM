@@ -9,6 +9,9 @@ import type { Event } from '@/types/event';
 
 type EventFormData = {
   name: string;
+  description: string;
+  location: string;
+  venue: string;
   startDate: string;
   startTime: string;
   endDate: string;
@@ -17,10 +20,15 @@ type EventFormData = {
   nftType: 'ERC721' | 'ERC1155';
   nftContract: string;
   artistAddress: string;
+  coverImageUrl: string;
+  tags: string;
 };
 
 const DEFAULT_FORM: EventFormData = {
   name: '',
+  description: '',
+  location: '',
+  venue: '',
   startDate: '',
   startTime: '',
   endDate: '',
@@ -29,6 +37,8 @@ const DEFAULT_FORM: EventFormData = {
   nftType: 'ERC1155',
   nftContract: '',
   artistAddress: '',
+  coverImageUrl: '',
+  tags: '',
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -97,6 +107,9 @@ export default function AdminEventsPage() {
   const [form, setForm] = useState<EventFormData>(DEFAULT_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<EventFormData>(DEFAULT_FORM);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const checkAdmin = useCallback(async () => {
     if (!address) return;
@@ -209,6 +222,88 @@ export default function AdminEventsPage() {
       }
     } catch {
       setResult({ error: 'Failed to update event' });
+    }
+  };
+
+  const startEditing = (event: Event) => {
+    setEditingId(event.id);
+    const startDate = new Date(event.startTime * 1000);
+    const endDate = new Date(event.endTime * 1000);
+    setEditForm({
+      name: event.name,
+      description: event.description || '',
+      location: event.location || '',
+      venue: event.venue || '',
+      startDate: startDate.toISOString().split('T')[0],
+      startTime: startDate.toTimeString().slice(0, 5),
+      endDate: endDate.toISOString().split('T')[0],
+      endTime: endDate.toTimeString().slice(0, 5),
+      maxSupply: event.maxSupply,
+      nftType: event.nftType,
+      nftContract: event.nftContract || '',
+      artistAddress: event.artistAddress || '',
+      coverImageUrl: event.coverImageUrl || '',
+      tags: event.tags?.join(', ') || '',
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditForm(DEFAULT_FORM);
+  };
+
+  const handleUpdate = async (eventId: string) => {
+    setIsUpdating(true);
+    setResult(null);
+    try {
+      const startTimestamp = Math.floor(
+        new Date(`${editForm.startDate}T${editForm.startTime}`).getTime() / 1000
+      );
+      const endTimestamp = Math.floor(
+        new Date(`${editForm.endDate}T${editForm.endTime}`).getTime() / 1000
+      );
+
+      if (endTimestamp <= startTimestamp) {
+        setResult({ error: 'End time must be after start time' });
+        setIsUpdating(false);
+        return;
+      }
+
+      const updates: Record<string, unknown> = {
+        name: editForm.name.trim(),
+        start_time: startTimestamp,
+        end_time: endTimestamp,
+        max_supply: editForm.maxSupply,
+        nft_type: editForm.nftType,
+      };
+
+      if (editForm.description) updates.description = editForm.description.trim();
+      if (editForm.location) updates.location = editForm.location.trim();
+      if (editForm.venue) updates.venue = editForm.venue.trim();
+      if (editForm.nftContract) updates.nft_contract = editForm.nftContract.trim();
+      if (editForm.artistAddress) updates.artist_address = editForm.artistAddress.trim();
+      if (editForm.coverImageUrl) updates.cover_image_url = editForm.coverImageUrl.trim();
+      if (editForm.tags) updates.tags = editForm.tags.split(',').map(t => t.trim()).filter(Boolean);
+
+      const res = await fetch('/api/events/admin-list', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address, eventId, updates }),
+      });
+
+      if (res.ok) {
+        setResult({ success: true, message: 'Event updated' });
+        setEditingId(null);
+        setEditForm(DEFAULT_FORM);
+        await fetchEvents();
+      } else {
+        const data = await res.json();
+        setResult({ error: data.error || 'Failed to update event' });
+      }
+    } catch {
+      setResult({ error: 'Failed to update event' });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -451,6 +546,12 @@ export default function AdminEventsPage() {
                       <StatusBadge status={event.status} />
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => editingId === event.id ? cancelEditing() : startEditing(event)}
+                        className="basefm-button-secondary !px-4 !py-2"
+                      >
+                        {editingId === event.id ? 'Cancel' : 'Edit'}
+                      </button>
                       {event.status === 'draft' ? (
                         <button
                           onClick={() => handleStatusChange(event.id, 'active')}
@@ -474,6 +575,110 @@ export default function AdminEventsPage() {
                     <span>{event.minted} / {event.maxSupply} passes issued</span>
                     <span>{event.nftType === 'ERC1155' ? 'Multi-pass' : 'Unique pass'}</span>
                   </div>
+
+                  {editingId === event.id ? (
+                    <div className="mt-4 pt-4 border-t border-zinc-900 grid gap-3">
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Name</label>
+                          <TextInput
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Venue</label>
+                          <TextInput
+                            value={editForm.venue}
+                            onChange={(e) => setEditForm({ ...editForm, venue: e.target.value })}
+                            placeholder="Venue name"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Description</label>
+                        <TextInput
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          placeholder="Event description"
+                        />
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Location</label>
+                          <TextInput
+                            value={editForm.location}
+                            onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                            placeholder="City, Country"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Cover Image URL</label>
+                          <TextInput
+                            value={editForm.coverImageUrl}
+                            onChange={(e) => setEditForm({ ...editForm, coverImageUrl: e.target.value })}
+                            placeholder="https://..."
+                          />
+                        </div>
+                      </div>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Start</label>
+                          <div className="flex gap-2">
+                            <TextInput type="date" value={editForm.startDate} onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })} />
+                            <TextInput type="time" value={editForm.startTime} onChange={(e) => setEditForm({ ...editForm, startTime: e.target.value })} />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">End</label>
+                          <div className="flex gap-2">
+                            <TextInput type="date" value={editForm.endDate} onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })} />
+                            <TextInput type="time" value={editForm.endTime} onChange={(e) => setEditForm({ ...editForm, endTime: e.target.value })} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Max Supply</label>
+                          <TextInput
+                            type="number"
+                            value={editForm.maxSupply}
+                            onChange={(e) => setEditForm({ ...editForm, maxSupply: Number(e.target.value) })}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">NFT Type</label>
+                          <SelectInput
+                            value={editForm.nftType}
+                            onChange={(e) => setEditForm({ ...editForm, nftType: e.target.value as 'ERC721' | 'ERC1155' })}
+                          >
+                            <option value="ERC1155">Multi-pass (ERC-1155)</option>
+                            <option value="ERC721">Unique pass (ERC-721)</option>
+                          </SelectInput>
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1 block">Tags</label>
+                          <TextInput
+                            value={editForm.tags}
+                            onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })}
+                            placeholder="jungle, dub, rave"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          onClick={() => handleUpdate(event.id)}
+                          disabled={isUpdating}
+                          className="basefm-button-primary !px-4 !py-2 disabled:cursor-not-allowed disabled:border-zinc-800 disabled:bg-zinc-800 disabled:text-zinc-500"
+                        >
+                          {isUpdating ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button onClick={cancelEditing} className="basefm-button-secondary !px-4 !py-2">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>

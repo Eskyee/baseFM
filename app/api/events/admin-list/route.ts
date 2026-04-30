@@ -95,18 +95,60 @@ export async function POST(req: NextRequest) {
 
 /**
  * PATCH /api/events/admin-list
- * Update event status
+ * Update event status or edit event details
  */
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { walletAddress, eventId, status } = body;
+    const { walletAddress, eventId, status, updates } = body;
 
     const denied = checkAdmin(walletAddress);
     if (denied) return denied;
 
-    if (!eventId || !status) {
-      return NextResponse.json({ error: 'eventId and status are required' }, { status: 400 });
+    if (!eventId) {
+      return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
+    }
+
+    const db = createServerClient();
+
+    // Full edit mode — updates object with event detail fields
+    if (updates && typeof updates === 'object') {
+      const allowedFields = [
+        'name', 'title', 'subtitle', 'description', 'location', 'venue',
+        'address', 'city', 'country', 'event_type', 'start_time', 'end_time',
+        'display_date', 'max_supply', 'nft_type', 'nft_contract',
+        'artist_address', 'stream_url', 'cover_image_url', 'image_url',
+        'tags', 'headliners', 'ticket_url', 'ticket_price', 'genres',
+        'promoter_id', 'status',
+      ];
+
+      const updateData: Record<string, unknown> = {};
+      for (const key of allowedFields) {
+        if (key in updates) {
+          updateData[key] = updates[key];
+        }
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+      }
+
+      const { error } = await db
+        .from('events')
+        .update(updateData)
+        .eq('id', eventId);
+
+      if (error) {
+        console.error('Failed to update event:', error);
+        return NextResponse.json({ error: 'Failed to update event' }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    // Legacy status-only mode
+    if (!status) {
+      return NextResponse.json({ error: 'status or updates required' }, { status: 400 });
     }
 
     const validStatuses = ['draft', 'active', 'ended'];
@@ -114,7 +156,6 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
-    const db = createServerClient();
     const { error } = await db
       .from('events')
       .update({ status })
