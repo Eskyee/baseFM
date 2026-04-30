@@ -455,6 +455,41 @@ export default function DashboardPage() {
                   </button>
                 </div>
               </div>
+
+              {/* X (Twitter) Relay */}
+              <div className="mt-4 border border-zinc-800 bg-black p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600">X (Twitter) Live</div>
+                  <span className="px-2 py-0.5 text-[10px] uppercase tracking-widest border border-zinc-700 bg-black text-zinc-400">Optional</span>
+                </div>
+                <div className="grid gap-px bg-zinc-900 sm:grid-cols-2">
+                  <div className="bg-black p-4">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">RTMP URL</div>
+                    <code className="block text-xs text-zinc-300 break-all select-all">rtmp://ie.pscp.tv:80/x</code>
+                  </div>
+                  <div className="bg-black p-4">
+                    <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">RTMPS URL</div>
+                    <code className="block text-xs text-zinc-300 break-all select-all">rtmps://ie.pscp.tv:443/x</code>
+                  </div>
+                </div>
+                <div className="mt-px bg-black p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-600 mb-2">Stream Key</div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="Your X stream key from studio.twitter.com"
+                      className="flex-1 bg-zinc-950 border border-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-zinc-600 font-mono"
+                    />
+                    <button className="border border-zinc-700 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white">
+                      Save
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 text-xs text-zinc-500 space-y-1">
+                  <p>Region: EU (Ireland) · Recommended: 1080p30, 9Mbps video, 128kbps AAC, keyframe every 3s</p>
+                  <p>Get your stream key from <a href="https://studio.twitter.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-white transition-colors">studio.twitter.com</a> → Go Live</p>
+                </div>
+              </div>
             </div>
 
             {/* Emergency Reset */}
