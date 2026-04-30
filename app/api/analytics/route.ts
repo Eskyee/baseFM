@@ -14,16 +14,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Wallet required' }, { status: 400 });
     }
 
-    // Allow users to view their own analytics, or admins to view anyone's
-    const isOwnAnalytics = requestingWallet === wallet.toLowerCase();
-    const isAdminUser = requestingWallet ? isAdmin(requestingWallet) : false;
-
-    if (!isOwnAnalytics && !isAdminUser) {
-      return NextResponse.json(
-        { error: 'You can only view your own analytics' },
-        { status: 403 }
-      );
-    }
+    // Analytics are public — anyone can view a DJ's stats
 
     const supabase = createServerClient();
 
@@ -44,12 +35,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Get all streams for this DJ
-    const { data: streams } = await supabase
+    // Get all streams for this DJ (try dj_id first, fallback to wallet)
+    let { data: streams } = await supabase
       .from('streams')
       .select('*')
       .eq('dj_id', dj.id)
       .order('created_at', { ascending: false });
+
+    if (!streams || streams.length === 0) {
+      const result = await supabase
+        .from('streams')
+        .select('*')
+        .eq('dj_wallet_address', wallet.toLowerCase())
+        .order('created_at', { ascending: false });
+      streams = result.data;
+    }
 
     if (!streams || streams.length === 0) {
       return NextResponse.json({
