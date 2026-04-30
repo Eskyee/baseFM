@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSignature, getAdminWallets } from '@/lib/admin/config';
+import { recordProductLearningEvent } from '@/lib/db/product-learning';
 
 /**
  * Admin authentication middleware with cryptographic signature verification.
@@ -51,6 +52,14 @@ export async function requireAdmin(request: NextRequest): Promise<NextResponse |
     const isValidSignature = await verifyAdminSignature(wallet, signature, nonce, timestamp);
     if (!isValidSignature) {
       console.warn(`Invalid admin signature attempt from wallet: ${wallet}`);
+      recordProductLearningEvent({
+        eventType: 'admin_signature_invalid',
+        severity: 'error',
+        surface: 'admin',
+        route: request.nextUrl.pathname,
+        walletAddress: wallet,
+        details: `Invalid signature from ${wallet}`,
+      }).catch(() => {});
       return NextResponse.json(
         { error: 'Unauthorized - Invalid signature' },
         { status: 401 }
@@ -63,6 +72,14 @@ export async function requireAdmin(request: NextRequest): Promise<NextResponse |
     const fiveMinutes = 5 * 60 * 1000;
     
     if (Math.abs(now - requestTime) > fiveMinutes) {
+      recordProductLearningEvent({
+        eventType: 'admin_auth_expired',
+        severity: 'warning',
+        surface: 'admin',
+        route: request.nextUrl.pathname,
+        walletAddress: wallet,
+        details: `Auth timestamp expired for ${wallet}`,
+      }).catch(() => {});
       return NextResponse.json(
         { error: 'Unauthorized - Request timestamp expired. Please refresh and try again.' },
         { status: 401 }

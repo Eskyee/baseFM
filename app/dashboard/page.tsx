@@ -11,6 +11,7 @@ import { WalletConnect } from '@/components/WalletConnect';
 import { TokenSurfacePanel } from '@/components/TokenSurfacePanel';
 import { useToastActions } from '@/components/ui/Toast';
 import { DJ_TOKEN_CONFIG } from '@/lib/token/config';
+import { reportProductLearningEvent } from '@/lib/product-learning';
 
 function formatAddress(address?: string | null) {
   if (!address) return '';
@@ -70,7 +71,15 @@ export default function DashboardPage() {
       router.refresh();
     } catch (error) {
       console.error('Cleanup error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to clear stale streams');
+      const msg = error instanceof Error ? error.message : 'Failed to clear stale streams';
+      reportProductLearningEvent('dashboard-cleanup-error', {
+        eventType: 'cleanup_error',
+        severity: 'warning',
+        surface: 'dashboard',
+        route: '/dashboard',
+        details: msg,
+      });
+      toast.error(msg);
     } finally {
       setIsCleaning(false);
     }
@@ -105,7 +114,15 @@ export default function DashboardPage() {
 
       router.push(`/dashboard/stream/${data.stream.id}`);
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Failed to arm broadcast');
+      const msg = error instanceof Error ? error.message : 'Failed to arm broadcast';
+      reportProductLearningEvent('dashboard-arm-error', {
+        eventType: 'arm_broadcast_error',
+        severity: 'error',
+        surface: 'dashboard',
+        route: '/dashboard',
+        details: msg,
+      });
+      setFormError(msg);
     } finally {
       setIsArming(false);
     }

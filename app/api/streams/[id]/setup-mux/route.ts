@@ -4,6 +4,7 @@ import { createMuxLiveStream, getMuxPlaybackUrl, isMuxConfigured } from '@/lib/s
 import { verifyWalletSignature } from '@/lib/auth/wallet';
 import { getBillingPricing } from '@/lib/billing/config';
 import { getStreamBillingSummary, upsertStreamBillingSession } from '@/lib/db/billing';
+import { recordProductLearningEvent } from '@/lib/db/product-learning';
 
 export async function POST(
   request: NextRequest,
@@ -111,6 +112,14 @@ export async function POST(
   } catch (error) {
     console.error('Error setting up Mux for stream:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    recordProductLearningEvent({
+      eventType: 'mux_setup_error',
+      severity: 'error',
+      surface: 'stream-control',
+      route: `/api/streams/${params.id}/setup-mux`,
+      streamId: params.id,
+      details: errorMessage,
+    }).catch(() => {});
     return NextResponse.json(
       { error: `Failed to setup streaming: ${errorMessage}` },
       { status: 500 }

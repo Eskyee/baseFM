@@ -5,6 +5,7 @@ import { getBillingPricing, getPlatformWalletAddress } from '@/lib/billing/confi
 import { getStreamBillingSummary, recordStreamSessionPayment } from '@/lib/db/billing';
 import { verifyUsdcTransfer } from '@/lib/onchain/verify-transaction';
 import { isValidTxHash, isValidWalletAddress } from '@/lib/validation';
+import { recordProductLearningEvent } from '@/lib/db/product-learning';
 
 export async function GET(
   _request: NextRequest,
@@ -67,6 +68,15 @@ export async function POST(
     );
 
     if (!verification.verified) {
+      recordProductLearningEvent({
+        eventType: 'payment_verification_failed',
+        severity: 'warning',
+        surface: 'billing',
+        route: `/api/billing/streams/${params.id}`,
+        walletAddress,
+        streamId: params.id,
+        details: verification.error || 'USDC transfer verification failed',
+      }).catch(() => {});
       return NextResponse.json(
         { error: `Stream session payment verification failed: ${verification.error}` },
         { status: 400 }
@@ -82,6 +92,13 @@ export async function POST(
     return NextResponse.json({ session });
   } catch (error) {
     console.error('Error recording stream session payment:', error);
+    recordProductLearningEvent({
+      eventType: 'payment_record_error',
+      severity: 'error',
+      surface: 'billing',
+      route: `/api/billing/streams/${params.id}`,
+      details: error instanceof Error ? error.message : 'Failed to record payment',
+    }).catch(() => {});
     return NextResponse.json({ error: 'Failed to record stream session payment' }, { status: 500 });
   }
 }

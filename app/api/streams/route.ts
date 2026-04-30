@@ -5,6 +5,7 @@ import { updateStreamWithMuxDetails } from '@/lib/db/streams';
 import { isValidWalletAddress } from '@/lib/auth/wallet';
 import { fetchAgentbotLiveStreams } from '@/lib/agentbot/live';
 import { StreamStatus } from '@/types/stream';
+import { recordProductLearningEvent } from '@/lib/db/product-learning';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -35,6 +36,13 @@ export async function GET(request: NextRequest) {
         )
       } catch (error) {
         console.error('[baseFM] Agentbot live fallback failed, using local DB:', error)
+        recordProductLearningEvent({
+          eventType: 'agentbot_live_fallback',
+          severity: 'warning',
+          surface: 'streams',
+          route: '/api/streams',
+          details: error instanceof Error ? error.message : 'Agentbot live fetch failed',
+        }).catch(() => {});
       }
     }
 
@@ -47,6 +55,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ streams }, { headers: NO_CACHE });
   } catch (error) {
     console.error('Error fetching streams:', error);
+    recordProductLearningEvent({
+      eventType: 'stream_fetch_error',
+      severity: 'error',
+      surface: 'streams',
+      route: '/api/streams',
+      details: error instanceof Error ? error.message : 'Failed to fetch streams',
+    }).catch(() => {});
     return NextResponse.json(
       { error: 'Failed to fetch streams' },
       { status: 500, headers: NO_CACHE }
@@ -118,6 +133,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ stream: updatedStream }, { status: 201 });
   } catch (error) {
     console.error('Error creating stream:', error);
+    recordProductLearningEvent({
+      eventType: 'stream_creation_error',
+      severity: 'error',
+      surface: 'streams',
+      route: '/api/streams',
+      details: error instanceof Error ? error.message : 'Failed to create stream',
+      streamId: streamId || undefined,
+    }).catch(() => {});
 
     // If we created the stream but Mux failed, clean up the orphaned stream
     if (streamId) {

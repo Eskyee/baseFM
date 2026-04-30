@@ -9,6 +9,7 @@ import { WalletConnect } from '@/components/WalletConnect';
 
 import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
 import Link from 'next/link';
+import { reportProductLearningEvent } from '@/lib/product-learning';
 
 const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as const;
 const USDC_DECIMALS = 6;
@@ -83,7 +84,15 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       const data = await response.json();
       setBilling(data.billing || null);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to fetch billing status');
+      const msg = err instanceof Error ? err.message : 'Failed to fetch billing status';
+      reportProductLearningEvent(`billing-fetch-${stream?.id}`, {
+        eventType: 'billing_fetch_error',
+        severity: 'warning',
+        surface: 'stream-control',
+        route: `/dashboard/stream/${stream?.id}`,
+        details: msg,
+      });
+      setActionError(msg);
     } finally {
       setIsBillingLoading(false);
     }
@@ -129,7 +138,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
         );
         await fetchBilling();
       } catch (err) {
-        setActionError(err instanceof Error ? err.message : 'Failed to record billing payment');
+        const msg = err instanceof Error ? err.message : 'Failed to record billing payment';
+        reportProductLearningEvent(`billing-record-${stream?.id}`, {
+          eventType: 'billing_record_error',
+          severity: 'error',
+          surface: 'stream-control',
+          route: `/dashboard/stream/${stream?.id}`,
+          streamId: stream?.id,
+          details: msg,
+        });
+        setActionError(msg);
       } finally {
         setBillingAction(null);
         setIsRecordingBilling(false);
@@ -175,7 +193,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       refetch();
       void fetchBilling();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unknown error');
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      reportProductLearningEvent(`stream-start-${stream!.id}`, {
+        eventType: 'stream_start_error',
+        severity: 'error',
+        surface: 'stream-control',
+        route: `/dashboard/stream/${stream!.id}`,
+        streamId: stream!.id,
+        details: msg,
+      });
+      setActionError(msg);
     } finally {
       setIsStarting(false);
     }
@@ -199,7 +226,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       refetch();
       void fetchBilling();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unknown error');
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      reportProductLearningEvent(`stream-stop-${stream!.id}`, {
+        eventType: 'stream_stop_error',
+        severity: 'warning',
+        surface: 'stream-control',
+        route: `/dashboard/stream/${stream!.id}`,
+        streamId: stream!.id,
+        details: msg,
+      });
+      setActionError(msg);
     } finally {
       setIsStopping(false);
     }
@@ -224,7 +260,16 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
       refetch();
       void fetchBilling();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unknown error');
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      reportProductLearningEvent(`mux-setup-${stream!.id}`, {
+        eventType: 'mux_setup_error',
+        severity: 'error',
+        surface: 'stream-control',
+        route: `/dashboard/stream/${stream!.id}`,
+        streamId: stream!.id,
+        details: msg,
+      });
+      setActionError(msg);
     } finally {
       setIsSettingUpMux(false);
     }
