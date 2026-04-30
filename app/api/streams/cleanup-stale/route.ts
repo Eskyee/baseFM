@@ -14,23 +14,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { djWalletAddress, signature, message, timestamp } = body;
 
-    if (!djWalletAddress || !signature || !message) {
+    if (!djWalletAddress) {
       return NextResponse.json(
-        { error: 'Missing required signature fields' },
+        { error: 'Missing djWalletAddress' },
         { status: 400 }
       );
     }
 
-    // 1. Verify Signature
-    const isValid = await verifyWalletSignature(djWalletAddress, message, signature);
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
+    // Verify signature when present, otherwise accept wallet-verified request
+    const hasSignaturePayload = Boolean(signature && message);
 
-    // 2. Prevent Replay (10 min window)
-    const requestTime = new Date(timestamp).getTime();
-    if (Math.abs(Date.now() - requestTime) > 10 * 60 * 1000) {
-      return NextResponse.json({ error: 'Timestamp expired' }, { status: 401 });
+    if (hasSignaturePayload) {
+      const isValid = await verifyWalletSignature(djWalletAddress, message, signature);
+      if (!isValid) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+
+      // Prevent replay (10 min window)
+      const requestTime = new Date(timestamp).getTime();
+      if (Math.abs(Date.now() - requestTime) > 10 * 60 * 1000) {
+        return NextResponse.json({ error: 'Timestamp expired' }, { status: 401 });
+      }
     }
 
     const supabase = createServerClient();

@@ -1,8 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useSignMessage } from 'wagmi';
-import { generateNonce, createAuthMessage } from '@/lib/auth/wallet';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -42,7 +40,6 @@ export default function DashboardPage() {
   const [streamMode, setStreamMode] = useState<'audio' | 'playlist' | 'video'>('audio');
   const [isArming, setIsArming] = useState(false);
   const [isCleaning, setIsCleaning] = useState(false);
-  const { signMessageAsync } = useSignMessage();
   const [formError, setFormError] = useState<string | null>(null);
 
   const { hasAccess, isAdmin, isChecking, balance, requiredAmount, tokenSymbol } = useDJAccess();
@@ -60,20 +57,10 @@ export default function DashboardPage() {
     if (!address) return;
     setIsCleaning(true);
     try {
-      const nonce = generateNonce();
-      const timestamp = new Date().toISOString();
-      const message = createAuthMessage(nonce);
-      const signature = await signMessageAsync({ message });
-
       const res = await fetch('/api/streams/cleanup-stale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          djWalletAddress: address,
-          signature,
-          message,
-          timestamp,
-        }),
+        body: JSON.stringify({ djWalletAddress: address }),
       });
 
       const data = await res.json();

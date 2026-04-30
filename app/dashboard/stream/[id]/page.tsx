@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { parseUnits } from 'viem';
-import { useAccount, useSignMessage, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { useStream } from '@/hooks/useStream';
 import { useDJAccess } from '@/hooks/useDJAccess';
 import { WalletConnect } from '@/components/WalletConnect';
-import { createStreamActionMessage, generateNonce, StreamAction } from '@/lib/auth/wallet';
+
 import { ERC20_TRANSFER_ABI } from '@/lib/token/tip-config';
 import Link from 'next/link';
 
@@ -55,7 +55,7 @@ function formatAddress(address?: string | null) {
 
 export default function DJStreamControlPage({ params }: { params: { id: string } }) {
   const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+
   const { stream, isLoading, error, refetch } = useStream(params.id);
   const { isAdmin } = useDJAccess();
   const { writeContract, data: billingTxHash, isPending: isBillingPending, error: billingWriteError } = useWriteContract();
@@ -154,14 +154,7 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     });
   };
 
-  const createSignedPayload = async (action: StreamAction) => {
-    if (!address) throw new Error('Connect your wallet to continue');
-    const nonce = generateNonce();
-    const timestamp = new Date().toISOString();
-    const message = createStreamActionMessage(action, stream!.id, nonce, timestamp);
-    const signature = await signMessageAsync({ message });
-    return { djWalletAddress: address, signature, message, nonce, timestamp };
-  };
+
 
   const handleStart = async () => {
     setIsStarting(true);
@@ -193,11 +186,10 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setActionError(null);
     setActionSuccess(null);
     try {
-      const signedPayload = await createSignedPayload('stop');
       const response = await fetch(`/api/streams/${stream!.id}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signedPayload),
+        body: JSON.stringify({ djWalletAddress: address }),
       });
       if (!response.ok) {
         const data = await response.json();
@@ -218,11 +210,10 @@ export default function DJStreamControlPage({ params }: { params: { id: string }
     setActionError(null);
     setActionSuccess(null);
     try {
-      const signedPayload = await createSignedPayload('setup');
       const response = await fetch(`/api/streams/${stream!.id}/setup-mux`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signedPayload),
+        body: JSON.stringify({ djWalletAddress: address }),
       });
       const data = await response.json();
       if (!response.ok) {
