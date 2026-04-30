@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import {
   createAdminAuthMessage,
@@ -21,6 +21,22 @@ export function useAdminAuth() {
   const { signMessageAsync } = useSignMessage();
   const cacheRef = useRef<CachedHeaders | null>(null);
   const inFlightRef = useRef<Promise<Record<string, string>> | null>(null);
+
+  // Clear cached signature when the wallet disconnects or switches.
+  // Without this, signing out and reconnecting the same wallet within the
+  // 4-min cache window would skip re-signing — a stale admin session.
+  useEffect(() => {
+    const current = cacheRef.current;
+    if (!address) {
+      cacheRef.current = null;
+      inFlightRef.current = null;
+      return;
+    }
+    if (current && current.wallet.toLowerCase() !== address.toLowerCase()) {
+      cacheRef.current = null;
+      inFlightRef.current = null;
+    }
+  }, [address]);
 
   const buildAdminHeaders = useCallback(async () => {
     if (!address) {
