@@ -20,6 +20,7 @@ export function useAdminAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const cacheRef = useRef<CachedHeaders | null>(null);
+  const inFlightRef = useRef<Promise<Record<string, string>> | null>(null);
 
   const buildAdminHeaders = useCallback(async () => {
     if (!address) {
@@ -35,25 +36,41 @@ export function useAdminAuth() {
       return cacheRef.current.headers;
     }
 
-    const nonce = generateAdminNonce();
-    const timestamp = getAdminAuthTimestamp();
-    const message = createAdminAuthMessage(nonce, timestamp);
-    const signature = await signMessageAsync({ message });
+    // Single-flight: if a signature request is already in progress for this
+    // wallet, every concurrent caller awaits the same promise instead of
+    // popping its own wallet window.
+    if (inFlightRef.current) {
+      return inFlightRef.current;
+    }
 
-    const headers = {
-      'x-wallet-address': address,
-      'x-signature': signature,
-      'x-nonce': nonce,
-      'x-timestamp': timestamp,
-    };
+    const promise = (async () => {
+      const nonce = generateAdminNonce();
+      const timestamp = getAdminAuthTimestamp();
+      const message = createAdminAuthMessage(nonce, timestamp);
+      const signature = await signMessageAsync({ message });
 
-    cacheRef.current = {
-      wallet: address,
-      expiresAt: now + ADMIN_AUTH_CACHE_MS,
-      headers,
-    };
+      const headers = {
+        'x-wallet-address': address,
+        'x-signature': signature,
+        'x-nonce': nonce,
+        'x-timestamp': timestamp,
+      };
 
-    return headers;
+      cacheRef.current = {
+        wallet: address,
+        expiresAt: Date.now() + ADMIN_AUTH_CACHE_MS,
+        headers,
+      };
+
+      return headers;
+    })();
+
+    inFlightRef.current = promise;
+    try {
+      return await promise;
+    } finally {
+      inFlightRef.current = null;
+    }
   }, [address, signMessageAsync]);
 
   const adminFetch = useCallback(async (input: RequestInfo | URL, init: RequestInit = {}) => {
