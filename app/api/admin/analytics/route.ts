@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       // Total DJs
       supabase.from('djs').select('id', { count: 'exact', head: true }),
       // Total community members
-      supabase.from('community_members').select('id', { count: 'exact', head: true }),
+      supabase.from('members').select('id', { count: 'exact', head: true }),
       // Total tips (last 30 days)
       supabase.from('tips').select('amount').gte('created_at', thirtyDaysAgo).eq('status', 'confirmed'),
       // Chat messages (last 7 days)
