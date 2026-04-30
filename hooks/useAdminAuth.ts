@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import {
   createAdminAuthMessage,
@@ -16,25 +16,28 @@ type CachedHeaders = {
 
 const ADMIN_AUTH_CACHE_MS = 4 * 60 * 1000;
 
+// Module-level state so the cached signature survives navigation between
+// admin pages (which each remount their own component). Without this, every
+// nav would drop the cache and prompt a fresh sign popup.
+let cachedHeaders: CachedHeaders | null = null;
+let inFlight: Promise<Record<string, string>> | null = null;
+
 export function useAdminAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const cacheRef = useRef<CachedHeaders | null>(null);
-  const inFlightRef = useRef<Promise<Record<string, string>> | null>(null);
 
   // Clear cached signature when the wallet disconnects or switches.
   // Without this, signing out and reconnecting the same wallet within the
   // 4-min cache window would skip re-signing — a stale admin session.
   useEffect(() => {
-    const current = cacheRef.current;
     if (!address) {
-      cacheRef.current = null;
-      inFlightRef.current = null;
+      cachedHeaders = null;
+      inFlight = null;
       return;
     }
-    if (current && current.wallet.toLowerCase() !== address.toLowerCase()) {
-      cacheRef.current = null;
-      inFlightRef.current = null;
+    if (cachedHeaders && cachedHeaders.wallet.toLowerCase() !== address.toLowerCase()) {
+      cachedHeaders = null;
+      inFlight = null;
     }
   }, [address]);
 
@@ -45,18 +48,18 @@ export function useAdminAuth() {
 
     const now = Date.now();
     if (
-      cacheRef.current &&
-      cacheRef.current.wallet.toLowerCase() === address.toLowerCase() &&
-      cacheRef.current.expiresAt > now
+      cachedHeaders &&
+      cachedHeaders.wallet.toLowerCase() === address.toLowerCase() &&
+      cachedHeaders.expiresAt > now
     ) {
-      return cacheRef.current.headers;
+      return cachedHeaders.headers;
     }
 
     // Single-flight: if a signature request is already in progress for this
     // wallet, every concurrent caller awaits the same promise instead of
     // popping its own wallet window.
-    if (inFlightRef.current) {
-      return inFlightRef.current;
+    if (inFlight) {
+      return inFlight;
     }
 
     const promise = (async () => {
@@ -72,7 +75,7 @@ export function useAdminAuth() {
         'x-timestamp': timestamp,
       };
 
-      cacheRef.current = {
+      cachedHeaders = {
         wallet: address,
         expiresAt: Date.now() + ADMIN_AUTH_CACHE_MS,
         headers,
@@ -81,11 +84,11 @@ export function useAdminAuth() {
       return headers;
     })();
 
-    inFlightRef.current = promise;
+    inFlight = promise;
     try {
       return await promise;
     } finally {
-      inFlightRef.current = null;
+      inFlight = null;
     }
   }, [address, signMessageAsync]);
 
