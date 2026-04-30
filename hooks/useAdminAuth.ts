@@ -16,6 +16,12 @@ type CachedHeaders = {
 
 const ADMIN_AUTH_CACHE_MS = 4 * 60 * 1000;
 
+// Module-level state so the cached signature survives navigation between
+// admin pages (which each remount their own component). Without this, every
+// nav would drop the cache and prompt a fresh sign popup.
+let cachedHeaders: CachedHeaders | null = null;
+let inFlight: Promise<Record<string, string>> | null = null;
+
 export function useAdminAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
@@ -45,11 +51,11 @@ export function useAdminAuth() {
 
     const now = Date.now();
     if (
-      cacheRef.current &&
-      cacheRef.current.wallet.toLowerCase() === address.toLowerCase() &&
-      cacheRef.current.expiresAt > now
+      cachedHeaders &&
+      cachedHeaders.wallet.toLowerCase() === address.toLowerCase() &&
+      cachedHeaders.expiresAt > now
     ) {
-      return cacheRef.current.headers;
+      return cachedHeaders.headers;
     }
 
     // Single-flight: if a signature request is already in progress for this
